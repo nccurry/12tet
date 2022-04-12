@@ -1,0 +1,33 @@
+{
+  "name": "musicomatic",
+  "version": "0.0.1",
+  "description": "Music theory library for generating and working with chords, modes, intervals, etc.",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "npx ts-node src/index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "github.com/nccurry/musicomatic"
+  },
+  "keywords": [
+    "music",
+    "theory",
+    "chords",
+    "notes",
+    "intervals"
+  ],
+  "author": "Nick Curry <code@nickcurry.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.18.0",
+    "@typescript-eslint/parser": "^5.18.0",
+    "eslint": "^8.12.0",
+    "typescript": "^4.6.3"
+  }
+}
