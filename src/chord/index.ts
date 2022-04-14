@@ -1,25 +1,32 @@
-import { ModeKeyNote } from "../mode"
-import { interval, IntervalData, IntervalDistance, ShortIntervalName } from "../interval"
+import { ModeKeyNote, ModeName } from "../mode"
+import {
+  interval as i,
+  Interval,
+  IntervalDistance,
+  IntervalIdentifier,
+  IntervalName,
+  ShortIntervalName
+} from "../interval"
 import { getEvenArrayElements, getEvenNumbers, normalizeValue, removeDuplicates } from "../utils"
 
 // Types
 
-export const diatonicChordType = ['maj', 'min', 'dim']
+export const diatonicChordType = ['maj', 'min', 'dim'] as const
 export type DiatonicChordType = typeof diatonicChordType[number]
 
-export const chordType = [...diatonicChordType, 'dom', 'sus2', 'sus4', 'aug', 'dimsus2', 'dimsus4', 'augsus2', 'augsus4']
+export const chordType = [...diatonicChordType, 'dom', 'sus2', 'sus4', 'aug', 'dimsus2', 'dimsus4', 'augsus2', 'augsus4'] as const
 export type ChordType = typeof chordType[number]
 
-export const chordAdditions = ['add2', 'add4', 'add6', 'add9', 'add11', 'add13']
+export const chordAdditions = ['add2', 'add4', 'add6', 'add9', 'add11', 'add13'] as const
 export type ChordAddition = typeof chordAdditions[number]
 
-export const chordAlteration = ['b2', '#2', 'b3', '#3', 'b4', '#4', 'b5', '#5', 'b6', '#6', 'b7', '#7', 'b9', '#9', 'b11', '#11', 'b13']
+export const chordAlteration = ['b1', '#1', 'b2', '#2', 'b3', '#3', 'b4', '#4', 'b5', '#5', 'b6', '#6', 'b7', '#7', 'b9', '#9', 'b11', '#11', 'b13', '#13'] as const
 export type ChordAlteration = typeof chordAlteration[number]
 
 export const chordExtensions = [5, 7, 9, 11, 13] as const
 export type ChordExtension = typeof chordExtensions[number]
 
-export const chordDegreeNumbers = [1, 2, 3, 4, 5, 6, 7, 9, 11, 13]
+export const chordDegreeNumbers = [1, 2, 3, 4, 5, 6, 7, 9, 11, 13] as const
 export type ChordDegreeNumber = typeof chordDegreeNumbers[number]
 
 // https://en.wikipedia.org/wiki/Roman_numeral_analysis#Modes
@@ -58,8 +65,8 @@ const chordDefaults: Required<Chord> = {
 // Data
 
 // Tone intervals in chord bases
-const chordTypeIntervals: { [key in ChordType]: IntervalDistance[] } = {
-  // 1, 3, 5, 7, 9, 11, 13
+const chordTypeIntervals: Record<ChordType, IntervalDistance[]> = {
+  // 1, 2, 3, 4, 5, 6, 7
   maj: [0, 2, 4, 5, 7, 9, 11],
   // b3, b7
   min: [0, 2, 3, 5, 7, 9, 10],
@@ -83,39 +90,9 @@ const chordTypeIntervals: { [key in ChordType]: IntervalDistance[] } = {
   augsus4: [0, 2, 5, 5, 8, 9, 11]
 }
 
-const chordAdditionIntervals: { [key in ChordAddition]: { degree: ChordDegreeNumber, interval: IntervalDistance } } = {
-  add2: { degree: 2, interval: 2 },
-  add4: { degree: 4, interval: 5 },
-  add6: { degree: 6, interval: 9 },
-  add9: { degree: 9, interval: 14 },
-  add11: { degree: 11, interval: 17 },
-  add13: { degree: 13, interval: 21 }
-}
-
-const chordAlterationInterval: { [key in ChordAlteration]: { degree: ChordDegreeNumber, baseInterval: IntervalDistance, alteredInterval: IntervalDistance } } = {
-  b2: { degree: 2, baseInterval: 2, alteredInterval: 1 },
-  '#2': { degree: 2, baseInterval: 2, alteredInterval: 3 },
-  b3: { degree: 3, baseInterval: 4, alteredInterval: 3 },
-  '#3': { degree: 3, baseInterval: 4, alteredInterval: 5 },
-  b4: { degree: 4, baseInterval: 5, alteredInterval: 4 },
-  '#4': { degree: 4, baseInterval: 5, alteredInterval: 6 },
-  b5: { degree: 5, baseInterval: 7, alteredInterval: 6 },
-  '#5': { degree: 5, baseInterval: 7, alteredInterval: 8 },
-  b6: { degree: 6, baseInterval: 9, alteredInterval: 8 },
-  '#6': { degree: 6, baseInterval: 9, alteredInterval: 10 },
-  b7: { degree: 7, baseInterval: 11, alteredInterval: 10 },
-  '#7': { degree: 7, baseInterval: 11, alteredInterval: 12 },
-  b9: { degree: 9, baseInterval: 14, alteredInterval: 13 },
-  '#9': { degree: 9, baseInterval: 14, alteredInterval: 15 },
-  b11: { degree: 11, baseInterval: 17, alteredInterval: 16 },
-  '#11': { degree: 11, baseInterval: 17, alteredInterval: 18 },
-  b13: { degree: 13, baseInterval: 21, alteredInterval: 20 }
-}
-
 // Functions
 
-function getAlterationInterval (chordType: ChordType, alteration: ChordAlteration): IntervalDistance {
-  const degree = Number(alteration[1])
+function getAlterationIntervals (chordType: ChordType, alteration: ChordAlteration): { base: IntervalDistance, altered: IntervalDistance } {
   const accidental = alteration[0]
   let adjustment = 0
   if (accidental === "#") {
@@ -123,7 +100,11 @@ function getAlterationInterval (chordType: ChordType, alteration: ChordAlteratio
   } else if (accidental === "b") {
     adjustment -= 1
   }
-  return chordTypeIntervals[chordType][normalizeValue(degree - 1 + adjustment, 12)]
+  const degreeIndex = normalizeValue(Number(alteration[1]) - 1, 7)
+  return {
+    base: chordTypeIntervals[chordType][degreeIndex],
+    altered: normalizeValue(chordTypeIntervals[chordType][degreeIndex] + adjustment, 12)
+  }
 }
 
 function getAdditionInterval (chordType: ChordType, addition: ChordAddition): IntervalDistance {
@@ -139,16 +120,21 @@ function createChordWithDefaults (partialChord: Partial<Chord>): Required<Chord>
   return chord
 }
 
+
+// function getChordIntervalFromKeyNote(chordType: ChordType, note: ModeKeyNote): IntervalData {
+//   const chordKeyNotes =
+// }
+
 export const chord = {
   setDefaults: createChordWithDefaults,
   notes: function (chord: Chord): ModeKeyNote[] {
     return []
   },
-  intervals: function (chord: Chord): IntervalData[] {
+  intervals: function (chord: Chord): Interval[] {
     const chordWithDefaults = createChordWithDefaults(chord)
 
     // Get base chord intervals based on extension
-    const chordIntervals: IntervalDistance[] = []
+    let chordIntervals: IntervalDistance[] = []
     for (let i = 0; i < chordWithDefaults.extension; i++) {
       if (i % 2 === 0) {
         chordIntervals.push(chordTypeIntervals[chordWithDefaults.type][normalizeValue(i, 7)])
@@ -161,21 +147,25 @@ export const chord = {
     })
 
     // Replace chord alteration intervals
-    const alteredIntervals = chordIntervals.map(interval => {
-      let newInterval = interval
-      chordWithDefaults.alterations.forEach(alteration => {
-        if (interval === chordAlterationInterval[alteration].baseInterval) {
-          newInterval = getAlterationInterval(chordWithDefaults.type, alteration)
+    chordWithDefaults.alterations.forEach(alteration => {
+      const intervals = getAlterationIntervals(chordWithDefaults.type, alteration)
+      chordIntervals = chordIntervals.map(interval => {
+        if (interval === intervals.base) {
+          return intervals.altered
+        } else {
+          return interval
         }
       })
-      return newInterval
     })
 
-    const deduplicatedIntervals = removeDuplicates(alteredIntervals)
+    // Add slash interval
 
-    deduplicatedIntervals.sort((a, b) => a - b)
 
-    const intervalData = deduplicatedIntervals.map(intervalDistance => interval.getIntervalData(intervalDistance))
+    chordIntervals = removeDuplicates(chordIntervals)
+
+    chordIntervals.sort((a, b) => a - b)
+
+    const intervalData = chordIntervals.map(intervalDistance => i.getIntervalData(intervalDistance))
 
     return intervalData
   }

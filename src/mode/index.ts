@@ -4,21 +4,22 @@ import { getTypedObjectKeys } from "../utils"
 import { ShortIntervalName } from "../interval"
 
 // Types
+interface ModeKey {
+  notes: ModeKeyNote[]
+  signature: ModeKeySignature
+}
 
-export type ModeData = Record<ModeName, {
+export type Mode = {
   chordNumerals: ChordNumeral[]
   chordBases: DiatonicChordType[]
   semitoneStructure: number[]
   intervals: ShortIntervalName[]
   keys: {
-    [key in ModeKeyNote]?: {
-      signature: ModeKeySignature
-      notes: ModeKeyNote[]
-    }
-  },
-}>
+    [key in ModeKeyNote]?: ModeKey
+  }
+}
 
-export const modeNames = ['Ionian', 'Dorian', 'Phrygian', 'Lydian', 'Mixolydian', 'Aeolian', 'Locrian']
+export const modeNames = ['Ionian', 'Dorian', 'Phrygian', 'Lydian', 'Mixolydian', 'Aeolian', 'Locrian'] as const
 export type ModeName = typeof modeNames[number]
 
 export const modeDegreeNumbers = [1, 2, 3, 4, 5, 6, 7]
@@ -39,12 +40,12 @@ export type ModeKeyNote = typeof modeKeyNotes[number]
 export const modeDegreeNames = ['Tonic', 'Supertonic', 'Mediant', 'Subdominant', 'Dominant', 'Submediant', 'Subtonic', 'Leading Tone'] as const
 export type ModeDegreeNames = typeof modeDegreeNames[number]
 
-export const modeKeySignature = ['', '#', '##', '###', '####', '#####', '######', '#######', 'b', 'bb', 'bbb', 'bbbb', 'bbbbb', 'bbbbbb', 'bbbbbbb']
+export const modeKeySignature = ['', '#', '##', '###', '####', '#####', '######', '#######', 'b', 'bb', 'bbb', 'bbbb', 'bbbbb', 'bbbbbb', 'bbbbbbb'] as const
 export type ModeKeySignature = typeof modeKeySignature[number]
 
 // Data
 
-const modeData : ModeData = {
+const modeData : Record<ModeName, Mode> = {
   Ionian: {
     chordNumerals: ['I', 'ii', 'iii', 'IV', 'V', 'vi', 'vii\u2070'],
     chordBases: ['maj', 'min', 'min', 'maj', 'maj', 'min', 'dim'],
@@ -525,26 +526,40 @@ const modeData : ModeData = {
 
 // Functions
 
+function names (): readonly ModeName[] {
+  return modeNames
+}
+
+function chordNumerals (modeName: ModeName): ChordNumeral[] {
+  return modeData[modeName].chordNumerals
+}
+
+function chordBases (modeName: ModeName): DiatonicChordType[] {
+  return modeData[modeName].chordBases
+}
+
+function intervals (modeName: ModeName): ShortIntervalName[] {
+  return modeData[modeName].intervals
+}
+
+function keys (modeName: ModeName): ModeKeyNote[] {
+  return getTypedObjectKeys(modeData[modeName].keys)
+}
+
+function keySignature (modeName: ModeName, key: ModeKeyNote): ModeKeySignature | undefined {
+  return modeData[modeName].keys[key]?.signature
+}
+
+function keyNotes (modeName: ModeName, key: ModeKeyNote): ModeKeyNote[] | undefined {
+  return modeData[modeName].keys[key]?.notes
+}
+
 export const mode = {
-  names: function (): ModeName[] {
-    return modeNames
-  },
-  chordNumerals: function (modeName: ModeName): ChordNumeral[] {
-    return modeData[modeName].chordNumerals
-  },
-  chordBases: function (modeName: ModeName): DiatonicChordType[] {
-    return modeData[modeName].chordBases
-  },
-  intervals: function (modeName: ModeName): DiatonicChordType[] {
-    return modeData[modeName].intervals
-  },
-  keys: function (modeName: ModeName): ModeKeyNote[] {
-    return getTypedObjectKeys(modeData[modeName].keys)
-  },
-  keySignature: function (modeName: ModeName, key: ModeKeyNote): ModeKeySignature | undefined {
-    return modeData[modeName].keys[key]?.signature
-  },
-  keyNotes: function (modeName: ModeName, key: ModeKeyNote): ModeKeyNote[] | undefined {
-    return modeData[modeName].keys[key]?.notes
-  }
+  names,
+  chordNumerals,
+  chordBases,
+  intervals,
+  keys,
+  keySignature,
+  keyNotes
 }
