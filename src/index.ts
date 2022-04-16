@@ -13,15 +13,17 @@ export {
 const gDim: Chord = {
   root: 'G',
   type: 'maj',
-  extension: 9,
-  alterations: ['b9', 'b1'],
-  additions: ['add13']
+  extension: 5,
+  alterations: [],
+  additions: [],
+  slash: 'F#'
 }
 
-// console.log(chord.setDefaults(gDim))
-// console.log(chord.intervals(gDim))
+console.log(chord.setDefaults(gDim))
+console.log(chord.intervals(gDim))
 // console.log(interval.distance('P1', 'M2'))
 
-const myNote = "A####"
-console.log(note.simplify(myNote))
-console.log(note.transpose(myNote, -1))
+// const myNote = "G####"
+// console.log(note.simplify(myNote))
+// console.log(note.transpose(myNote, -1))
+// console.log(note.distance("C", "G"))

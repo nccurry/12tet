@@ -1,4 +1,4 @@
-import { ModeKeyNote, ModeName } from "../mode"
+
 import {
   interval as i,
   Interval,
@@ -7,7 +7,8 @@ import {
   IntervalName,
   ShortIntervalName
 } from "../interval"
-import { getEvenArrayElements, getEvenNumbers, normalizeValue, removeDuplicates } from "../utils"
+import {getEvenArrayElements, getEvenNumbers, normalizeValue, offsetArray, removeDuplicates} from '../utils'
+import {ModeNote, note} from '../note'
 
 // Types
 
@@ -45,12 +46,12 @@ export const chordNumerals = [
 export type ChordNumeral = typeof chordNumerals[number]
 
 export interface Chord {
-  root: ModeKeyNote
+  root: ModeNote
   type: ChordType
   extension?: ChordExtension
   additions?: ChordAddition[]
   alterations?: ChordAlteration[]
-  slash?: ModeKeyNote
+  slash?: ModeNote
 }
 
 const chordDefaults: Required<Chord> = {
@@ -112,7 +113,7 @@ function getAdditionInterval (chordType: ChordType, addition: ChordAddition): In
   return chordTypeIntervals[chordType][normalizeValue(degree - 1, 12)]
 }
 
-function createChordWithDefaults (partialChord: Partial<Chord>): Required<Chord> {
+function setDefaults (partialChord: Partial<Chord>): Required<Chord> {
   const chord: Required<Chord> = Object.assign(chordDefaults, partialChord)
   if (!partialChord.slash) {
     chord.slash = chord.root
@@ -121,52 +122,70 @@ function createChordWithDefaults (partialChord: Partial<Chord>): Required<Chord>
 }
 
 
-// function getChordIntervalFromKeyNote(chordType: ChordType, note: ModeKeyNote): IntervalData {
+// function getChordIntervalFromKeyNote(chordType: ChordType, note: ModeNote): IntervalData {
 //   const chordKeyNotes =
 // }
 
-export const chord = {
-  setDefaults: createChordWithDefaults,
-  notes: function (chord: Chord): ModeKeyNote[] {
-    return []
-  },
-  intervals: function (chord: Chord): Interval[] {
-    const chordWithDefaults = createChordWithDefaults(chord)
+function notes (chord: Chord): ModeNote[] {
+  return []
+}
 
-    // Get base chord intervals based on extension
-    let chordIntervals: IntervalDistance[] = []
-    for (let i = 0; i < chordWithDefaults.extension; i++) {
-      if (i % 2 === 0) {
-        chordIntervals.push(chordTypeIntervals[chordWithDefaults.type][normalizeValue(i, 7)])
-      }
+function intervals (chord: Chord): Interval[] {
+  const chordWithDefaults = setDefaults(chord)
+
+  // Get base chord intervals based on extension
+  let chordIntervals: IntervalDistance[] = []
+  for (let i = 0; i < chordWithDefaults.extension; i++) {
+    if (i % 2 === 0) {
+      chordIntervals.push(chordTypeIntervals[chordWithDefaults.type][normalizeValue(i, 7)])
     }
-
-    // Add chord addition intervals
-    chordWithDefaults.additions.forEach(addition => {
-      chordIntervals.push(getAdditionInterval(chordWithDefaults.type, addition))
-    })
-
-    // Replace chord alteration intervals
-    chordWithDefaults.alterations.forEach(alteration => {
-      const intervals = getAlterationIntervals(chordWithDefaults.type, alteration)
-      chordIntervals = chordIntervals.map(interval => {
-        if (interval === intervals.base) {
-          return intervals.altered
-        } else {
-          return interval
-        }
-      })
-    })
-
-    // Add slash interval
-
-
-    chordIntervals = removeDuplicates(chordIntervals)
-
-    chordIntervals.sort((a, b) => a - b)
-
-    const intervalData = chordIntervals.map(intervalDistance => i.getIntervalData(intervalDistance))
-
-    return intervalData
   }
+
+  // Add chord addition intervals
+  chordWithDefaults.additions.forEach(addition => {
+    chordIntervals.push(getAdditionInterval(chordWithDefaults.type, addition))
+  })
+
+  // Replace chord alteration intervals
+  chordWithDefaults.alterations.forEach(alteration => {
+    const intervals = getAlterationIntervals(chordWithDefaults.type, alteration)
+    chordIntervals = chordIntervals.map(interval => {
+      if (interval === intervals.base) {
+        return intervals.altered
+      } else {
+        return interval
+      }
+    })
+  })
+
+  // Add slash interval
+  let slashInterval: Interval | undefined
+  if (chord.slash) {
+    slashInterval = note.distance(chord.root, chord.slash)
+    chordIntervals.push(slashInterval.length)
+  }
+
+  chordIntervals = removeDuplicates(chordIntervals)
+
+  chordIntervals.sort((a, b) => a - b)
+
+  // Set slash interval first
+  if (slashInterval) {
+    let slashIndex = chordIntervals.findIndex(intervalLength => intervalLength === slashInterval.length)
+  }
+
+  const intervalData = chordIntervals.map(intervalDistance => i.getInterval(intervalDistance))
+
+  return intervalData
+}
+
+function generate (chord: Chord) {
+
+}
+
+export const chord = {
+  notes,
+  intervals,
+  generate,
+  setDefaults
 }

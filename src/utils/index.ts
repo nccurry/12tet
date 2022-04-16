@@ -1,5 +1,28 @@
 import { ChordDegreeNumber } from "../chord"
 
+export function offsetArray<T> (array: T[], offset: number): T[] {
+  const arrayCopy = getShallowCopy(array)
+
+  // Wrap around the array if the offset is larger
+  // This should prevent shift from ever causing an error
+  if (offset > arrayCopy.length) {
+    console.log(`Offset ${offset} was larger than the array's length ${arrayCopy.length}, using modulus instead`)
+    offset = offset % arrayCopy.length
+  }
+
+  for (let i = 0; i < offset; i++) {
+    const shift = arrayCopy.shift()
+    if (!shift) {
+      // This should never happen since offset should always be less than scaleNotes
+      console.error(`There was an error offsetting array ${arrayCopy.join(' ')} by offset ${offset}`)
+    } else {
+      arrayCopy.push(shift)
+    }
+  }
+
+  return arrayCopy
+}
+
 export function getEvenArrayElements<A> (array: A[]): A[] {
   const elements: A[] = []
   array.forEach((element, index) => {

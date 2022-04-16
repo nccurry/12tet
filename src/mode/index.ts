@@ -2,10 +2,11 @@
 import { ChordNumeral, DiatonicChordType } from "../chord"
 import { getTypedObjectKeys } from "../utils"
 import { ShortIntervalName } from "../interval"
+import {ModeNote} from '../note'
 
 // Types
 interface ModeKey {
-  notes: ModeKeyNote[]
+  notes: ModeNote[]
   signature: ModeKeySignature
 }
 
@@ -15,9 +16,13 @@ export type Mode = {
   semitoneStructure: number[]
   intervals: ShortIntervalName[]
   keys: {
-    [key in ModeKeyNote]?: ModeKey
+    [key in ModeNote]?: ModeKey
   }
 }
+
+export const modeKeySignature = ['', '#', '##', '###', '####', '#####', '######', '#######', 'b', 'bb', 'bbb', 'bbbb', 'bbbbb', 'bbbbbb', 'bbbbbbb'] as const
+export type ModeKeySignature = typeof modeKeySignature[number]
+
 
 export const modeNames = ['Ionian', 'Dorian', 'Phrygian', 'Lydian', 'Mixolydian', 'Aeolian', 'Locrian'] as const
 export type ModeName = typeof modeNames[number]
@@ -32,16 +37,11 @@ interface ModeDegreeComplex {
 
 export type ModeDegree = ModeDegreeNumber | ModeDegreeComplex
 
-// "Simplest" notes that appear in any key in any mode. Excludes more "complex" enharmonic equivalents.
-export const modeKeyNotes = ['C', 'D', 'E', 'F', 'G', 'A', 'B', 'F#', 'C#', 'G#', 'D#', 'A#', 'E#', 'B#', 'Bb', 'Eb', 'Ab', 'Db', 'Gb', 'Cb', 'Fb'] as const
-export type ModeKeyNote = typeof modeKeyNotes[number]
+
 
 // https://en.wikipedia.org/wiki/Degree_(music)#Scale_degree_names
 export const modeDegreeNames = ['Tonic', 'Supertonic', 'Mediant', 'Subdominant', 'Dominant', 'Submediant', 'Subtonic', 'Leading Tone'] as const
 export type ModeDegreeNames = typeof modeDegreeNames[number]
-
-export const modeKeySignature = ['', '#', '##', '###', '####', '#####', '######', '#######', 'b', 'bb', 'bbb', 'bbbb', 'bbbbb', 'bbbbbb', 'bbbbbbb'] as const
-export type ModeKeySignature = typeof modeKeySignature[number]
 
 // Data
 
@@ -542,15 +542,15 @@ function intervals (modeName: ModeName): ShortIntervalName[] {
   return modeData[modeName].intervals
 }
 
-function keys (modeName: ModeName): ModeKeyNote[] {
+function keys (modeName: ModeName): ModeNote[] {
   return getTypedObjectKeys(modeData[modeName].keys)
 }
 
-function keySignature (modeName: ModeName, key: ModeKeyNote): ModeKeySignature | undefined {
+function keySignature (modeName: ModeName, key: ModeNote): ModeKeySignature | undefined {
   return modeData[modeName].keys[key]?.signature
 }
 
-function keyNotes (modeName: ModeName, key: ModeKeyNote): ModeKeyNote[] | undefined {
+function keyNotes (modeName: ModeName, key: ModeNote): ModeNote[] | undefined {
   return modeData[modeName].keys[key]?.notes
 }
 
