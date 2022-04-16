@@ -171,7 +171,9 @@ function intervals (chord: Chord): Interval[] {
 
   // Set slash interval first
   if (slashInterval) {
-    let slashIndex = chordIntervals.findIndex(intervalLength => intervalLength === slashInterval.length)
+    while (chordIntervals[0] !== slashInterval.length) {
+      chordIntervals = offsetArray(chordIntervals, 1)
+    }
   }
 
   const intervalData = chordIntervals.map(intervalDistance => i.getInterval(intervalDistance))

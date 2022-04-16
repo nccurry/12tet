@@ -10,17 +10,17 @@ export {
   mode,
 }
 
-const gDim: Chord = {
+const gMaj: Chord = {
   root: 'G',
   type: 'maj',
-  extension: 5,
+  extension: 7,
   alterations: [],
   additions: [],
-  slash: 'F#'
+  slash: 'D'
 }
 
-console.log(chord.setDefaults(gDim))
-console.log(chord.intervals(gDim))
+// console.log(chord.setDefaults(gMaj))
+console.log(chord.intervals(gMaj))
 // console.log(interval.distance('P1', 'M2'))
 
 // const myNote = "G####"

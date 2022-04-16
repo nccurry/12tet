@@ -12,7 +12,7 @@ export function offsetArray<T> (array: T[], offset: number): T[] {
 
   for (let i = 0; i < offset; i++) {
     const shift = arrayCopy.shift()
-    if (!shift) {
+    if (shift === undefined) {
       // This should never happen since offset should always be less than scaleNotes
       console.error(`There was an error offsetting array ${arrayCopy.join(' ')} by offset ${offset}`)
     } else {
