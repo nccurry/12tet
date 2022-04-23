@@ -1,11 +1,9 @@
-// Types
+import { normalizeValue } from "../utils"
+
+// Data / Types
 
 // https://en.wikipedia.org/wiki/Interval_(music)
-import { normalizeValue } from "../utils"
-import { ChordType } from "../chord"
-import {ModeNote} from '../note'
-
-const intervalNames = [
+const INTERVAL_NAMES = [
   'Perfect Unison',
   'Minor Second',
   'Major Second',
@@ -20,9 +18,12 @@ const intervalNames = [
   'Major Seventh',
   'Perfect Octave',
 ] as const
-export type IntervalName = typeof intervalNames[number]
+export type IntervalName = typeof INTERVAL_NAMES[number]
+export function isIntervalName (interval: any): interval is IntervalName {
+  return INTERVAL_NAMES.includes(interval)
+}
 
-const alternateIntervalNames = [
+const ALTERNATE_INTERVAL_NAMES = [
   'Semitone',
   'Tone',
   'Trisemitone',
@@ -73,9 +74,9 @@ const alternateIntervalNames = [
   'Half Step',
   'Whole Step'
 ] as const
-export type AlternateIntervalName = typeof alternateIntervalNames[number]
+export type AlternateIntervalName = typeof ALTERNATE_INTERVAL_NAMES[number]
 
-const intervalShortNames = [
+const INTERVAL_SHORT_NAMES = [
   'P1',
   'm2',
   'M2',
@@ -90,31 +91,20 @@ const intervalShortNames = [
   'M7',
   'P8'
 ] as const
-export type ShortIntervalName = typeof intervalShortNames[number]
-
-export function isIntervalName (interval: any): interval is IntervalName {
-  return intervalNames.includes(interval)
-}
-
+export type ShortIntervalName = typeof INTERVAL_SHORT_NAMES[number]
 export function isShortIntervalName (interval: any): interval is ShortIntervalName {
-  return intervalShortNames.includes(interval)
+  return INTERVAL_SHORT_NAMES.includes(interval)
 }
 
 export type IntervalDistance = number
 
-export type IntervalIdentifier = IntervalName | ShortIntervalName | IntervalDistance
+export type IntervalIdentifier = IntervalName | ShortIntervalName | IntervalDistance | IntervalData
 
-export interface Interval {
-  length: number,
-  name: IntervalName,
-  shortName: ShortIntervalName,
-  alternateNames: AlternateIntervalName[],
-  tension: number
+export function isIntervalData (interval: any): interval is IntervalData {
+  return (interval as IntervalData).name !== undefined && (interval as IntervalData).shortName !== undefined
 }
 
-// Data
-
-const intervalData: Record<ShortIntervalName, Interval> = {
+const INTERVAL_DATA: Record<ShortIntervalName, IntervalData> = {
   P1: {
     length: 0,
     name: 'Perfect Unison',
@@ -208,63 +198,44 @@ const intervalData: Record<ShortIntervalName, Interval> = {
   }
 }
 
-// Functions
+// Functions / Classes
 
-function getInterval(nameShortNameOrLength: IntervalIdentifier): Interval {
-  let filteredData: Interval
-  if (isIntervalName(nameShortNameOrLength)) {
-    return Object.values(intervalData).find(element => element.name === nameShortNameOrLength)!
-  } else if (isShortIntervalName(nameShortNameOrLength)) {
-    return intervalData[nameShortNameOrLength]
+function getInterval(interval: IntervalIdentifier): IntervalData {
+  if (isIntervalData(interval)) {
+    return interval
+  } else if (isIntervalName(interval)) {
+    return Object.values(INTERVAL_DATA).find(element => element.name === interval)!
+  } else if (isShortIntervalName(interval)) {
+    return INTERVAL_DATA[interval]
   } else {
-    return Object.values(intervalData).find(element => element.length === normalizeValue(nameShortNameOrLength, 12))!
+    return Object.values(INTERVAL_DATA).find(element => element.length === normalizeValue(interval, 12))!
   }
-
-  return filteredData
 }
 
-function getKeyNoteFromChordInterval(chord: ChordType, root: ModeNote, interval: IntervalIdentifier) {
-  const intervalData = getInterval(interval)
+abstract class IntervalData {
+  // The length of the interval in semitones
+  readonly length: IntervalDistance
+  // The long name of the interval
+  readonly name: IntervalName
+  // The short name of the interval
+  readonly shortName: ShortIntervalName
+  // Alternate long names of the interval
+  readonly alternateNames: AlternateIntervalName[]
+  // The intervals tension rating
+  readonly tension: number
 
+  constructor(interval: IntervalIdentifier) {
+    const i = getInterval(interval)
+    this.length = i.length
+    this.name = i.name
+    this.shortName = i.shortName
+    this.alternateNames = i.alternateNames
+    this.tension = i.tension
+  }
 }
 
-function toName (shortNameOrLength: ShortIntervalName | number): IntervalName {
-  const intervalData = getInterval(shortNameOrLength)
-  return intervalData.name
-}
-
-function toShortName (nameOrLength: IntervalName | number): ShortIntervalName {
-  const intervalData = getInterval(nameOrLength)
-  return intervalData.shortName
-}
-
-function toLength (nameOrShortName: IntervalName | ShortIntervalName): number {
-  const intervalData = getInterval(nameOrShortName)
-  return intervalData.length
-}
-
-function alternateNames (nameShortNameOrLength: IntervalIdentifier): AlternateIntervalName[] {
-  const intervalData = getInterval(nameShortNameOrLength)
-  return intervalData.alternateNames
-}
-
-function tension (nameShortNameOrLength: IntervalIdentifier): number {
-  const intervalData = getInterval(nameShortNameOrLength)
-  return intervalData.tension
-}
-
-function distance (first: IntervalIdentifier, second: IntervalIdentifier): IntervalDistance {
-  const firstData = getInterval(first)
-  const secondData = getInterval(second)
-  return normalizeValue(secondData.length - firstData.length, 12)
-}
-
-export const interval = {
-  toName,
-  toShortName,
-  toLength,
-  alternateNames,
-  tension,
-  getInterval,
-  distance
+export class Interval extends IntervalData {
+  distance (interval: Interval) {
+    return normalizeValue(interval.length - this.length, 12)
+  }
 }

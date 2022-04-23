@@ -1,16 +1,9 @@
+import { Interval, IntervalDistance } from "../interval"
+import { normalizeValue, offsetArray, removeDuplicates } from '../utils'
+import { interval, StandardNote } from '../note'
+import {AeolianKey, IonianStandardKey, IonianMode, LocrianKey, MixolydianKey, Mode} from "../mode"
 
-import {
-  interval as i,
-  Interval,
-  IntervalDistance,
-  IntervalIdentifier,
-  IntervalName,
-  ShortIntervalName
-} from "../interval"
-import {getEvenArrayElements, getEvenNumbers, normalizeValue, offsetArray, removeDuplicates} from '../utils'
-import {ModeNote, note} from '../note'
-
-// Types
+// Data / Types
 
 export const diatonicChordType = ['maj', 'min', 'dim'] as const
 export type DiatonicChordType = typeof diatonicChordType[number]
@@ -45,26 +38,6 @@ export const chordNumerals = [
 ] as const
 export type ChordNumeral = typeof chordNumerals[number]
 
-export interface Chord {
-  root: ModeNote
-  type: ChordType
-  extension?: ChordExtension
-  additions?: ChordAddition[]
-  alterations?: ChordAlteration[]
-  slash?: ModeNote
-}
-
-const chordDefaults: Required<Chord> = {
-  root: 'C',
-  type: 'maj',
-  extension: 5,
-  additions: [],
-  alterations: [],
-  slash: 'C'
-}
-
-// Data
-
 // Tone intervals in chord bases
 const chordTypeIntervals: Record<ChordType, IntervalDistance[]> = {
   // 1, 2, 3, 4, 5, 6, 7
@@ -91,7 +64,16 @@ const chordTypeIntervals: Record<ChordType, IntervalDistance[]> = {
   augsus4: [0, 2, 5, 5, 8, 9, 11]
 }
 
-// Functions
+interface ChordConfig {
+  type?: ChordType,
+  extension?: ChordExtension,
+  additions?: ChordAddition[],
+  alterations?: ChordAlteration[],
+  slash?: StandardNote
+}
+
+
+// Functions / Classes
 
 function getAlterationIntervals (chordType: ChordType, alteration: ChordAlteration): { base: IntervalDistance, altered: IntervalDistance } {
   const accidental = alteration[0]
@@ -113,81 +95,126 @@ function getAdditionInterval (chordType: ChordType, addition: ChordAddition): In
   return chordTypeIntervals[chordType][normalizeValue(degree - 1, 12)]
 }
 
-function setDefaults (partialChord: Partial<Chord>): Required<Chord> {
-  const chord: Required<Chord> = Object.assign(chordDefaults, partialChord)
-  if (!partialChord.slash) {
-    chord.slash = chord.root
-  }
-  return chord
-}
-
 
 // function getChordIntervalFromKeyNote(chordType: ChordType, note: ModeNote): IntervalData {
 //   const chordKeyNotes =
 // }
 
-function notes (chord: Chord): ModeNote[] {
-  return []
+// function notes (c: ChordData): Note[] {
+//   return chord.intervals(c).map(interval => {
+//     const transposed = note.transpose(c.root, interval)
+//     const signature = (new Mode('Ionian')).keySignature(c.root)
+//
+//     return 'A'
+//   })
+// }
+
+export abstract class ChordData {
+  readonly root: StandardNote
+  readonly type: ChordType
+  extension: ChordExtension
+  additions: ChordAddition[]
+  alterations: ChordAlteration[]
+  slash: StandardNote
+
+  protected constructor(root: StandardNote, config?: ChordConfig) {
+    this.root = root
+    this.type = config && config.type ? config.type : 'maj'
+    this.extension = config && config.extension ? config.extension : 5
+    this.additions = config && config.additions ? config.additions : []
+    this.alterations = config && config.alterations ? config.alterations : []
+    this.slash = config && config.slash ? config.slash : root
+  }
 }
 
-function intervals (chord: Chord): Interval[] {
-  const chordWithDefaults = setDefaults(chord)
-
-  // Get base chord intervals based on extension
-  let chordIntervals: IntervalDistance[] = []
-  for (let i = 0; i < chordWithDefaults.extension; i++) {
-    if (i % 2 === 0) {
-      chordIntervals.push(chordTypeIntervals[chordWithDefaults.type][normalizeValue(i, 7)])
-    }
+export class Chord extends ChordData {
+  constructor(root: StandardNote, config?: ChordConfig) {
+    super(root, config)
   }
 
-  // Add chord addition intervals
-  chordWithDefaults.additions.forEach(addition => {
-    chordIntervals.push(getAdditionInterval(chordWithDefaults.type, addition))
-  })
+  generateVoicings (): StandardNote[][] {
+    return []
+  }
 
-  // Replace chord alteration intervals
-  chordWithDefaults.alterations.forEach(alteration => {
-    const intervals = getAlterationIntervals(chordWithDefaults.type, alteration)
-    chordIntervals = chordIntervals.map(interval => {
-      if (interval === intervals.base) {
-        return intervals.altered
-      } else {
-        return interval
+  private intervals (): Interval[] {
+    // Get base chord intervals based on extension
+    let chordIntervals: IntervalDistance[] = []
+    for (let i = 0; i < this.extension; i++) {
+      if (i % 2 === 0) {
+        chordIntervals.push(chordTypeIntervals[this.type][normalizeValue(i, 7)])
       }
-    })
-  })
-
-  // Add slash interval
-  let slashInterval: Interval | undefined
-  if (chord.slash) {
-    slashInterval = note.distance(chord.root, chord.slash)
-    chordIntervals.push(slashInterval.length)
-  }
-
-  chordIntervals = removeDuplicates(chordIntervals)
-
-  chordIntervals.sort((a, b) => a - b)
-
-  // Set slash interval first
-  if (slashInterval) {
-    while (chordIntervals[0] !== slashInterval.length) {
-      chordIntervals = offsetArray(chordIntervals, 1)
     }
+
+    // Add chord addition intervals
+    this.additions.forEach(addition => {
+      chordIntervals.push(getAdditionInterval(this.type, addition))
+    })
+
+    // Replace chord alteration intervals
+    this.alterations.forEach(alteration => {
+      const intervals = getAlterationIntervals(this.type, alteration)
+      chordIntervals = chordIntervals.map(interval => {
+        if (interval === intervals.base) {
+          return intervals.altered
+        } else {
+          return interval
+        }
+      })
+    })
+
+    // Add slash interval
+    let slashInterval: Interval | undefined
+    if (this.slash != this.root) {
+      slashInterval = interval(this.root, this.slash)
+      chordIntervals.push(slashInterval.length)
+    }
+
+    chordIntervals = removeDuplicates(chordIntervals)
+
+    chordIntervals.sort((a, b) => a - b)
+
+    // Set slash interval first
+    if (slashInterval) {
+      while (chordIntervals[0] !== slashInterval.length) {
+        chordIntervals = offsetArray(chordIntervals, 1)
+      }
+    }
+
+    const intervalData = chordIntervals.map(intervalDistance => new Interval(intervalDistance))
+
+    return intervalData
   }
 
-  const intervalData = chordIntervals.map(intervalDistance => i.getInterval(intervalDistance))
-
-  return intervalData
+  // notes (): ModeNote {
+  //   const intervals = this.intervals()
+  //   const mode = new IonianMode().key(this.root)
+  //   return intervals.map(interval => {
+  //
+  //   })
+  // }
 }
 
-function generate (chord: Chord) {
-
+export class MajorChord extends Chord {
+  constructor(root: IonianStandardKey, config?: ChordConfig) {
+    super(root, config)
+  }
 }
 
-export const chord = {
-  notes,
-  intervals,
-  generate,
-  setDefaults
+export class MinorChord extends Chord {
+  constructor(root: AeolianKey, config?: ChordConfig) {
+    super(root, config)
+  }
 }
+
+export class DiminishedChord extends Chord {
+  constructor(root: LocrianKey, config?: ChordConfig) {
+    super(root, config)
+  }
+}
+
+export class DominantChord extends Chord {
+  constructor(root: MixolydianKey, config?: ChordConfig) {
+    super(root, config)
+  }
+}
+

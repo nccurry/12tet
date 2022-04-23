@@ -1,29 +1,29 @@
-import { chord, Chord } from './chord'
-import { interval, ShortIntervalName } from './interval'
-import { mode } from './mode'
-import { voicing } from "./voicing"
-import { note, Note } from "./note"
+import { Chord, ChordData } from './chord'
+import { Interval } from './interval'
+import {AEOLIAN_KEYS, IONIAN_STANDARD_KEYS, IonianMode, MIXOLYDIAN_KEYS, Mode} from "./mode"
+import {arrayDifference} from "./utils";
 
-export {
-  chord,
-  interval,
-  mode,
-}
+const gMaj7SlashD = new Chord('G', { extension: 7, slash: 'D' })
+const P0 = new Interval(0)
+const bSharpMajor = new Mode('Ionian').key('B#')
+const ionianMode = new IonianMode().key('bb').notes
+// const cMajor2 = new Key('B#', 'Ionian')
 
-const gMaj: Chord = {
-  root: 'G',
-  type: 'maj',
-  extension: 7,
-  alterations: [],
-  additions: [],
-  slash: 'D'
-}
 
-// console.log(chord.setDefaults(gMaj))
-console.log(chord.intervals(gMaj))
-// console.log(interval.distance('P1', 'M2'))
 
-// const myNote = "G####"
-// console.log(note.simplify(myNote))
-// console.log(note.transpose(myNote, -1))
-// console.log(note.distance("C", "G"))
+const gMaj = new Chord('G')
+// gMaj.notes()
+// gMaj.generateVoicings()
+const gMinAdd9Sharp5 = new Chord('G', {
+  type: 'min',
+  extension: 9,
+  additions: ['add9'],
+  alterations: ['#5']
+})
+
+
+
+
+
+
+

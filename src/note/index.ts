@@ -1,77 +1,115 @@
-// Types
+import {Interval, IntervalIdentifier} from '../interval'
+import { normalizeValue } from '../utils'
+import {isInMode, ModeName} from "../mode";
 
-import {IntervalIdentifier, interval as i, Interval, interval} from '../interval'
-import {normalizeValue} from '../utils'
+// Data / Types
 
-export const naturalNote = ['C', 'D', 'E', 'F', 'G', 'A', 'B'] as const
-export type NaturalNote = typeof naturalNote[number]
+export const NATURAL_NOTES: readonly string[] = ['C', 'D', 'E', 'F', 'G', 'A', 'B'] as const
+export type NaturalNote = typeof NATURAL_NOTES[number]
+export function isNaturalNote (note: string): note is NaturalNote {
+  return NATURAL_NOTES.includes(note as NaturalNote)
+}
 
-// "Simplest" notes that appear in any key in any mode. Excludes "complex" enharmonic equivalents.
-export const modeNote = ['C', 'D', 'E', 'F', 'G', 'A', 'B', 'F#', 'C#', 'G#', 'D#', 'A#', 'E#', 'B#', 'Bb', 'Eb', 'Ab', 'Db', 'Gb', 'Cb', 'Fb'] as const
-export type ModeNote = typeof modeNote[number]
+export const ACCENTED_NOTES: readonly string[] = ['F#', 'C#', 'G#', 'D#', 'A#', 'E#', 'B#', 'Bb', 'Eb', 'Ab', 'Db', 'Gb', 'Cb', 'Fb'] as const
+export type AccentedNote = typeof ACCENTED_NOTES[number]
+export function isAccentedNote (note: string): note is AccentedNote {
+  return ACCENTED_NOTES.includes(note as AccentedNote)
+}
 
-export const noteAccidental = ['', '#', '##', '###', '####', '#####', '######', '#######', 'b', 'bb', 'bbb', 'bbbb', 'bbbbb', 'bbbbbb', 'bbbbbbb'] as const
-export type NoteAccidental = typeof noteAccidental[number]
+export const THEORETICAL_NOTES: readonly string[] = ['C##', 'D##', 'E##', 'F##', 'G##', 'A##', 'B##', 'Cbb', 'Dbb', 'Ebb', 'Fbb', 'Gbb', 'Abb', 'Bbb'] as const
+export type TheoreticalNote = typeof THEORETICAL_NOTES[number]
+export function isTheoreticalNote (note: string): note is TheoreticalNote {
+  return THEORETICAL_NOTES.includes(note as TheoreticalNote)
+}
 
-export const noteRegister = [0, 1, 2, 3, 4, 5, 6, 7, 8] as const
-export type NoteRegister = typeof noteRegister[number]
+export type StandardNote = NaturalNote | AccentedNote
+export function isStandardNote (note: string): note is StandardNote {
+  return isNaturalNote(note) || isAccentedNote(note)
+}
 
-export type Note = `${NaturalNote}${NoteAccidental}`
-export type RegisterNote = `${Note}${NoteRegister}`
+export type AnyNote = StandardNote | TheoreticalNote
+export function isAnyNote (note: string): note is AnyNote {
+  return isStandardNote(note) || isTheoreticalNote(note)
+}
 
-// Data
+export const NOTE_REGISTER: readonly number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8] as const
+export type NoteRegister = typeof NOTE_REGISTER[number]
 
-const tones: ModeNote[][] = [
-  ['Ab', 'G#'],
-  ['A'],
-  ['A#', 'Bb'],
-  ['B', 'Cb'],
-  ['B#', 'C'],
-  ['C#', 'Db'],
-  ['D'],
-  ['D#', 'Eb'],
-  ['E', 'Fb'],
-  ['E#', 'F'],
-  ['F#', 'Gb'],
-  ['G']
+export type ToneNotes = [AnyNote, AnyNote, AnyNote] | [AnyNote, AnyNote]
+
+export interface Tone {
+  index: number
+  notes: ToneNotes
+}
+
+// export type Tone = readonly [AnyNote, AnyNote, AnyNote] | readonly [AnyNote, AnyNote]
+export const TONES: readonly Tone[] = [
+  { notes: ['G##', 'A', 'Bbb'], index: 0 },
+  { notes: ['A#', 'Bb', 'Cbb'], index: 1 },
+  { notes: ['A##', 'B', 'Cb'], index: 2 },
+  { notes: ['B#', 'C', 'Dbb'], index: 3 },
+  { notes: ['B##', 'C#', 'Db'], index: 4 },
+  { notes: ['C##', 'D', 'Ebb'], index: 5 },
+  { notes: ['D#', 'Eb', 'Fbb'], index: 6 },
+  { notes: ['D##', 'E', 'Fb'], index: 7 },
+  { notes: ['E#', 'F', 'Gbb'], index: 8 },
+  { notes: ['E##', 'F#', 'Gb'], index: 9 },
+  { notes: ['F##', 'G', 'Abb'], index: 10 },
+  { notes: ['G#', 'Ab'], index: 11 }
 ]
 
-// Functions
+function tonesByNote (): Record<AnyNote, Tone> {
+  const tonesByNote: { [key in AnyNote]?: Tone } = {}
+  TONES.forEach(tone => {
+    tone.notes.forEach(note => {
+      tonesByNote[note] = tone
+    })
+  })
+  return tonesByNote as Record<AnyNote, Tone>
+}
+export const TONES_BY_NOTE: Record<AnyNote, Tone> = tonesByNote()
 
-function transpose (note: Note, interval: IntervalIdentifier): Note[] {
-  const intervalData = i.getInterval(interval)
-  const simpleNote = simplify(note)
-  const toneIndex = tones.findIndex(tone => tone.includes(simpleNote[0] as ModeNote))
-  return tones[normalizeValue(toneIndex + intervalData.length, 12)]
+
+// Functions / Classes
+
+export function getTone(note: AnyNote): Tone {
+  return TONES_BY_NOTE[note]
 }
 
-function simplify (note: Note): ModeNote[] {
-  const accidentalOffset = (note.match(/#/g) || []).length - (note.match(/b/g) || []).length
-  const root = note[0] as Note
-  const toneIndex = tones.findIndex(tone => tone.includes(root as ModeNote))
-  if (toneIndex === -1) {
-    return []
-  } else {
-    return tones[normalizeValue(toneIndex + accidentalOffset, 12)]
+export function simplify(note: StandardNote): StandardNote
+export function simplify(note: TheoreticalNote): StandardNote[]
+export function simplify(note: AnyNote, mode: ModeName): StandardNote
+export function simplify(note: AnyNote, mode?: ModeName): StandardNote[] | StandardNote | undefined {
+  const tone = getTone(note)
+  const standardNotes = tone.notes.filter(isStandardNote)
+  if (isStandardNote(note) && !mode) {
+    return note
+  } else if (isStandardNote(note) && mode) {
+    return standardNotes.filter(note => isInMode(note, mode))[0]
+  } else if (isTheoreticalNote(note) && !mode) {
+    return standardNotes
+  } else if (isTheoreticalNote(note) && mode) {
+    return standardNotes.filter(note => isInMode(note, mode))[0]
   }
 }
 
-function distance (firstNote: Note, secondNote: Note): Interval {
-  const simpleFirstNote = simplify(firstNote)
-  const simpleSecondNote = simplify(secondNote)
-  const firstToneIndex = tones.findIndex(tone => tone.includes(simpleFirstNote[0]))
-  const secondToneIndex = tones.findIndex(tone => tone.includes(simpleSecondNote[0]))
-
-  if (firstToneIndex === -1 || secondToneIndex === -1) {
-    console.error(`There was a problem getting the distance between ${firstNote} and ${secondNote}`)
-    return interval.getInterval(0)  // TODO: Probably don't want to do this
-  } else {
-    return interval.getInterval(normalizeValue(secondToneIndex - firstToneIndex, 12))
-  }
+export function interval (firstNote: AnyNote, secondNote: AnyNote): Interval {
+  return new Interval(normalizeValue(TONES_BY_NOTE[firstNote].index - TONES_BY_NOTE[secondNote].index, 12))
 }
 
-export const note = {
-  transpose,
-  simplify,
-  distance
+export function transpose (note: AnyNote, intervalIdentifier: IntervalIdentifier, mode: ModeName): StandardNote
+export function transpose (note: AnyNote, intervalIdentifier: IntervalIdentifier): ToneNotes
+export function transpose (note: AnyNote, intervalIdentifier: IntervalIdentifier, mode?: ModeName): ToneNotes | StandardNote {
+  const interval = new Interval(intervalIdentifier)
+  const tone = TONES[normalizeValue(TONES_BY_NOTE[note].index + interval.length, 12)]
+  if (mode) {
+    return simplify(tone.notes[0], mode)
+  } else {
+    return tone.notes
+  }
+
+}
+
+for (let i = 0; i < 24; i++) {
+  console.log(transpose('B', i, 'Ionian'))
 }

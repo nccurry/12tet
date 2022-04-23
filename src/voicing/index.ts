@@ -2,7 +2,7 @@ import { IntervalDistance } from "../interval"
 import { Chord } from "../chord"
 import { ModeDegree } from "../mode"
 
-// Types
+// Data / Types
 
 type Voicing = IntervalDistance[]
 
@@ -15,11 +15,9 @@ interface VoicingOptions {
   guaranteeDegrees?: ModeDegree[]
 }
 
-// Data
 
 
-
-// Functions
+// Functions / Classes
 
 export const voicing = {
   generate: function (chord: Required<Chord>, voicing: VoicingOptions) {},

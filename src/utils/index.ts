@@ -1,5 +1,3 @@
-import { ChordDegreeNumber } from "../chord"
-
 export function offsetArray<T> (array: T[], offset: number): T[] {
   const arrayCopy = getShallowCopy(array)
 
@@ -97,9 +95,13 @@ function removeArrayElement<A> (array: A[], index: number): A[] {
 }
 
 // https://stackoverflow.com/questions/52856496/typescript-object-keys-return-string
-export const getTypedObjectKeys = Object.keys as <T extends object>(obj: T) => Array<keyof T>
+export const getTypedObjectKeys = Object.keys as <T extends object>(obj: T) => T[]
 
 export function normalizeValue (value: number, max: number): number {
   const multiples = Math.abs(Math.floor(value / max)) * max
   return ((multiples * max) + value) % max
+}
+
+export function arrayDifference <T>(array1: readonly T[], array2: readonly T[]) {
+  return array1.filter((v) => !array2.includes(v))
 }
