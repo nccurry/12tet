@@ -1,7 +1,7 @@
 import { Interval, IntervalDistance } from "../interval"
 import { normalizeValue, offsetArray, removeDuplicates } from '../utils'
 import { interval, StandardNote } from '../note'
-import {AeolianKey, IonianStandardKey, IonianMode, LocrianKey, MixolydianKey, Mode} from "../mode"
+import { AeolianStandardKey, IonianStandardKey, IonianMode, LocrianStandardKey, MixolydianStandardKey, Mode } from "../mode"
 
 // Data / Types
 
@@ -201,19 +201,19 @@ export class MajorChord extends Chord {
 }
 
 export class MinorChord extends Chord {
-  constructor(root: AeolianKey, config?: ChordConfig) {
+  constructor(root: AeolianStandardKey, config?: ChordConfig) {
     super(root, config)
   }
 }
 
 export class DiminishedChord extends Chord {
-  constructor(root: LocrianKey, config?: ChordConfig) {
+  constructor(root: LocrianStandardKey, config?: ChordConfig) {
     super(root, config)
   }
 }
 
 export class DominantChord extends Chord {
-  constructor(root: MixolydianKey, config?: ChordConfig) {
+  constructor(root: MixolydianStandardKey, config?: ChordConfig) {
     super(root, config)
   }
 }

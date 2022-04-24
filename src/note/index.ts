@@ -1,22 +1,22 @@
-import {Interval, IntervalIdentifier} from '../interval'
+import { Interval, IntervalIdentifier } from '../interval'
 import { normalizeValue } from '../utils'
-import {isInMode, ModeName} from "../mode";
+import { isModeKey, ModeName } from "../mode"
 
 // Data / Types
 
-export const NATURAL_NOTES: readonly string[] = ['C', 'D', 'E', 'F', 'G', 'A', 'B'] as const
+export const NATURAL_NOTES= ['C', 'D', 'E', 'F', 'G', 'A', 'B'] as const
 export type NaturalNote = typeof NATURAL_NOTES[number]
 export function isNaturalNote (note: string): note is NaturalNote {
   return NATURAL_NOTES.includes(note as NaturalNote)
 }
 
-export const ACCENTED_NOTES: readonly string[] = ['F#', 'C#', 'G#', 'D#', 'A#', 'E#', 'B#', 'Bb', 'Eb', 'Ab', 'Db', 'Gb', 'Cb', 'Fb'] as const
+export const ACCENTED_NOTES = ['F#', 'C#', 'G#', 'D#', 'A#', 'E#', 'B#', 'Bb', 'Eb', 'Ab', 'Db', 'Gb', 'Cb', 'Fb'] as const
 export type AccentedNote = typeof ACCENTED_NOTES[number]
 export function isAccentedNote (note: string): note is AccentedNote {
   return ACCENTED_NOTES.includes(note as AccentedNote)
 }
 
-export const THEORETICAL_NOTES: readonly string[] = ['C##', 'D##', 'E##', 'F##', 'G##', 'A##', 'B##', 'Cbb', 'Dbb', 'Ebb', 'Fbb', 'Gbb', 'Abb', 'Bbb'] as const
+export const THEORETICAL_NOTES = ['C##', 'D##', 'E##', 'F##', 'G##', 'A##', 'B##', 'Cbb', 'Dbb', 'Ebb', 'Fbb', 'Gbb', 'Abb', 'Bbb'] as const
 export type TheoreticalNote = typeof THEORETICAL_NOTES[number]
 export function isTheoreticalNote (note: string): note is TheoreticalNote {
   return THEORETICAL_NOTES.includes(note as TheoreticalNote)
@@ -32,7 +32,7 @@ export function isAnyNote (note: string): note is AnyNote {
   return isStandardNote(note) || isTheoreticalNote(note)
 }
 
-export const NOTE_REGISTER: readonly number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8] as const
+export const NOTE_REGISTER = [0, 1, 2, 3, 4, 5, 6, 7, 8] as const
 export type NoteRegister = typeof NOTE_REGISTER[number]
 
 export type ToneNotes = [AnyNote, AnyNote, AnyNote] | [AnyNote, AnyNote]
@@ -42,7 +42,6 @@ export interface Tone {
   notes: ToneNotes
 }
 
-// export type Tone = readonly [AnyNote, AnyNote, AnyNote] | readonly [AnyNote, AnyNote]
 export const TONES: readonly Tone[] = [
   { notes: ['G##', 'A', 'Bbb'], index: 0 },
   { notes: ['A#', 'Bb', 'Cbb'], index: 1 },
@@ -85,11 +84,11 @@ export function simplify(note: AnyNote, mode?: ModeName): StandardNote[] | Stand
   if (isStandardNote(note) && !mode) {
     return note
   } else if (isStandardNote(note) && mode) {
-    return standardNotes.filter(note => isInMode(note, mode))[0]
+    return standardNotes.filter(note => isModeKey(note, mode))[0]
   } else if (isTheoreticalNote(note) && !mode) {
     return standardNotes
   } else if (isTheoreticalNote(note) && mode) {
-    return standardNotes.filter(note => isInMode(note, mode))[0]
+    return standardNotes.filter(note => isModeKey(note, mode))[0]
   }
 }
 
@@ -108,8 +107,4 @@ export function transpose (note: AnyNote, intervalIdentifier: IntervalIdentifier
     return tone.notes
   }
 
-}
-
-for (let i = 0; i < 24; i++) {
-  console.log(transpose('B', i, 'Ionian'))
 }
