@@ -43,18 +43,19 @@ export interface Tone {
 }
 
 export const TONES: readonly Tone[] = [
-  { notes: ['G##', 'A', 'Bbb'], index: 0 },
-  { notes: ['A#', 'Bb', 'Cbb'], index: 1 },
-  { notes: ['A##', 'B', 'Cb'], index: 2 },
-  { notes: ['B#', 'C', 'Dbb'], index: 3 },
-  { notes: ['B##', 'C#', 'Db'], index: 4 },
-  { notes: ['C##', 'D', 'Ebb'], index: 5 },
-  { notes: ['D#', 'Eb', 'Fbb'], index: 6 },
-  { notes: ['D##', 'E', 'Fb'], index: 7 },
-  { notes: ['E#', 'F', 'Gbb'], index: 8 },
-  { notes: ['E##', 'F#', 'Gb'], index: 9 },
-  { notes: ['F##', 'G', 'Abb'], index: 10 },
-  { notes: ['G#', 'Ab'], index: 11 }
+  { notes: ['B#', 'C', 'Dbb'], index: 0 },
+  { notes: ['B##', 'C#', 'Db'], index: 1 },
+  { notes: ['C##', 'D', 'Ebb'], index: 2 },
+  { notes: ['D#', 'Eb', 'Fbb'], index: 3 },
+  { notes: ['D##', 'E', 'Fb'], index: 4 },
+  { notes: ['E#', 'F', 'Gbb'], index: 5 },
+  { notes: ['E##', 'F#', 'Gb'], index: 6 },
+  { notes: ['F##', 'G', 'Abb'], index: 7 },
+  { notes: ['G#', 'Ab'], index: 8 },
+  { notes: ['G##', 'A', 'Bbb'], index: 9 },
+  { notes: ['A#', 'Bb', 'Cbb'], index: 10 },
+  { notes: ['A##', 'B', 'Cb'], index: 11 },
+
 ]
 
 function tonesByNote (): Record<AnyNote, Tone> {

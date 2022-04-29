@@ -8,8 +8,8 @@ import {
   LocrianStandardKey,
   MixolydianStandardKey,
   Mode,
-  LydianStandardKey, DorianStandardKey, PhrygianStandardKey, IonianAnyKey
-} from "../mode"
+  LydianStandardKey, DorianStandardKey, PhrygianStandardKey, IonianAnyKey, AeolianAnyKey
+} from '../mode'
 
 // Data / Types
 
@@ -83,28 +83,28 @@ interface ChordConfig {
 
 // Functions / Classes
 
-function simplifyChord (root: AnyNote, type: ChordType): { root: StandardNote, type: ChordType } {
-  switch (type) {
-    case 'maj':
-      return { root: simplifyNote(root, 'Ionian'), type: 'maj' }
-    case 'min':
-      return { root: simplifyNote(root, 'Aeolian'), type: 'min' }
-    case 'dim':
-      return { root: simplifyNote(root, 'Locrian'), type: 'dim' }
-    case 'dimsus2':
-      return { root: simplifyNote(root, 'Locrian'), type: 'dimsus2' }
-    case 'dimsus4':
-      return { root: simplifyNote(root, 'Locrian'), type: 'dimsus4' }
-    case 'dom':
-      return { root: simplifyNote(root, 'Mixolydian'), type: 'dom' }
-    case 'sus2':
-      return { root: simplifyNote(root, 'Ionian'), type: 'maj' }
-    case 'sus4':
-    case 'aug':
-    case 'augsus2':
-    case 'augsus4':
-  }
-}
+// function simplifyChord (root: AnyNote, type: ChordType): { root: StandardNote, type: ChordType } {
+//   switch (type) {
+//     case 'maj':
+//       return { root: simplifyNote(root, 'Ionian'), type: 'maj' }
+//     case 'min':
+//       return { root: simplifyNote(root, 'Aeolian'), type: 'min' }
+//     case 'dim':
+//       return { root: simplifyNote(root, 'Locrian'), type: 'dim' }
+//     case 'dimsus2':
+//       return { root: simplifyNote(root, 'Locrian'), type: 'dimsus2' }
+//     case 'dimsus4':
+//       return { root: simplifyNote(root, 'Locrian'), type: 'dimsus4' }
+//     case 'dom':
+//       return { root: simplifyNote(root, 'Mixolydian'), type: 'dom' }
+//     case 'sus2':
+//       return { root: simplifyNote(root, 'Ionian'), type: 'maj' }
+//     case 'sus4':
+//     case 'aug':
+//     case 'augsus2':
+//     case 'augsus4':
+//   }
+// }
 
 function getAlterationIntervals (chordType: ChordType, alteration: ChordAlteration): { base: IntervalDistance, altered: IntervalDistance } {
   const accidental = alteration[0]
@@ -141,16 +141,16 @@ function getAdditionInterval (chordType: ChordType, addition: ChordAddition): In
 // }
 
 export abstract class ChordData {
-  readonly root: StandardNote
+  readonly root: AnyNote
   readonly type: ChordType
   extension: ChordExtension
   additions: ChordAddition[]
   alterations: ChordAlteration[]
-  slash: StandardNote
+  slash: AnyNote
 
-  protected constructor(root: StandardNote, config?: ChordConfig) {
+  protected constructor(root: AnyNote, type: ChordType, config?: ChordConfig) {
     this.root = root
-    this.type = config && config.type ? config.type : 'maj'
+    this.type = type
     this.extension = config && config.extension ? config.extension : 5
     this.additions = config && config.additions ? config.additions : []
     this.alterations = config && config.alterations ? config.alterations : []
@@ -159,8 +159,8 @@ export abstract class ChordData {
 }
 
 export class Chord extends ChordData {
-  constructor(root: StandardNote, config?: ChordConfig) {
-    super(root, config)
+  constructor(root: AnyNote, type: ChordType, config?: ChordConfig) {
+    super(root, type, config)
   }
 
   generateVoicings (): StandardNote[][] {
@@ -227,31 +227,37 @@ export class Chord extends ChordData {
 
 export class MajorChord extends Chord {
   constructor(root: IonianStandardKey, config?: ChordConfig) {
-    super(root, config)
+    super(root, 'maj', config)
   }
 }
 
-export class AnyMajorChord extends Chord {
-  constructor(root: IonianAnyKey, config?: ChordConfig) {
-    super(root, config)
-  }
-}
-
-export class MinorChord extends Chord {
-  constructor(root: AeolianStandardKey, config?: ChordConfig) {
-    super(root, config)
-  }
-}
-
-export class DiminishedChord extends Chord {
-  constructor(root: LocrianStandardKey, config?: ChordConfig) {
-    super(root, config)
-  }
-}
-
-export class DominantChord extends Chord {
-  constructor(root: MixolydianStandardKey, config?: ChordConfig) {
-    super(root, config)
-  }
-}
-
+// export class AnyMajorChord extends Chord {
+//   constructor(root: IonianAnyKey, config?: ChordConfig) {
+//     super(root, config)
+//   }
+// }
+//
+// export class MinorChord extends Chord {
+//   constructor(root: AeolianStandardKey, config?: ChordConfig) {
+//     super(root, config)
+//   }
+// }
+//
+// export class AnyMinorChord extends Chord {
+//   constructor(root: AeolianAnyKey, config?: ChordConfig) {
+//     super(root, config)
+//   }
+// }
+//
+// export class DiminishedChord extends Chord {
+//   constructor(root: LocrianStandardKey, config?: ChordConfig) {
+//     super(root, config)
+//   }
+// }
+//
+// export class DominantChord extends Chord {
+//   constructor(root: MixolydianStandardKey, config?: ChordConfig) {
+//     super(root, config)
+//   }
+// }
+//
