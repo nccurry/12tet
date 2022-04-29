@@ -1,7 +1,15 @@
 import { Interval, IntervalDistance } from "../interval"
 import { normalizeValue, offsetArray, removeDuplicates } from '../utils'
-import { interval, StandardNote } from '../note'
-import { AeolianStandardKey, IonianStandardKey, IonianMode, LocrianStandardKey, MixolydianStandardKey, Mode } from "../mode"
+import {AnyNote, interval, simplifyNote, StandardNote} from '../note'
+import {
+  AeolianStandardKey,
+  IonianStandardKey,
+  IonianMode,
+  LocrianStandardKey,
+  MixolydianStandardKey,
+  Mode,
+  LydianStandardKey, DorianStandardKey, PhrygianStandardKey, IonianAnyKey
+} from "../mode"
 
 // Data / Types
 
@@ -74,6 +82,29 @@ interface ChordConfig {
 
 
 // Functions / Classes
+
+function simplifyChord (root: AnyNote, type: ChordType): { root: StandardNote, type: ChordType } {
+  switch (type) {
+    case 'maj':
+      return { root: simplifyNote(root, 'Ionian'), type: 'maj' }
+    case 'min':
+      return { root: simplifyNote(root, 'Aeolian'), type: 'min' }
+    case 'dim':
+      return { root: simplifyNote(root, 'Locrian'), type: 'dim' }
+    case 'dimsus2':
+      return { root: simplifyNote(root, 'Locrian'), type: 'dimsus2' }
+    case 'dimsus4':
+      return { root: simplifyNote(root, 'Locrian'), type: 'dimsus4' }
+    case 'dom':
+      return { root: simplifyNote(root, 'Mixolydian'), type: 'dom' }
+    case 'sus2':
+      return { root: simplifyNote(root, 'Ionian'), type: 'maj' }
+    case 'sus4':
+    case 'aug':
+    case 'augsus2':
+    case 'augsus4':
+  }
+}
 
 function getAlterationIntervals (chordType: ChordType, alteration: ChordAlteration): { base: IntervalDistance, altered: IntervalDistance } {
   const accidental = alteration[0]
@@ -196,6 +227,12 @@ export class Chord extends ChordData {
 
 export class MajorChord extends Chord {
   constructor(root: IonianStandardKey, config?: ChordConfig) {
+    super(root, config)
+  }
+}
+
+export class AnyMajorChord extends Chord {
+  constructor(root: IonianAnyKey, config?: ChordConfig) {
     super(root, config)
   }
 }

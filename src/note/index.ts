@@ -75,10 +75,10 @@ export function getTone(note: AnyNote): Tone {
   return TONES_BY_NOTE[note]
 }
 
-export function simplify(note: StandardNote): StandardNote
-export function simplify(note: TheoreticalNote): StandardNote[]
-export function simplify(note: AnyNote, mode: ModeName): StandardNote
-export function simplify(note: AnyNote, mode?: ModeName): StandardNote[] | StandardNote | undefined {
+export function simplifyNote(note: StandardNote): StandardNote
+export function simplifyNote(note: TheoreticalNote): StandardNote[]
+export function simplifyNote(note: AnyNote, mode: ModeName): StandardNote
+export function simplifyNote(note: AnyNote, mode?: ModeName): StandardNote[] | StandardNote | undefined {
   const tone = getTone(note)
   const standardNotes = tone.notes.filter(isStandardNote)
   if (isStandardNote(note) && !mode) {
@@ -102,7 +102,7 @@ export function transpose (note: AnyNote, intervalIdentifier: IntervalIdentifier
   const interval = new Interval(intervalIdentifier)
   const tone = TONES[normalizeValue(TONES_BY_NOTE[note].index + interval.length, 12)]
   if (mode) {
-    return simplify(tone.notes[0], mode)
+    return simplifyNote(tone.notes[0], mode)
   } else {
     return tone.notes
   }
