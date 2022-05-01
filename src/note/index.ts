@@ -1,10 +1,10 @@
 import { Interval, IntervalIdentifier } from '../interval'
-import { normalizeValue } from '../utils'
+import {getShallowCopy, normalizeValue} from '../utils'
 import { isModeKey, ModeName } from "../mode"
 
 // Data / Types
 
-export const NATURAL_NOTES= ['C', 'D', 'E', 'F', 'G', 'A', 'B'] as const
+export const NATURAL_NOTES = ['C', 'D', 'E', 'F', 'G', 'A', 'B'] as const
 export type NaturalNote = typeof NATURAL_NOTES[number]
 export function isNaturalNote (note: string): note is NaturalNote {
   return NATURAL_NOTES.includes(note as NaturalNote)
@@ -71,6 +71,18 @@ export const TONES_BY_NOTE: Record<AnyNote, Tone> = tonesByNote()
 
 
 // Functions / Classes
+
+export function getNextNaturalNote(note: NaturalNote): NaturalNote {
+  for (let i = 0; i < NATURAL_NOTES.length; i++) {
+    console.log(note, NATURAL_NOTES[i])
+    if (NATURAL_NOTES[i] === note) {
+
+      return NATURAL_NOTES[(i + 1) % NATURAL_NOTES.length]
+    }
+  }
+  // TODO: Decide how to handle this
+  return 'C'
+}
 
 export function getTone(note: AnyNote): Tone {
   return TONES_BY_NOTE[note]

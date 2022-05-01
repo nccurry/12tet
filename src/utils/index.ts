@@ -75,7 +75,7 @@ function removeArrayOfArrayDuplicates<A> (array: A[][]): A[][] {
   return Array.from(uniqueStringArray, element => JSON.parse(element) as A[])
 }
 
-function getShallowCopy<A> (array: A[]): A[] {
+export function getShallowCopy<A> (array: A[]): A[] {
   return array.slice()
 }
 
@@ -104,4 +104,12 @@ export function normalizeValue (value: number, max: number): number {
 
 export function arrayDifference <T>(array1: readonly T[], array2: readonly T[]) {
   return array1.filter((v) => !array2.includes(v))
+}
+
+export function sumTo (array: number[], index: number): number {
+  let sum = 0
+  for (let i = 0; i <= index; i++) {
+    sum += array[i % array.length]
+  }
+  return sum
 }

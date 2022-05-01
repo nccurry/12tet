@@ -1,5 +1,5 @@
-import { offsetArray } from './utils'
-import { AnyNote, getTone, StandardNote, Tone, ToneNotes, TONES } from './note'
+import {offsetArray, sumTo} from './utils'
+import {AnyNote, getNextNaturalNote, getTone, NaturalNote, StandardNote, Tone, ToneNotes, TONES} from './note'
 import { AnyModeDegreeNumber, IonianAnyKey, ModeKey, ModeKeySignature, ModeName } from './mode'
 import { ChordAlteration } from "./chord"
 
@@ -14,13 +14,7 @@ const modeTonePatterns: Record<ModeName, number[]> = {
 }
 const ionianPattern = [2, 2, 1, 2, 2, 2, 1]
 
-function sumTo (array: number[], index: number): number {
-  let sum = 0
-  for (let i = 0; i <= index; i++) {
-    sum += array[i % array.length]
-  }
-  return sum
-}
+
 
 // class Key {
 //   tonic: AnyNote
@@ -38,8 +32,8 @@ function sumTo (array: number[], index: number): number {
 //   }
 // }
 
-function generateKey(root: AnyNote, mode: ModeName): AnyNote[] {
-  const tone = getTone(root)
+function generateKey(tonic: AnyNote, mode: ModeName): AnyNote[] {
+  const tone = getTone(tonic)
   let toneIndexes: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
   toneIndexes = offsetArray(toneIndexes, tone.index)
   const modeTonePattern = modeTonePatterns[mode]
@@ -60,10 +54,19 @@ function generateKey(root: AnyNote, mode: ModeName): AnyNote[] {
 
   // Convert tones to notes
   const notes: AnyNote[] = []
-  keyTones.forEach(tone => {
-
+  keyTones.forEach((tone, index) => {
+    if (index === 0) {
+      notes.push(tonic)
+    } else {
+      const nextNote = getNextNaturalNote(notes[index - 1][0] as NaturalNote)
+      tone.forEach(note => {
+        if (note[0] === nextNote) {
+          notes.push(note)
+        }
+      })
+    }
   })
-  return []
+  return notes
 }
 
 // function generateSharpScales(): { [key in IonianAnyKey]?: { signature: ModeKeySignature, notes: AnyNote[], tones: number[] } } {
@@ -139,7 +142,7 @@ function generate() {
     console.log(flatScalesTones)
 }
 
-generateKey('C', 'Dorian')
+console.log(generateKey('F##', 'Ionian'))
 
 
 
