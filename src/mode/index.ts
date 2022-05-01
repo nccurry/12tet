@@ -4,7 +4,7 @@ import {AnyNote, StandardNote, transpose} from '../note'
 
 // Data / Types
 
-interface ModeKey {
+export interface ModeKey {
   notes: AnyNote[]
   signature: ModeKeySignature
 }
