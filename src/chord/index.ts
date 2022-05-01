@@ -1,6 +1,6 @@
 import { Interval, IntervalDistance } from "../interval"
 import { normalizeValue, offsetArray, removeDuplicates } from '../utils'
-import {AnyNote, interval, simplifyNote, StandardNote} from '../note'
+import { AnyNote, interval, simplifyNote, StandardNote } from '../note'
 import {
   AeolianStandardKey,
   IonianStandardKey,

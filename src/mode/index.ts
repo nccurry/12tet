@@ -1,6 +1,6 @@
 import { Chord, ChordNumeral, DiatonicChordType } from "../chord"
 import { ShortIntervalName } from "../interval"
-import {AnyNote, StandardNote, transpose} from '../note'
+import { AnyNote, StandardNote, transpose } from '../note'
 
 // Data / Types
 
@@ -24,6 +24,11 @@ export type ModeName = typeof MODE_NAMES[number]
 
 export const MODE_DEGREE_NUMBERS = [1, 2, 3, 4, 5, 6, 7]
 export type ModeDegreeNumber = typeof MODE_DEGREE_NUMBERS[number]
+
+export const ALTERED_MODE_DEGREE_NUMBERS = ['b1', '#1', 'b2', '#2', 'b3', '#3', 'b4', '#4', 'b5', '#5', 'b6', '#6', 'b7', '#7'] as const
+export type AlteredModeDegreeNumber = typeof ALTERED_MODE_DEGREE_NUMBERS[number]
+
+export type AnyModeDegreeNumber = ModeDegreeNumber | AlteredModeDegreeNumber
 
 interface ModeDegreeComplex {
   number: ModeDegreeNumber,
