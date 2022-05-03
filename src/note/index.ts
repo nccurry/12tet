@@ -74,9 +74,7 @@ export const TONES_BY_NOTE: Record<AnyNote, Tone> = tonesByNote()
 
 export function getNextNaturalNote(note: NaturalNote): NaturalNote {
   for (let i = 0; i < NATURAL_NOTES.length; i++) {
-    console.log(note, NATURAL_NOTES[i])
     if (NATURAL_NOTES[i] === note) {
-
       return NATURAL_NOTES[(i + 1) % NATURAL_NOTES.length]
     }
   }
