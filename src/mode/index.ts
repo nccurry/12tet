@@ -20,7 +20,14 @@ export function isModeKeySignature (signature: string): signature is ModeKeySign
 }
 
 export const MODE_NAMES = ['Ionian', 'Dorian', 'Phrygian', 'Lydian', 'Mixolydian', 'Aeolian', 'Locrian'] as const
-export type ModeName = typeof MODE_NAMES[number]
+export type AnyModeName = typeof MODE_NAMES[number]
+export type IonianModeName = 'Ionian'
+export type DorianModeName = 'Dorian'
+export type PhrygianModeName = 'Phrygian'
+export type LydianModeName = 'Lydian'
+export type MixolydianModeName = 'Mixolydian'
+export type AeolianModeName = 'Aeolian'
+export type LocrianModeName = 'Locrian'
 
 export const MODE_DEGREE_NUMBERS = [1, 2, 3, 4, 5, 6, 7]
 export type ModeDegreeNumber = typeof MODE_DEGREE_NUMBERS[number]
@@ -145,6 +152,8 @@ export function isLocrianTheoreticalKey (note: AnyNote): note is LocrianTheoreti
 export function isLocrianAnyKey (note: AnyNote): note is LocrianAnyKey {
   return isLocrianStandardKey(note) || isLocrianTheoreticalKey(note)
 }
+
+export type AnyStandardKey = IonianStandardKey | DorianStandardKey | PhrygianStandardKey | LydianStandardKey | MixolydianStandardKey | AeolianStandardKey | LocrianStandardKey
 
 const MODE_DATA : {
   Ionian: IonianData,
@@ -1867,7 +1876,11 @@ const MODE_DATA : {
 
 // Functions / Classes
 
-export function isModeKey (key: AnyNote, mode: ModeName): boolean {
+export function getModeTonePattern(mode: AnyModeName): number[] {
+  return MODE_DATA[mode].semitoneStructure
+}
+
+export function isModeAnyKey (key: AnyNote, mode: AnyModeName): boolean {
   switch (mode) {
     case 'Ionian':
       return isIonianAnyKey(key)
@@ -1886,12 +1899,31 @@ export function isModeKey (key: AnyNote, mode: ModeName): boolean {
   }
 }
 
-export function names (): readonly ModeName[] {
+export function isModeStandardKey (key: AnyNote, mode: AnyModeName): boolean {
+  switch (mode) {
+    case 'Ionian':
+      return isIonianStandardKey(key)
+    case 'Dorian':
+      return isDorianStandardKey(key)
+    case 'Phrygian':
+      return isPhrygianStandardKey(key)
+    case 'Lydian':
+      return isLydianStandardKey(key)
+    case 'Mixolydian':
+      return isMixolydianStandardKey(key)
+    case 'Aeolian':
+      return isAeolianStandardKey(key)
+    case 'Locrian':
+      return isLocrianStandardKey(key)
+  }
+}
+
+export function names (): readonly AnyModeName[] {
   return MODE_NAMES
 }
 
 export abstract class ModeData {
-  readonly name: ModeName
+  readonly name: AnyModeName
   readonly chordNumerals: ChordNumeral[]
   readonly chordBases: DiatonicChordType[]
   readonly semitoneStructure: number[]
@@ -1899,7 +1931,7 @@ export abstract class ModeData {
   readonly ionianAdjustment: number[]
   readonly keyBySignature: Record<ModeKeySignature, ModeKey>
 
-  constructor(name: ModeName) {
+  constructor(name: AnyModeName) {
     this.name = name
     this.chordNumerals = MODE_DATA[this.name].chordNumerals
     this.chordBases = MODE_DATA[this.name].chordBases
@@ -1921,7 +1953,7 @@ interface LocrianData extends ModeData { keyByTonic: Record<LocrianAnyKey, ModeK
 export class Mode extends ModeData {
   readonly keyByTonic: { [key in StandardNote]?: ModeKey }
 
-  constructor(name: ModeName) {
+  constructor(name: AnyModeName) {
     super(name)
     this.keyByTonic = MODE_DATA[this.name].keyByTonic
   }

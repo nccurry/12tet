@@ -1,34 +1,74 @@
 import { Interval, IntervalIdentifier } from '../interval'
-import {getShallowCopy, normalizeValue} from '../utils'
-import { isModeKey, ModeName } from "../mode"
+import { getShallowCopy, normalizeValue } from '../utils'
+import {
+  isModeAnyKey,
+  isModeStandardKey,
+  AnyModeName,
+  IonianModeName,
+  IonianStandardKey,
+  DorianModeName,
+  DorianStandardKey,
+  PhrygianMode,
+  PhrygianStandardKey,
+  LydianModeName,
+  PhrygianModeName,
+  LydianStandardKey,
+  MixolydianModeName,
+  MixolydianStandardKey,
+  AeolianModeName,
+  AeolianStandardKey,
+  LocrianStandardKey, LocrianModeName
+} from "../mode"
 
 // Data / Types
 
 export const NATURAL_NOTES = ['C', 'D', 'E', 'F', 'G', 'A', 'B'] as const
 export type NaturalNote = typeof NATURAL_NOTES[number]
-export function isNaturalNote (note: string): note is NaturalNote {
-  return NATURAL_NOTES.includes(note as NaturalNote)
+export function isNaturalNote (note: any): note is NaturalNote {
+  return NATURAL_NOTES.includes(note.toString() as NaturalNote)
 }
 
-export const ACCENTED_NOTES = ['F#', 'C#', 'G#', 'D#', 'A#', 'E#', 'B#', 'Bb', 'Eb', 'Ab', 'Db', 'Gb', 'Cb', 'Fb'] as const
-export type AccentedNote = typeof ACCENTED_NOTES[number]
-export function isAccentedNote (note: string): note is AccentedNote {
-  return ACCENTED_NOTES.includes(note as AccentedNote)
+export const STANDARD_SHARP_NOTES = ['F#', 'C#', 'G#', 'D#', 'A#', 'E#', 'B#'] as const
+export type StandardSharpNote = typeof STANDARD_SHARP_NOTES[number]
+export function isStandardSharpNote (note: any): note is StandardSharpNote {
+  return STANDARD_SHARP_NOTES.includes(note.toString() as StandardSharpNote)
 }
 
-export const THEORETICAL_NOTES = ['C##', 'D##', 'E##', 'F##', 'G##', 'A##', 'B##', 'Cbb', 'Dbb', 'Ebb', 'Fbb', 'Gbb', 'Abb', 'Bbb'] as const
-export type TheoreticalNote = typeof THEORETICAL_NOTES[number]
-export function isTheoreticalNote (note: string): note is TheoreticalNote {
-  return THEORETICAL_NOTES.includes(note as TheoreticalNote)
+export const STANDARD_FLAT_NOTES = ['Bb', 'Eb', 'Ab', 'Db', 'Gb', 'Cb', 'Fb'] as const
+export type StandardFlatNote = typeof STANDARD_FLAT_NOTES[number]
+export function isStandardFlatNote (note: any): note is StandardFlatNote {
+  return STANDARD_FLAT_NOTES.includes(note.toString() as StandardFlatNote)
 }
 
-export type StandardNote = NaturalNote | AccentedNote
-export function isStandardNote (note: string): note is StandardNote {
+export const THEORETICAL_SHARP_NOTES = ['C##', 'D##', 'E##', 'F##', 'G##', 'A##', 'B##'] as const
+export type TheoreticalSharpNote = typeof THEORETICAL_SHARP_NOTES[number]
+export function isTheoreticalSharpNote (note: any): note is TheoreticalSharpNote {
+  return THEORETICAL_SHARP_NOTES.includes(note.toString() as TheoreticalSharpNote)
+}
+
+export const THEORETICAL_FLAT_NOTES = ['Cbb', 'Dbb', 'Ebb', 'Fbb', 'Gbb', 'Abb', 'Bbb'] as const
+export type TheoreticalFlatNote = typeof THEORETICAL_FLAT_NOTES[number]
+export function isTheoreticalFlatNote (note: any): note is TheoreticalFlatNote {
+  return THEORETICAL_FLAT_NOTES.includes(note.toString() as TheoreticalFlatNote)
+}
+
+export type StandardAccentedNote = StandardSharpNote | StandardFlatNote
+export function isAccentedNote (note: any): note is StandardAccentedNote {
+  return isStandardSharpNote(note) || isStandardFlatNote(note)
+}
+
+export type TheoreticalNote = TheoreticalSharpNote | TheoreticalFlatNote
+export function isTheoreticalNote (note: any): note is TheoreticalNote {
+  return isTheoreticalSharpNote(note) || isTheoreticalFlatNote(note)
+}
+
+export type StandardNote = NaturalNote | StandardAccentedNote
+export function isStandardNote (note: any): note is StandardNote {
   return isNaturalNote(note) || isAccentedNote(note)
 }
 
 export type AnyNote = StandardNote | TheoreticalNote
-export function isAnyNote (note: string): note is AnyNote {
+export function isAnyNote (note: any): note is AnyNote {
   return isStandardNote(note) || isTheoreticalNote(note)
 }
 
@@ -42,7 +82,7 @@ export interface Tone {
   notes: ToneNotes
 }
 
-export const TONES: readonly Tone[] = [
+const TONES: readonly Tone[] = [
   { notes: ['B#', 'C', 'Dbb'], index: 0 },
   { notes: ['B##', 'C#', 'Db'], index: 1 },
   { notes: ['C##', 'D', 'Ebb'], index: 2 },
@@ -82,24 +122,34 @@ export function getNextNaturalNote(note: NaturalNote): NaturalNote {
   return 'C'
 }
 
-export function getTone(note: AnyNote): Tone {
-  return TONES_BY_NOTE[note]
+export function getTone(noteOrIndex: AnyNote | number): Tone {
+  if (isAnyNote(noteOrIndex)) {
+    return TONES_BY_NOTE[noteOrIndex]
+  } else {
+    return TONES[noteOrIndex % TONES.length]
+  }
 }
 
 export function simplifyNote(note: StandardNote): StandardNote
 export function simplifyNote(note: TheoreticalNote): StandardNote[]
-export function simplifyNote(note: AnyNote, mode: ModeName): StandardNote
-export function simplifyNote(note: AnyNote, mode?: ModeName): StandardNote[] | StandardNote | undefined {
+export function simplifyNote(note: AnyNote, mode: IonianModeName): IonianStandardKey
+export function simplifyNote(note: AnyNote, mode: DorianModeName): DorianStandardKey
+export function simplifyNote(note: AnyNote, mode: PhrygianModeName): PhrygianStandardKey
+export function simplifyNote(note: AnyNote, mode: LydianModeName): LydianStandardKey
+export function simplifyNote(note: AnyNote, mode: MixolydianModeName): MixolydianStandardKey
+export function simplifyNote(note: AnyNote, mode: AeolianModeName): AeolianStandardKey
+export function simplifyNote(note: AnyNote, mode: LocrianModeName): LocrianStandardKey
+export function simplifyNote(note: AnyNote, mode: AnyModeName): StandardNote
+export function simplifyNote(note: AnyNote, mode?: AnyModeName): StandardNote[] | StandardNote | undefined {
   const tone = getTone(note)
-  const standardNotes = tone.notes.filter(isStandardNote)
+  const toneNotes = tone.notes.filter(toneNote => toneNote !== note)
+  const standardNotes = toneNotes.filter(isStandardNote)
   if (isStandardNote(note) && !mode) {
     return note
-  } else if (isStandardNote(note) && mode) {
-    return standardNotes.filter(note => isModeKey(note, mode))[0]
   } else if (isTheoreticalNote(note) && !mode) {
     return standardNotes
-  } else if (isTheoreticalNote(note) && mode) {
-    return standardNotes.filter(note => isModeKey(note, mode))[0]
+  } else if (mode) {
+    return standardNotes.filter(note => isModeStandardKey(note, mode))[0]
   }
 }
 
@@ -107,9 +157,9 @@ export function interval (firstNote: AnyNote, secondNote: AnyNote): Interval {
   return new Interval(normalizeValue(TONES_BY_NOTE[firstNote].index - TONES_BY_NOTE[secondNote].index, 12))
 }
 
-export function transpose (note: AnyNote, intervalIdentifier: IntervalIdentifier, mode: ModeName): StandardNote
+export function transpose (note: AnyNote, intervalIdentifier: IntervalIdentifier, mode: AnyModeName): StandardNote
 export function transpose (note: AnyNote, intervalIdentifier: IntervalIdentifier): ToneNotes
-export function transpose (note: AnyNote, intervalIdentifier: IntervalIdentifier, mode?: ModeName): ToneNotes | StandardNote {
+export function transpose (note: AnyNote, intervalIdentifier: IntervalIdentifier, mode?: AnyModeName): ToneNotes | StandardNote {
   const interval = new Interval(intervalIdentifier)
   const tone = TONES[normalizeValue(TONES_BY_NOTE[note].index + interval.length, 12)]
   if (mode) {
