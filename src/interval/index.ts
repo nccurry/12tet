@@ -102,10 +102,18 @@ export function isShortIntervalName (interval: any): interval is ShortIntervalNa
 }
 
 // A number representing the semitone distance between two intervals
-export type IntervalDistance = number
+export type IntervalDistance = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
+export function isIntervalDistance (interval: any): interval is IntervalDistance {
+  return interval <= 12
+}
+
+export type ComplexIntervalDistance = number
+export function isComplexIntervalDistance (interval: any): interval is ComplexIntervalDistance {
+  return interval > 12
+}
 
 // An identifier that uniquely identifies a given interval
-export type IntervalIdentifier = IntervalName | ShortIntervalName | IntervalDistance | IntervalData
+export type IntervalIdentifier = IntervalName | ShortIntervalName | IntervalDistance | ComplexIntervalDistance | IntervalData
 
 // Metadata of the inter-octave intervals
 const INTERVAL_DATA: Record<ShortIntervalName, IntervalData> = {
@@ -204,7 +212,7 @@ const INTERVAL_DATA: Record<ShortIntervalName, IntervalData> = {
 
 // getInterval accepts an intervalIdentifier and returns an object containing that interval's data
 // or a TypeError if the supplied interValIdentifier is not of type IntervalIdentifier
-function getInterval(intervalIdentifier: IntervalIdentifier): IntervalData | TypeError {
+export function getInterval(intervalIdentifier: IntervalIdentifier): IntervalData | TypeError {
   if (isIntervalData(intervalIdentifier)) {
     return intervalIdentifier
   } else if (isIntervalName(intervalIdentifier)) {
@@ -216,8 +224,20 @@ function getInterval(intervalIdentifier: IntervalIdentifier): IntervalData | Typ
     }
   } else if (isShortIntervalName(intervalIdentifier)) {
     return INTERVAL_DATA[intervalIdentifier]
+  } else if (isIntervalDistance(intervalIdentifier)) {
+    const intervalData = Object.values(INTERVAL_DATA).find(element => element.length === intervalIdentifier)
+    if (!intervalData) {
+      return new TypeError(`${intervalIdentifier} is not of type IntervalIdentifier`)
+    } else {
+      return intervalData
+    }
   } else {
-    const intervalData = Object.values(INTERVAL_DATA).find(element => element.length === normalizeValue(intervalIdentifier, 12))
+    // With complex intervals, we want to normalize to Perfect Octaves, not Perfect Unisons
+    let normalizedValue = normalizeValue(intervalIdentifier, 12)
+    if (normalizedValue === 0) {
+      normalizedValue = 12
+    }
+    const intervalData = Object.values(INTERVAL_DATA).find(element => element.length === normalizedValue)
     if (!intervalData) {
       return new TypeError(`${intervalIdentifier} is not of type IntervalIdentifier`)
     } else {
