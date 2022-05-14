@@ -113,3 +113,7 @@ export function sumTo (array: number[], index: number): number {
   }
   return sum
 }
+
+export function isTypeError(error: unknown): error is Error {
+  return error instanceof TypeError
+}
