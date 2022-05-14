@@ -1,9 +1,9 @@
-import { normalizeValue } from "../utils"
+import { isTypeError, normalizeValue } from "../utils"
 
-// Data / Types
 
-// https://en.wikipedia.org/wiki/Interval_(music)
-const INTERVAL_NAMES = [
+
+// Standard inter-octave interval names
+export const INTERVAL_NAMES = [
   'Perfect Unison',
   'Minor Second',
   'Major Second',
@@ -23,7 +23,8 @@ export function isIntervalName (interval: any): interval is IntervalName {
   return INTERVAL_NAMES.includes(interval)
 }
 
-const ALTERNATE_INTERVAL_NAMES = [
+// Alternate and extra-octave interval names
+export const ALTERNATE_INTERVAL_NAMES = [
   'Semitone',
   'Tone',
   'Trisemitone',
@@ -75,7 +76,11 @@ const ALTERNATE_INTERVAL_NAMES = [
   'Whole Step'
 ] as const
 export type AlternateIntervalName = typeof ALTERNATE_INTERVAL_NAMES[number]
+export function isAlternateIntervalName (interval: any): interval is AlternateIntervalName {
+  return ALTERNATE_INTERVAL_NAMES.includes(interval)
+}
 
+// Abbreviated inter-octave interval names
 const INTERVAL_SHORT_NAMES = [
   'P1',
   'm2',
@@ -96,14 +101,13 @@ export function isShortIntervalName (interval: any): interval is ShortIntervalNa
   return INTERVAL_SHORT_NAMES.includes(interval)
 }
 
+// A number representing the semitone distance between two intervals
 export type IntervalDistance = number
 
+// An identifier that uniquely identifies a given interval
 export type IntervalIdentifier = IntervalName | ShortIntervalName | IntervalDistance | IntervalData
 
-export function isIntervalData (interval: any): interval is IntervalData {
-  return (interval as IntervalData).name !== undefined && (interval as IntervalData).shortName !== undefined
-}
-
+// Metadata of the inter-octave intervals
 const INTERVAL_DATA: Record<ShortIntervalName, IntervalData> = {
   P1: {
     length: 0,
@@ -198,42 +202,68 @@ const INTERVAL_DATA: Record<ShortIntervalName, IntervalData> = {
   }
 }
 
-// Functions / Classes
-
-function getInterval(interval: IntervalIdentifier): IntervalData {
-  if (isIntervalData(interval)) {
-    return interval
-  } else if (isIntervalName(interval)) {
-    return Object.values(INTERVAL_DATA).find(element => element.name === interval)!
-  } else if (isShortIntervalName(interval)) {
-    return INTERVAL_DATA[interval]
+// getInterval accepts an intervalIdentifier and returns an object containing that interval's data
+// or a TypeError if the supplied interValIdentifier is not of type IntervalIdentifier
+function getInterval(intervalIdentifier: IntervalIdentifier): IntervalData | TypeError {
+  if (isIntervalData(intervalIdentifier)) {
+    return intervalIdentifier
+  } else if (isIntervalName(intervalIdentifier)) {
+    const intervalData = Object.values(INTERVAL_DATA).find(element => element.name === intervalIdentifier)
+    if (!intervalData) {
+      return new TypeError(`${intervalIdentifier} is not of type IntervalIdentifier`)
+    } else {
+      return intervalData
+    }
+  } else if (isShortIntervalName(intervalIdentifier)) {
+    return INTERVAL_DATA[intervalIdentifier]
   } else {
-    return Object.values(INTERVAL_DATA).find(element => element.length === normalizeValue(interval, 12))!
+    const intervalData = Object.values(INTERVAL_DATA).find(element => element.length === normalizeValue(intervalIdentifier, 12))
+    if (!intervalData) {
+      return new TypeError(`${intervalIdentifier} is not of type IntervalIdentifier`)
+    } else {
+      return intervalData
+    }
   }
 }
 
-abstract class IntervalData {
+// An abstract class representing the dat of a single interval
+// Used as a type when passing around interval information
+export abstract class IntervalData {
   // The length of the interval in semitones
   readonly length: IntervalDistance
+
   // The long name of the interval
   readonly name: IntervalName
+
   // The short name of the interval
   readonly shortName: ShortIntervalName
+
   // Alternate long names of the interval
   readonly alternateNames: AlternateIntervalName[]
+
   // The intervals tension rating
   readonly tension: number
 
-  constructor(interval: IntervalIdentifier) {
-    const i = getInterval(interval)
-    this.length = i.length
-    this.name = i.name
-    this.shortName = i.shortName
-    this.alternateNames = i.alternateNames
-    this.tension = i.tension
+  constructor(intervalIdentifier: IntervalIdentifier) {
+    const interval = getInterval(intervalIdentifier)
+    if (isTypeError(interval)) {
+      throw interval
+    } else {
+      this.length = interval.length
+      this.name = interval.name
+      this.shortName = interval.shortName
+      this.alternateNames = interval.alternateNames
+      this.tension = interval.tension
+    }
   }
 }
 
+// IntervalData type guard
+export function isIntervalData (interval: any): interval is IntervalData {
+  return (interval as IntervalData).name !== undefined && (interval as IntervalData).shortName !== undefined
+}
+
+// A class representing a single interval
 export class Interval extends IntervalData {
   distance (interval: Interval) {
     return normalizeValue(interval.length - this.length, 12)
