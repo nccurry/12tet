@@ -26,3 +26,12 @@ console.log(p8_1.name) // Perfect Octave
 console.log(p8_2.tension) // 0
 console.log(p8_3.alternateNames) // ['Augmented Seventh']
 ```
+
+## Development
+
+### Running tests
+
+You can execute the test suite using jest
+```shell
+jest
+```

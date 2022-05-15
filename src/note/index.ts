@@ -1,14 +1,12 @@
 import { Interval, IntervalIdentifier } from '../interval'
-import { getShallowCopy, normalizeValue } from '../utils'
+import { wrapValue } from '../utils'
 import {
-  isModeAnyKey,
   isModeStandardKey,
   AnyModeName,
   IonianModeName,
   IonianStandardKey,
   DorianModeName,
   DorianStandardKey,
-  PhrygianMode,
   PhrygianStandardKey,
   LydianModeName,
   PhrygianModeName,
@@ -17,7 +15,8 @@ import {
   MixolydianStandardKey,
   AeolianModeName,
   AeolianStandardKey,
-  LocrianStandardKey, LocrianModeName
+  LocrianStandardKey,
+  LocrianModeName
 } from "../mode"
 
 // Data / Types
@@ -95,7 +94,6 @@ const TONES: readonly Tone[] = [
   { notes: ['G##', 'A', 'Bbb'], index: 9 },
   { notes: ['A#', 'Bb', 'Cbb'], index: 10 },
   { notes: ['A##', 'B', 'Cb'], index: 11 },
-
 ]
 
 function tonesByNote (): Record<AnyNote, Tone> {
@@ -154,14 +152,14 @@ export function simplifyNote(note: AnyNote, mode?: AnyModeName): StandardNote[] 
 }
 
 export function interval (firstNote: AnyNote, secondNote: AnyNote): Interval {
-  return new Interval(normalizeValue(TONES_BY_NOTE[firstNote].index - TONES_BY_NOTE[secondNote].index, 12))
+  return new Interval(wrapValue(TONES_BY_NOTE[firstNote].index - TONES_BY_NOTE[secondNote].index, 12))
 }
 
 export function transpose (note: AnyNote, intervalIdentifier: IntervalIdentifier, mode: AnyModeName): StandardNote
 export function transpose (note: AnyNote, intervalIdentifier: IntervalIdentifier): ToneNotes
 export function transpose (note: AnyNote, intervalIdentifier: IntervalIdentifier, mode?: AnyModeName): ToneNotes | StandardNote {
   const interval = new Interval(intervalIdentifier)
-  const tone = TONES[normalizeValue(TONES_BY_NOTE[note].index + interval.length, 12)]
+  const tone = TONES[wrapValue(TONES_BY_NOTE[note].index + interval.length, 12)]
   if (mode) {
     return simplifyNote(tone.notes[0], mode)
   } else {

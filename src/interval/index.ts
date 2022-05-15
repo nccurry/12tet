@@ -1,4 +1,4 @@
-import { isTypeError, normalizeValue } from "../utils"
+import { isTypeError, wrapValue } from "../utils"
 
 
 
@@ -233,7 +233,7 @@ export function getInterval(intervalIdentifier: IntervalIdentifier): IntervalDat
     }
   } else {
     // With complex intervals, we want to normalize to Perfect Octaves, not Perfect Unisons
-    let normalizedValue = normalizeValue(intervalIdentifier, 12)
+    let normalizedValue = wrapValue(intervalIdentifier, 12)
     if (normalizedValue === 0) {
       normalizedValue = 12
     }
@@ -286,6 +286,6 @@ export function isIntervalData (interval: any): interval is IntervalData {
 // A class representing a single interval
 export class Interval extends IntervalData {
   distance (interval: Interval) {
-    return normalizeValue(interval.length - this.length, 12)
+    return wrapValue(interval.length - this.length, 12)
   }
 }

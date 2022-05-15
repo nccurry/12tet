@@ -1,5 +1,4 @@
-import {Key} from "./key";
+import { Key } from "./key"
 
 
-const test = new Key('C', 'Ionian')
-console.log(test)
+const cIonian = new Key('C#', 'Ionian')

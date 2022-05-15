@@ -1,5 +1,5 @@
 import { Interval, IntervalDistance } from "../interval"
-import { normalizeValue, offsetArray, removeDuplicates } from '../utils'
+import { wrapValue, rotateArray, removeDuplicates } from '../utils'
 import { AnyNote, interval, simplifyNote, StandardNote } from '../note'
 import {
   AeolianStandardKey,
@@ -114,16 +114,16 @@ function getAlterationIntervals (chordType: ChordType, alteration: ChordAlterati
   } else if (accidental === "b") {
     adjustment -= 1
   }
-  const degreeIndex = normalizeValue(Number(alteration[1]) - 1, 7)
+  const degreeIndex = wrapValue(Number(alteration[1]) - 1, 7)
   return {
     base: chordTypeIntervals[chordType][degreeIndex],
-    altered: normalizeValue(chordTypeIntervals[chordType][degreeIndex] + adjustment, 12)
+    altered: wrapValue(chordTypeIntervals[chordType][degreeIndex] + adjustment, 12)
   }
 }
 
 function getAdditionInterval (chordType: ChordType, addition: ChordAddition): IntervalDistance {
   const degree = Number(addition[3])
-  return chordTypeIntervals[chordType][normalizeValue(degree - 1, 12)]
+  return chordTypeIntervals[chordType][wrapValue(degree - 1, 12)]
 }
 
 
@@ -172,7 +172,7 @@ export class Chord extends ChordData {
     let chordIntervals: IntervalDistance[] = []
     for (let i = 0; i < this.extension; i++) {
       if (i % 2 === 0) {
-        chordIntervals.push(chordTypeIntervals[this.type][normalizeValue(i, 7)])
+        chordIntervals.push(chordTypeIntervals[this.type][wrapValue(i, 7)])
       }
     }
 
@@ -207,7 +207,7 @@ export class Chord extends ChordData {
     // Set slash interval first
     if (slashInterval) {
       while (chordIntervals[0] !== slashInterval.length) {
-        chordIntervals = offsetArray(chordIntervals, 1)
+        chordIntervals = rotateArray(chordIntervals, 1)
       }
     }
 

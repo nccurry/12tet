@@ -1,4 +1,8 @@
-import { normalizeValue, offsetArray, sumTo } from '../utils'
+import {
+  wrapValue,
+  rotateArray,
+  sumTo, isTypeError
+} from '../utils'
 import {
   AnyNote,
   getNextNaturalNote,
@@ -7,37 +11,47 @@ import {
   isStandardFlatNote,
   isStandardSharpNote, isTheoreticalFlatNote,
   isTheoreticalSharpNote,
-  NaturalNote,
-  simplifyNote, StandardNote,
+  simplifyNote,
   Tone,
 } from '../note'
 import {
   AnyModeDegreeNumber,
   isModeAnyKey,
   ModeKeySignature,
-  AnyModeName, getModeTonePattern, ALTERED_MODE_DEGREE_NUMBERS, MODE_DEGREE_NUMBERS, ModeKey
+  AnyModeName, getModeTonePattern,
+  ALTERED_MODE_DEGREE_NUMBERS,
+  MODE_DEGREE_NUMBERS, isModeKeySignature
 } from '../mode'
 
-function getKeySignatureFromNotes(notes: AnyNote[]): ModeKeySignature {
+// Given the notes of a key, return the key signature
+function getKeySignatureFromKeyNotes(notes: AnyNote[]): ModeKeySignature | TypeError {
+  if (notes.length != 7) {
+    return TypeError(`Invalid key. Notes array ${notes} does not have enough notes to make a valid key`)
+  }
+
+  // Count the total number of sharps and flats present in the notes array
   let sharps = 0
   let flats = 0
   notes.forEach(note => {
     sharps += (note.match(/#/g) || []).length
     flats += (note.match(/b/g) || []).length
   })
-  if (sharps === 0 && flats === 0) {
+
+  if (sharps !==0 && flats !==0) {
+    return TypeError(`Invalid key. Notes array ${notes} cannot contain both sharps and flats`)
+  } else if (sharps === 0 && flats === 0) {
     return ''
-  } else if (flats === 0) {
-    return `${sharps}#` as ModeKeySignature
   } else {
-    return `${flats}#` as ModeKeySignature
+    const keySignature = flats === 0 ? `${sharps}#` : `${flats}#`
+    return isModeKeySignature(keySignature) ? keySignature : TypeError(`Key signature ${keySignature} is not a valid key signature`)
   }
 }
 
+// Given a tonic note and a mode, return an array of Tones
 function getKeyTones(tonic: AnyNote, mode: AnyModeName): Tone[] {
   const tone = getTone(tonic)
   let toneIndexes: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-  toneIndexes = offsetArray(toneIndexes, tone.index)
+  toneIndexes = rotateArray(toneIndexes, tone.index)
   const modeTonePattern = getModeTonePattern(mode)
 
   // Generate tones
@@ -53,28 +67,52 @@ function getKeyTones(tonic: AnyNote, mode: AnyModeName): Tone[] {
     }
     index++
   }
+
   return keyTones
 }
 
-// TODO: Gracefully handle enharmonic equivalents without a mode key
-function convertKeyTonesToNotes(tonic: AnyNote, keyTones: Tone[]): AnyNote[] {
-  // Convert tones to notes
+// Given a tonic and an array of Tones, simplify to an array of notes
+function convertKeyTonesToNotes(tonic: AnyNote, keyTones: Tone[]): AnyNote[] | TypeError {
+  if (keyTones.length != 7) {
+    return TypeError(`The list of key tones does not have 7 tones`)
+  }
+
+  if (!keyTones[0].notes.includes(tonic)) {
+    return TypeError(`The first key tone ${keyTones[0].notes} does not include the tonic note ${tonic}`)
+  }
+
   const notes: AnyNote[] = []
+
+  // Starting with the supplied tonic, iterate over the list of tones and get the next in the sequence
+  // We exploit the fact that every valid mode has only a single instance of each of A, B, C, D, E, F, G
+  // and that every tone always contains different 2-3 instances of each of A, B, C, D, E, F, G
+  // So if the last note was B# we know the next note has to have a root C
   keyTones.forEach((tone, index) => {
     if (index === 0) {
       notes.push(tonic)
     } else {
-      const nextNote = getNextNaturalNote(notes[index - 1][0] as NaturalNote)
-      tone.notes.forEach(note => {
-        if (note[0] === nextNote) {
-          notes.push(note)
-        }
-      })
+      const lastNaturalNote = notes[index - 1][0]
+      if (isNaturalNote(lastNaturalNote)) {
+        const nextNaturalNote = getNextNaturalNote(lastNaturalNote)
+        tone.notes.forEach(note => {
+          if (note[0] === nextNaturalNote) {
+            notes.push(note)
+          }
+        })
+      } else {
+        return TypeError(`Note ${lastNaturalNote} is not a valid natural note`)
+      }
     }
   })
+
+  if (notes.length != 7) {
+    return TypeError(`The generated list of notes ${notes} does not contain 7 notes`)
+  }
+
   return notes
 }
 
+// Get the note a sharp or flat above or below a given note
 function adjustNote(note: AnyNote, adjustment: 'b' | '#' | ''): AnyNote {
   if (adjustment === '') {
     return note
@@ -83,10 +121,10 @@ function adjustNote(note: AnyNote, adjustment: 'b' | '#' | ''): AnyNote {
   let tone = getTone(note)
   switch (adjustment) {
     case "b":
-      tone = getTone(normalizeValue(tone.index - 1, 12))
+      tone = getTone(wrapValue(tone.index - 1, 12))
       break
     case "#":
-      tone = getTone(normalizeValue(tone.index + 1, 12))
+      tone = getTone(wrapValue(tone.index + 1, 12))
       break
   }
 
@@ -109,6 +147,8 @@ function adjustNote(note: AnyNote, adjustment: 'b' | '#' | ''): AnyNote {
   }
 }
 
+// Given a list of notes, return an object with degree keys and note values
+// It is assumed that the notes are given in order - i.e. index 0 is the first degree of the key
 function generateNotesByDegree(notes: AnyNote[]): Record<AnyModeDegreeNumber, AnyNote> {
   const notesByDegree: { [key in AnyModeDegreeNumber]?: AnyNote } = {}
   MODE_DEGREE_NUMBERS.forEach((degree, index)=> {
@@ -144,11 +184,21 @@ export abstract class KeyData {
     }
     this.mode = mode
     this._tones = getKeyTones(this.tonic, this.mode)
-    this.notes = convertKeyTonesToNotes(this.tonic, this._tones)
-    this.signature = getKeySignatureFromNotes(this.notes)
+    const notes = convertKeyTonesToNotes(this.tonic, this._tones)
+    if (isTypeError(notes)) {
+      throw notes
+    } else {
+      this.notes = notes
+    }
     this.enharmonicEquivalents = this._tones[0].notes.filter(note => note !== this.tonic && isModeAnyKey(note, this.mode))
-    this.theoreticalKey = parseInt(this.signature[0]) > 7
     this.notesByDegree = generateNotesByDegree(this.notes)
+    const signature = getKeySignatureFromKeyNotes(this.notes)
+    if (isTypeError(signature)) {
+      throw signature
+    } else {
+      this.signature = signature
+    }
+    this.theoreticalKey = parseInt(this.signature[0]) > 7
   }
 }
 
