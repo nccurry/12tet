@@ -10,9 +10,9 @@ import {
   isNaturalNote,
   isStandardFlatNote,
   isStandardSharpNote, isTheoreticalFlatNote,
-  isTheoreticalSharpNote,
-  simplifyNote,
-  Tone,
+  isTheoreticalSharpNote, NATURAL_NOTES,
+  simplifyNote, STANDARD_FLAT_NOTES, STANDARD_SHARP_NOTES, THEORETICAL_FLAT_NOTES, THEORETICAL_SHARP_NOTES,
+  Tone
 } from '../note'
 import {
   AnyModeDegreeNumber,
@@ -20,11 +20,11 @@ import {
   ModeKeySignature,
   AnyModeName, getModeTonePattern,
   ALTERED_MODE_DEGREE_NUMBERS,
-  MODE_DEGREE_NUMBERS, isModeKeySignature
+  STANDARD_MODE_DEGREE_NUMBERS, isModeKeySignature, StandardModeDegreeNumber
 } from '../mode'
 
 // Given the notes of a key, return the key signature
-function getKeySignatureFromKeyNotes(notes: AnyNote[]): ModeKeySignature | TypeError {
+export function getKeySignatureFromKeyNotes(notes: AnyNote[]): ModeKeySignature | TypeError {
   if (notes.length != 7) {
     return TypeError(`Invalid key. Notes array ${notes} does not have enough notes to make a valid key`)
   }
@@ -39,16 +39,18 @@ function getKeySignatureFromKeyNotes(notes: AnyNote[]): ModeKeySignature | TypeE
 
   if (sharps !==0 && flats !==0) {
     return TypeError(`Invalid key. Notes array ${notes} cannot contain both sharps and flats`)
+  } else if (sharps > 14 || flats > 14) {
+    return TypeError(`Invalid key. Cannot have more than 14 sharps or flats`)
   } else if (sharps === 0 && flats === 0) {
     return ''
   } else {
-    const keySignature = flats === 0 ? `${sharps}#` : `${flats}#`
+    const keySignature = flats === 0 ? `${sharps}#` : `${flats}b`
     return isModeKeySignature(keySignature) ? keySignature : TypeError(`Key signature ${keySignature} is not a valid key signature`)
   }
 }
 
 // Given a tonic note and a mode, return an array of Tones
-function getKeyTones(tonic: AnyNote, mode: AnyModeName): Tone[] {
+export function getKeyTones(tonic: AnyNote, mode: AnyModeName): Tone[] {
   const tone = getTone(tonic)
   let toneIndexes: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
   toneIndexes = rotateArray(toneIndexes, tone.index)
@@ -72,7 +74,7 @@ function getKeyTones(tonic: AnyNote, mode: AnyModeName): Tone[] {
 }
 
 // Given a tonic and an array of Tones, simplify to an array of notes
-function convertKeyTonesToNotes(tonic: AnyNote, keyTones: Tone[]): AnyNote[] | TypeError {
+export function convertKeyTonesToNotes(tonic: AnyNote, keyTones: Tone[]): AnyNote[] | TypeError {
   if (keyTones.length != 7) {
     return TypeError(`The list of key tones does not have 7 tones`)
   }
@@ -113,7 +115,7 @@ function convertKeyTonesToNotes(tonic: AnyNote, keyTones: Tone[]): AnyNote[] | T
 }
 
 // Get the note a sharp or flat above or below a given note
-function adjustNote(note: AnyNote, adjustment: 'b' | '#' | ''): AnyNote {
+export function adjustNote(note: AnyNote, adjustment: 'b' | '#' | ''): AnyNote {
   if (adjustment === '') {
     return note
   }
@@ -149,9 +151,9 @@ function adjustNote(note: AnyNote, adjustment: 'b' | '#' | ''): AnyNote {
 
 // Given a list of notes, return an object with degree keys and note values
 // It is assumed that the notes are given in order - i.e. index 0 is the first degree of the key
-function generateNotesByDegree(notes: AnyNote[]): Record<AnyModeDegreeNumber, AnyNote> {
+export function generateNotesByDegree(notes: AnyNote[]): Record<AnyModeDegreeNumber, AnyNote> {
   const notesByDegree: { [key in AnyModeDegreeNumber]?: AnyNote } = {}
-  MODE_DEGREE_NUMBERS.forEach((degree, index)=> {
+  STANDARD_MODE_DEGREE_NUMBERS.forEach((degree, index)=> {
     notesByDegree[degree] = notes[index]
   })
 
@@ -167,11 +169,10 @@ export abstract class KeyData {
   readonly mode: AnyModeName
   readonly notes: AnyNote[]
   readonly signature: ModeKeySignature
-  readonly notesByDegree?: Record<AnyModeDegreeNumber, AnyNote>
-  readonly degreesByNote?: Record<AnyNote, AnyModeDegreeNumber>
+  readonly notesByDegree: Record<AnyModeDegreeNumber, AnyNote>
   readonly enharmonicEquivalents: AnyNote[]
   readonly theoreticalKey: boolean
-  private readonly _tones?: Tone[]
+  readonly tones: Tone[]
 
   constructor(tonic: AnyNote, mode: AnyModeName) {
     // Not every mode has a key with a tonic of every possible theoretical note
@@ -183,14 +184,14 @@ export abstract class KeyData {
       this.tonic = tonic
     }
     this.mode = mode
-    this._tones = getKeyTones(this.tonic, this.mode)
-    const notes = convertKeyTonesToNotes(this.tonic, this._tones)
+    this.tones = getKeyTones(this.tonic, this.mode)
+    const notes = convertKeyTonesToNotes(this.tonic, this.tones)
     if (isTypeError(notes)) {
       throw notes
     } else {
       this.notes = notes
     }
-    this.enharmonicEquivalents = this._tones[0].notes.filter(note => note !== this.tonic && isModeAnyKey(note, this.mode))
+    this.enharmonicEquivalents = this.tones[0].notes.filter(note => note !== this.tonic && isModeAnyKey(note, this.mode))
     this.notesByDegree = generateNotesByDegree(this.notes)
     const signature = getKeySignatureFromKeyNotes(this.notes)
     if (isTypeError(signature)) {
@@ -202,6 +203,4 @@ export abstract class KeyData {
   }
 }
 
-export class Key extends KeyData {
-
-}
+export class Key extends KeyData {}

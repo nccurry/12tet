@@ -29,20 +29,20 @@ export type MixolydianModeName = 'Mixolydian'
 export type AeolianModeName = 'Aeolian'
 export type LocrianModeName = 'Locrian'
 
-export const MODE_DEGREE_NUMBERS = [1, 2, 3, 4, 5, 6, 7]
-export type ModeDegreeNumber = typeof MODE_DEGREE_NUMBERS[number]
+export const STANDARD_MODE_DEGREE_NUMBERS = [1, 2, 3, 4, 5, 6, 7]
+export type StandardModeDegreeNumber = typeof STANDARD_MODE_DEGREE_NUMBERS[number]
 
 export const ALTERED_MODE_DEGREE_NUMBERS = ['b1', '#1', 'b2', '#2', 'b3', '#3', 'b4', '#4', 'b5', '#5', 'b6', '#6', 'b7', '#7'] as const
 export type AlteredModeDegreeNumber = typeof ALTERED_MODE_DEGREE_NUMBERS[number]
 
-export type AnyModeDegreeNumber = ModeDegreeNumber | AlteredModeDegreeNumber
+export type AnyModeDegreeNumber = StandardModeDegreeNumber | AlteredModeDegreeNumber
 
 interface ModeDegreeComplex {
-  number: ModeDegreeNumber,
+  number: StandardModeDegreeNumber,
   accidental?: '' | '#' | 'b'
 }
 
-export type ModeDegree = ModeDegreeNumber | ModeDegreeComplex
+export type ModeDegree = StandardModeDegreeNumber | ModeDegreeComplex
 
 // https://en.wikipedia.org/wiki/Degree_(music)#Scale_degree_names
 export const MODE_DEGREE_NAMES: readonly string[] = ['Tonic', 'Supertonic', 'Mediant', 'Subdominant', 'Dominant', 'Submediant', 'Subtonic', 'Leading Tone'] as const
