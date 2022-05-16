@@ -1,4 +1,4 @@
-import {convertKeyTonesToNotes, getKeySignatureFromKeyNotes, getKeyTones} from './index'
+import {adjustNote, convertKeyTonesToNotes, getKeySignatureFromKeyNotes, getKeyTones} from './index'
 import {AnyNote, Tone} from '../note'
 
 describe('Test getKeySignatureFromKeyNotes', () => {
@@ -45,5 +45,33 @@ describe('Test convertKeyTonesToNotes', () => {
   test('Execute convertKeyTonesToNotes', () => {
     const keyTones: Tone[] = [{"index": 0, "notes": ["B#", "C", "Dbb"]}, {"index": 2, "notes": ["C##", "D", "Ebb"]}, {"index": 4, "notes": ["D##", "E", "Fb"]}, {"index": 5, "notes": ["E#", "F", "Gbb"]}, {"index": 7, "notes": ["F##", "G", "Abb"]}, {"index": 9, "notes": ["G##", "A", "Bbb"]}, {"index": 11, "notes": ["A##", "B", "Cb"]}]
     expect(convertKeyTonesToNotes('C', keyTones)).toStrictEqual(['C', 'D', 'E', 'F', 'G', 'A', 'B'])
+  })
+
+  test('Execute convertKeyTonesToNotes with less than 7 tones', () => {
+    const keyTones: Tone[] = [{"index": 0, "notes": ["B#", "C", "Dbb"]}]
+    expect(convertKeyTonesToNotes('C', keyTones)).toStrictEqual(TypeError(`The list of key tones does not have 7 tones`))
+  })
+
+  test('Execute convertKeyTonesToNotes with wrong tonic', () => {
+    const keyTones: Tone[] = [{"index": 0, "notes": ["B#", "C", "Dbb"]}, {"index": 2, "notes": ["C##", "D", "Ebb"]}, {"index": 4, "notes": ["D##", "E", "Fb"]}, {"index": 5, "notes": ["E#", "F", "Gbb"]}, {"index": 7, "notes": ["F##", "G", "Abb"]}, {"index": 9, "notes": ["G##", "A", "Bbb"]}, {"index": 11, "notes": ["A##", "B", "Cb"]}]
+    expect(convertKeyTonesToNotes('D', keyTones)).toStrictEqual(TypeError(`The first key tone ${["B#", "C", "Dbb"]} does not include the tonic note D`))
+  })
+})
+
+describe('Test adjustNote', () => {
+  test('Execute adjustNote with natural note and a sharp', () => {
+    expect(adjustNote('C', '#')).toStrictEqual('C#')
+  })
+
+  test('Execute adjustNote with sharp note and a sharp', () => {
+    expect(adjustNote('C#', '#')).toStrictEqual('D')
+  })
+
+  test('Execute adjustNote with natural note and a flat', () => {
+    expect(adjustNote('D', 'b')).toStrictEqual('Db')
+  })
+
+  test('Execute adjustNote with flat note and a flat', () => {
+    expect(adjustNote('Db', 'b')).toStrictEqual('C')
   })
 })
