@@ -4,18 +4,18 @@ import {
   isModeStandardKey,
   AnyModeName,
   IonianModeName,
-  IonianStandardKey,
+  IonianStandardTonic,
   DorianModeName,
-  DorianStandardKey,
-  PhrygianStandardKey,
+  DorianStandardTonic,
+  PhrygianStandardTonic,
   LydianModeName,
   PhrygianModeName,
-  LydianStandardKey,
+  LydianStandardTonic,
   MixolydianModeName,
-  MixolydianStandardKey,
+  MixolydianStandardTonic,
   AeolianModeName,
-  AeolianStandardKey,
-  LocrianStandardKey,
+  AeolianStandardTonic,
+  LocrianStandardTonic,
   LocrianModeName
 } from "../mode"
 
@@ -130,13 +130,13 @@ export function getTone(noteOrIndex: AnyNote | number): Tone {
 
 export function simplifyNote(note: StandardNote): StandardNote
 export function simplifyNote(note: TheoreticalNote): StandardNote[]
-export function simplifyNote(note: AnyNote, mode: IonianModeName): IonianStandardKey
-export function simplifyNote(note: AnyNote, mode: DorianModeName): DorianStandardKey
-export function simplifyNote(note: AnyNote, mode: PhrygianModeName): PhrygianStandardKey
-export function simplifyNote(note: AnyNote, mode: LydianModeName): LydianStandardKey
-export function simplifyNote(note: AnyNote, mode: MixolydianModeName): MixolydianStandardKey
-export function simplifyNote(note: AnyNote, mode: AeolianModeName): AeolianStandardKey
-export function simplifyNote(note: AnyNote, mode: LocrianModeName): LocrianStandardKey
+export function simplifyNote(note: AnyNote, mode: IonianModeName): IonianStandardTonic
+export function simplifyNote(note: AnyNote, mode: DorianModeName): DorianStandardTonic
+export function simplifyNote(note: AnyNote, mode: PhrygianModeName): PhrygianStandardTonic
+export function simplifyNote(note: AnyNote, mode: LydianModeName): LydianStandardTonic
+export function simplifyNote(note: AnyNote, mode: MixolydianModeName): MixolydianStandardTonic
+export function simplifyNote(note: AnyNote, mode: AeolianModeName): AeolianStandardTonic
+export function simplifyNote(note: AnyNote, mode: LocrianModeName): LocrianStandardTonic
 export function simplifyNote(note: AnyNote, mode: AnyModeName): StandardNote
 export function simplifyNote(note: AnyNote, mode?: AnyModeName): StandardNote[] | StandardNote | undefined {
   const tone = getTone(note)

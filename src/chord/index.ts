@@ -2,13 +2,13 @@ import { Interval, IntervalDistance } from "../interval"
 import { wrapValue, rotateArray, removeDuplicates } from '../utils'
 import { AnyNote, interval, simplifyNote, StandardNote } from '../note'
 import {
-  AeolianStandardKey,
-  IonianStandardKey,
+  AeolianStandardTonic,
+  IonianStandardTonic,
   IonianMode,
-  LocrianStandardKey,
-  MixolydianStandardKey,
+  LocrianStandardTonic,
+  MixolydianStandardTonic,
   Mode,
-  LydianStandardKey, DorianStandardKey, PhrygianStandardKey, IonianAnyKey, AeolianAnyKey
+  LydianStandardTonic, DorianStandardTonic, PhrygianStandardTonic, IonianTonic, AeolianTonic
 } from '../mode'
 
 // Data / Types
@@ -226,7 +226,7 @@ export class Chord extends ChordData {
 }
 
 export class MajorChord extends Chord {
-  constructor(root: IonianStandardKey, config?: ChordConfig) {
+  constructor(root: IonianStandardTonic, config?: ChordConfig) {
     super(root, 'maj', config)
   }
 }
