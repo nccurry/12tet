@@ -20,7 +20,7 @@ import {
   ModeKeySignature,
   AnyModeName, getModeTonePattern,
   ALTERED_MODE_DEGREE_NUMBERS,
-  STANDARD_MODE_DEGREE_NUMBERS, isModeKeySignature, StandardModeDegreeNumber
+  STANDARD_MODE_DEGREE_NUMBERS, isModeKeySignature, StandardModeDegreeNumber, IonianAnyKey, IonianModeName
 } from '../mode'
 
 // Given the notes of a key, return the key signature
@@ -204,3 +204,12 @@ export abstract class KeyData {
 }
 
 export class Key extends KeyData {}
+
+export class IonianKey extends KeyData {
+  declare readonly tonic: IonianAnyKey
+  declare readonly mode: IonianModeName
+
+  constructor(tonic: AnyNote) {
+    super(tonic, 'Ionian')
+  }
+}

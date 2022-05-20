@@ -20,5 +20,5 @@ interface VoicingOptions {
 // Functions / Classes
 
 export const voicing = {
-  generate: function (chord: Required<Chord>, voicing: VoicingOptions) {},
+  generate: function (chord: Required<Chord>, voicing: VoicingOptions) {}
 }
