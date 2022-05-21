@@ -20,9 +20,12 @@ export type LydianModeName = 'Lydian'
 export type MixolydianModeName = 'Mixolydian'
 export type AeolianModeName = 'Aeolian'
 export type LocrianModeName = 'Locrian'
-export const MODE_NAMES = ['Ionian', 'Dorian', 'Phrygian', 'Lydian', 'Mixolydian', 'Aeolian', 'Locrian'] as const
-export type AnyModeName = typeof MODE_NAMES[number]
 
+export const MODE_NAMES = ['Ionian', 'Dorian', 'Phrygian', 'Lydian', 'Mixolydian', 'Aeolian', 'Locrian'] as const
+export type ModeName = typeof MODE_NAMES[number]
+export function isModeName (name: any): name is ModeName {
+  return MODE_NAMES.includes(name)
+}
 
 export const STANDARD_MODE_DEGREE_NUMBERS = [1, 2, 3, 4, 5, 6, 7] as const
 export type StandardModeDegreeNumber = typeof STANDARD_MODE_DEGREE_NUMBERS[number]
@@ -190,7 +193,7 @@ export const TONICS = [...STANDARD_TONICS, ...THEORETICAL_TONICS]
 export type Tonic = typeof TONICS[number]
 export function isTonic (note: any): note is Tonic {
   return TONICS.includes(note)
-
+}
 
 const MODE_DATA : {
   Ionian: IonianData,
@@ -266,10 +269,9 @@ const MODE_DATA : {
   }
 }
 
-export function getModeTonePattern(mode: AnyModeName): number[] {
+export function getModeTonePattern(mode: ModeName): number[] {
   return MODE_DATA[mode].semitoneStructure
 }
-
 
 export function isKeyBySignature (keyBySignature: Record<string, unknown>): keyBySignature is Record<ModeKeySignature, Key> {
   const keyBySignatureKeys = Object.keys(keyBySignature)
@@ -310,19 +312,19 @@ export function isIonianKeyBySignature (keyBySignature: Record<string, unknown>)
 }
 
 
-export function names (): readonly AnyModeName[] {
+export function names (): readonly ModeName[] {
   return MODE_NAMES
 }
 
 export abstract class ModeData {
-  readonly name: AnyModeName
+  readonly name: ModeName
   readonly chordNumerals: ChordNumeral[]
   readonly chordBases: DiatonicChordType[]
   readonly semitoneStructure: number[]
   readonly intervals: ShortIntervalName[]
   readonly ionianAdjustment: number[]
 
-  constructor(name: AnyModeName) {
+  constructor(name: ModeName) {
     this.name = name
     this.chordNumerals = MODE_DATA[this.name].chordNumerals
     this.chordBases = MODE_DATA[this.name].chordBases
@@ -344,7 +346,7 @@ export class Mode extends ModeData {
   readonly keyByTonic: { [key in AnyNote]?: Key }
   readonly keyBySignature: Record<ModeKeySignature, Key>
 
-  constructor(modeName: AnyModeName) {
+  constructor(modeName: ModeName) {
     super(modeName)
     this.keyByTonic = {}
     MODE_DATA[modeName].tonics.forEach(key => {

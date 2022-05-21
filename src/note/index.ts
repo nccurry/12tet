@@ -2,7 +2,7 @@ import { Interval, IntervalIdentifier } from '../interval'
 import { wrapValue } from '../utils'
 import {
   isModeStandardKey,
-  AnyModeName,
+  ModeName,
   IonianModeName,
   IonianStandardTonic,
   DorianModeName,
@@ -137,8 +137,8 @@ export function simplifyNote(note: AnyNote, mode: LydianModeName): LydianStandar
 export function simplifyNote(note: AnyNote, mode: MixolydianModeName): MixolydianStandardTonic
 export function simplifyNote(note: AnyNote, mode: AeolianModeName): AeolianStandardTonic
 export function simplifyNote(note: AnyNote, mode: LocrianModeName): LocrianStandardTonic
-export function simplifyNote(note: AnyNote, mode: AnyModeName): StandardNote
-export function simplifyNote(note: AnyNote, mode?: AnyModeName): StandardNote[] | StandardNote | undefined {
+export function simplifyNote(note: AnyNote, mode: ModeName): StandardNote
+export function simplifyNote(note: AnyNote, mode?: ModeName): StandardNote[] | StandardNote | undefined {
   const tone = getTone(note)
   const toneNotes = tone.notes.filter(toneNote => toneNote !== note)
   const standardNotes = toneNotes.filter(isStandardNote)
@@ -155,9 +155,9 @@ export function interval (firstNote: AnyNote, secondNote: AnyNote): Interval {
   return new Interval(wrapValue(TONES_BY_NOTE[firstNote].index - TONES_BY_NOTE[secondNote].index, 12))
 }
 
-export function transpose (note: AnyNote, intervalIdentifier: IntervalIdentifier, mode: AnyModeName): StandardNote
+export function transpose (note: AnyNote, intervalIdentifier: IntervalIdentifier, mode: ModeName): StandardNote
 export function transpose (note: AnyNote, intervalIdentifier: IntervalIdentifier): ToneNotes
-export function transpose (note: AnyNote, intervalIdentifier: IntervalIdentifier, mode?: AnyModeName): ToneNotes | StandardNote {
+export function transpose (note: AnyNote, intervalIdentifier: IntervalIdentifier, mode?: ModeName): ToneNotes | StandardNote {
   const interval = new Interval(intervalIdentifier)
   const tone = TONES[wrapValue(TONES_BY_NOTE[note].index + interval.length, 12)]
   if (mode) {

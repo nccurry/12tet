@@ -18,7 +18,7 @@ import {
   AnyModeDegreeNumber,
   isModeAnyKey,
   ModeKeySignature,
-  AnyModeName, getModeTonePattern,
+  ModeName, getModeTonePattern,
   ALTERED_MODE_DEGREE_NUMBERS,
   STANDARD_MODE_DEGREE_NUMBERS, isModeKeySignature, StandardModeDegreeNumber, IonianTonic, IonianModeName
 } from '../mode'
@@ -50,7 +50,7 @@ export function getKeySignatureFromKeyNotes(notes: AnyNote[]): ModeKeySignature 
 }
 
 // Given a tonic note and a mode, return an array of Tones
-export function getKeyTones(tonic: AnyNote, mode: AnyModeName): Tone[] {
+export function getKeyTones(tonic: AnyNote, mode: ModeName): Tone[] {
   const tone = getTone(tonic)
   let toneIndexes: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
   toneIndexes = rotateArray(toneIndexes, tone.index)
@@ -166,7 +166,7 @@ export function generateNotesByDegree(notes: AnyNote[]): Record<AnyModeDegreeNum
 
 export abstract class KeyData {
   readonly tonic: AnyNote
-  readonly mode: AnyModeName
+  readonly mode: ModeName
   readonly notes: AnyNote[]
   readonly signature: ModeKeySignature
   readonly notesByDegree: Record<AnyModeDegreeNumber, AnyNote>
@@ -174,7 +174,7 @@ export abstract class KeyData {
   readonly theoreticalKey: boolean
   readonly tones: Tone[]
 
-  constructor(tonic: AnyNote, mode: AnyModeName) {
+  constructor(tonic: AnyNote, mode: ModeName) {
     // Not every mode has a key with a tonic of every possible theoretical note
     // For example there is no B## Ionian
     // If we're given a mismatch, simplify to the lowest enharmonic equivalent and use that
