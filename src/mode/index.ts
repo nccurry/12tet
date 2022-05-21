@@ -1,17 +1,7 @@
 import { ChordNumeral, DiatonicChordType } from "../chord"
 import { ShortIntervalName } from "../interval"
 import { AnyNote, StandardNote } from '../note'
-import {IonianKey, Key} from "../key";
-
-const MODE_KEY_SIGNATURES = [
-  '',
-  '1#', '2#', '3#', '4#', '5#', '6#', '7#', '8#', '9#', '10#', '11#', '12#', '13#', '14#',
-  '1b', '2b', '3b', '4b', '5b', '6b', '7b', '8b', '9b', '10b', '11b', '12b', '13b', '14b',
-] as const
-export type ModeKeySignature = typeof MODE_KEY_SIGNATURES[number]
-export function isModeKeySignature (signature: any): signature is ModeKeySignature {
-  return MODE_KEY_SIGNATURES.includes(signature)
-}
+import { IonianKey, Key } from "../key"
 
 export type IonianModeName = 'Ionian'
 export type DorianModeName = 'Dorian'
@@ -25,6 +15,16 @@ export const MODE_NAMES = ['Ionian', 'Dorian', 'Phrygian', 'Lydian', 'Mixolydian
 export type ModeName = typeof MODE_NAMES[number]
 export function isModeName (name: any): name is ModeName {
   return MODE_NAMES.includes(name)
+}
+
+const MODE_KEY_SIGNATURES = [
+  '',
+  '1#', '2#', '3#', '4#', '5#', '6#', '7#', '8#', '9#', '10#', '11#', '12#', '13#', '14#',
+  '1b', '2b', '3b', '4b', '5b', '6b', '7b', '8b', '9b', '10b', '11b', '12b', '13b', '14b',
+] as const
+export type ModeKeySignature = typeof MODE_KEY_SIGNATURES[number]
+export function isModeKeySignature (signature: any): signature is ModeKeySignature {
+  return MODE_KEY_SIGNATURES.includes(signature)
 }
 
 export const STANDARD_MODE_DEGREE_NUMBERS = [1, 2, 3, 4, 5, 6, 7] as const
@@ -191,7 +191,7 @@ export function isTheoreticalTonic (note: any): note is TheoreticalTonic {
 
 export const TONICS = [...STANDARD_TONICS, ...THEORETICAL_TONICS]
 export type Tonic = typeof TONICS[number]
-export function isTonic (note: any): note is Tonic {
+export function isTonic (note: any): note is AnyNote {
   return TONICS.includes(note)
 }
 
@@ -269,7 +269,45 @@ const MODE_DATA : {
   }
 }
 
-export function getModeTonePattern(mode: ModeName): number[] {
+export function isModeStandardTonic (tonic: Tonic, mode: ModeName): boolean {
+  switch (mode) {
+    case 'Ionian':
+      return isIonianStandardTonic(tonic)
+    case 'Dorian':
+      return isDorianStandardTonic(tonic)
+    case 'Phrygian':
+      return isPhrygianStandardTonic(tonic)
+    case 'Lydian':
+      return isLydianStandardTonic(tonic)
+    case 'Mixolydian':
+      return isMixolydianStandardTonic(tonic)
+    case 'Aeolian':
+      return isAeolianStandardTonic(tonic)
+    case 'Locrian':
+      return isLocrianStandardTonic(tonic)
+  }
+}
+
+export function isModeTonic (tonic: Tonic, mode: ModeName): boolean {
+  switch (mode) {
+    case 'Ionian':
+      return isIonianTonic(tonic)
+    case 'Dorian':
+      return isDorianTonic(tonic)
+    case 'Phrygian':
+      return isPhrygianTonic(tonic)
+    case 'Lydian':
+      return isLydianTonic(tonic)
+    case 'Mixolydian':
+      return isMixolydianTonic(tonic)
+    case 'Aeolian':
+      return isAeolianTonic(tonic)
+    case 'Locrian':
+      return isLocrianTonic(tonic)
+  }
+}
+
+export function getModeTonePattern(mode: ModeName): readonly number[] {
   return MODE_DATA[mode].semitoneStructure
 }
 
@@ -300,29 +338,14 @@ export function isKeyBySignature (keyBySignature: Record<string, unknown>): keyB
   return lengthMatches && keysMatch && valuesAreKeyType
 }
 
-export function isIonianKeyBySignature (keyBySignature: Record<string, unknown>): keyBySignature is Record<ModeKeySignature, IonianKey> {
-  let valuesAreIonianKeyType = true
-  Object.values(keyBySignature).forEach(key => {
-    if (!(key instanceof IonianKey)) {
-      valuesAreIonianKeyType = false
-    }
-  })
-
-  return isKeyBySignature(keyBySignature) && valuesAreIonianKeyType
-}
-
-
-export function names (): readonly ModeName[] {
-  return MODE_NAMES
-}
-
 export abstract class ModeData {
   readonly name: ModeName
-  readonly chordNumerals: ChordNumeral[]
-  readonly chordBases: DiatonicChordType[]
-  readonly semitoneStructure: number[]
-  readonly intervals: ShortIntervalName[]
-  readonly ionianAdjustment: number[]
+  readonly chordNumerals: readonly ChordNumeral[]
+  readonly chordBases: readonly DiatonicChordType[]
+  readonly semitoneStructure: readonly number[]
+  readonly intervals: readonly ShortIntervalName[]
+  readonly ionianAdjustment: readonly number[]
+  readonly tonics: readonly AnyNote[]
 
   constructor(name: ModeName) {
     this.name = name
@@ -331,16 +354,37 @@ export abstract class ModeData {
     this.semitoneStructure = MODE_DATA[this.name].semitoneStructure
     this.intervals = MODE_DATA[this.name].intervals
     this.ionianAdjustment = MODE_DATA[this.name].ionianAdjustment
+    this.tonics = MODE_DATA[this.name].tonics
   }
 }
 
-interface IonianData extends ModeData { tonics: readonly IonianTonic[] }
-interface DorianData extends ModeData { tonics: readonly DorianTonic[] }
-interface PhrygianData extends ModeData { tonics: readonly PhrygianTonic[] }
-interface LydianData extends ModeData { tonics: readonly LydianTonic[] }
-interface MixolydianData extends ModeData { tonics: readonly MixolydianTonic[] }
-interface AeolianData extends ModeData { tonics: readonly AeolianTonic[] }
-interface LocrianData extends ModeData { tonics: readonly LocrianTonic[] }
+export abstract class IonianData extends ModeData {
+  declare tonics: readonly IonianTonic[]
+}
+
+export abstract class  DorianData extends ModeData {
+  declare tonics: readonly DorianTonic[]
+}
+
+export abstract class  PhrygianData extends ModeData {
+  declare tonics: readonly PhrygianTonic[]
+}
+
+export abstract class  LydianData extends ModeData {
+  declare tonics: readonly LydianTonic[]
+}
+
+export abstract class  MixolydianData extends ModeData {
+  declare tonics: readonly MixolydianTonic[]
+}
+
+export abstract class  AeolianData extends ModeData {
+  declare tonics: readonly AeolianTonic[]
+}
+
+export abstract class  LocrianData extends ModeData {
+  declare tonics: readonly LocrianTonic[]
+}
 
 export class Mode extends ModeData {
   readonly keyByTonic: { [key in AnyNote]?: Key }
@@ -365,116 +409,96 @@ export class Mode extends ModeData {
     } else {
       throw TypeError(`There was a problem generating keyBySignature for mode ${modeName}`)
     }
-
   }
 
   key (keyIdentifier: ModeKeySignature | AnyNote): Key | TypeError {
-    if ()
-    return isModeKeySignature(keyIdentifier) ? this.keyBySignature[keyIdentifier] : this.keyByTonic[keyIdentifier]
+    if(isModeKeySignature(keyIdentifier)) {
+      return this.keyBySignature[keyIdentifier]
+    } else {
+      const key = this.keyByTonic[keyIdentifier]
+      if (key) {
+        return key
+      } else {
+        return TypeError(`Key with tonic ${keyIdentifier} does not exist for mode ${this.name}`)
+      }
+    }
   }
 }
 
-export class IonianMode extends Mode {
+export class IonianMode extends IonianData {
   declare readonly keyByTonic: Record<IonianStandardTonic, IonianKey>
   declare readonly keyBySignature: Record<ModeKeySignature, IonianKey>
   constructor() {
     super('Ionian')
-    this.keyByTonic = MODE_DATA.Ionian.keyByTonic
   }
 
-  key (keyIdentifier: ModeKeySignature | IonianStandardTonic): ModeKey {
+  key (keyIdentifier: ModeKeySignature | IonianStandardTonic): Key {
     return isModeKeySignature(keyIdentifier) ? this.keyBySignature[keyIdentifier] : this.keyByTonic[keyIdentifier]
   }
 }
 
 export class DorianMode extends Mode {
-  declare readonly keyByTonic: Record<DorianStandardTonic, ModeKey>
+  declare readonly keyByTonic: Record<DorianStandardTonic, Key>
   constructor() {
     super('Dorian')
-    this.keyByTonic = MODE_DATA.Dorian.keyByTonic
   }
 
-  key (keyIdentifier: ModeKeySignature | DorianStandardTonic): ModeKey {
+  key (keyIdentifier: ModeKeySignature | DorianStandardTonic): Key {
     return isModeKeySignature(keyIdentifier) ? this.keyBySignature[keyIdentifier] : this.keyByTonic[keyIdentifier]
   }
 }
 
 export class PhrygianMode extends Mode {
-  declare readonly keyByTonic: Record<PhrygianStandardTonic, ModeKey>
+  declare readonly keyByTonic: Record<PhrygianStandardTonic, Key>
   constructor() {
     super('Phrygian')
-    this.keyByTonic = MODE_DATA.Phrygian.keyByTonic
   }
 
-  key (keyIdentifier: ModeKeySignature | PhrygianStandardTonic): ModeKey {
+  key (keyIdentifier: ModeKeySignature | PhrygianStandardTonic): Key {
     return isModeKeySignature(keyIdentifier) ? this.keyBySignature[keyIdentifier] : this.keyByTonic[keyIdentifier]
   }
 }
 
 export class LydianMode extends Mode {
-  declare readonly keyByTonic: Record<LydianStandardTonic, ModeKey>
+  declare readonly keyByTonic: Record<LydianStandardTonic, Key>
   constructor() {
     super('Lydian')
-    this.keyByTonic = MODE_DATA.Lydian.keyByTonic
   }
 
-  key (keyIdentifier: ModeKeySignature | LydianStandardTonic): ModeKey {
+  key (keyIdentifier: ModeKeySignature | LydianStandardTonic): Key {
     return isModeKeySignature(keyIdentifier) ? this.keyBySignature[keyIdentifier] : this.keyByTonic[keyIdentifier]
   }
 }
 
 export class MixolydianMode extends Mode {
-  declare readonly keyByTonic: Record<MixolydianStandardTonic, ModeKey>
+  declare readonly keyByTonic: Record<MixolydianStandardTonic, Key>
   constructor() {
     super('Mixolydian')
-    this.keyByTonic = MODE_DATA.Mixolydian.keyByTonic
   }
 
-  key (keyIdentifier: ModeKeySignature | MixolydianStandardTonic): ModeKey {
+  key (keyIdentifier: ModeKeySignature | MixolydianStandardTonic): Key {
     return isModeKeySignature(keyIdentifier) ? this.keyBySignature[keyIdentifier] : this.keyByTonic[keyIdentifier]
   }
 }
 
 export class AeolianMode extends Mode {
-  declare readonly keyByTonic: Record<AeolianStandardTonic, ModeKey>
+  declare readonly keyByTonic: Record<AeolianStandardTonic, Key>
   constructor() {
     super('Aeolian')
-    this.keyByTonic = MODE_DATA.Aeolian.keyByTonic
   }
 
-  key (keyIdentifier: ModeKeySignature | AeolianStandardTonic): ModeKey {
+  key (keyIdentifier: ModeKeySignature | AeolianStandardTonic): Key {
     return isModeKeySignature(keyIdentifier) ? this.keyBySignature[keyIdentifier] : this.keyByTonic[keyIdentifier]
   }
 }
 
 export class LocrianMode extends Mode {
-  declare readonly keyByTonic: Record<LocrianStandardTonic, ModeKey>
+  declare readonly keyByTonic: Record<LocrianStandardTonic, Key>
   constructor() {
     super('Aeolian')
-    this.keyByTonic = MODE_DATA.Locrian.keyByTonic
   }
 
-  key (keyIdentifier: ModeKeySignature | LocrianStandardTonic): ModeKey {
+  key (keyIdentifier: ModeKeySignature | LocrianStandardTonic): Key {
     return isModeKeySignature(keyIdentifier) ? this.keyBySignature[keyIdentifier] : this.keyByTonic[keyIdentifier]
   }
 }
-
-// export abstract class KeyData {
-//   mode: ModeName
-//   signature: ModeKeySignature
-//   tonic: ModeNote
-//   notes: ModeNote[]
-//
-//   constructor (signature: ModeKeySignature, mode: ModeName = 'Ionian') {
-//     this.mode = mode
-//     this.signature = signature
-//     this.notes = MODE_DATA[mode].keyBySignature[signature]
-//     this.tonic = this.notes[0]
-//   }
-// }
-
-//
-// export class Key extends KeyData {
-//
-// }
-//

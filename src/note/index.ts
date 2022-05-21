@@ -1,7 +1,7 @@
 import { Interval, IntervalIdentifier } from '../interval'
 import { wrapValue } from '../utils'
 import {
-  isModeStandardKey,
+  isModeStandardTonic,
   ModeName,
   IonianModeName,
   IonianStandardTonic,
@@ -147,7 +147,7 @@ export function simplifyNote(note: AnyNote, mode?: ModeName): StandardNote[] | S
   } else if (isTheoreticalNote(note) && !mode) {
     return standardNotes
   } else if (mode) {
-    return standardNotes.filter(note => isModeStandardKey(note, mode))[0]
+    return standardNotes.filter(note => isModeStandardTonic(note, mode))[0]
   }
 }
 

@@ -16,7 +16,7 @@ import {
 } from '../note'
 import {
   AnyModeDegreeNumber,
-  isModeAnyKey,
+  isModeTonic,
   ModeKeySignature,
   ModeName, getModeTonePattern,
   ALTERED_MODE_DEGREE_NUMBERS,
@@ -65,7 +65,7 @@ export function getKeyTones(tonic: AnyNote, mode: ModeName): Tone[] {
       keyTones.push(getTone(toneIndexes[0]))
       // If not, count up the appropriate number of semitones for the mode
     } else {
-      keyTones.push(getTone(toneIndexes[sumTo(modeTonePattern, index)]))
+      keyTones.push(getTone(toneIndexes[sumTo([...modeTonePattern], index)]))
     }
     index++
   }
@@ -178,7 +178,7 @@ export abstract class KeyData {
     // Not every mode has a key with a tonic of every possible theoretical note
     // For example there is no B## Ionian
     // If we're given a mismatch, simplify to the lowest enharmonic equivalent and use that
-    if (!isModeAnyKey(tonic, mode)) {
+    if (!isModeTonic(tonic, mode)) {
       this.tonic = simplifyNote(tonic, mode)
     } else {
       this.tonic = tonic
@@ -191,7 +191,7 @@ export abstract class KeyData {
     } else {
       this.notes = notes
     }
-    this.enharmonicEquivalents = this.tones[0].notes.filter(note => note !== this.tonic && isModeAnyKey(note, this.mode))
+    this.enharmonicEquivalents = this.tones[0].notes.filter(note => note !== this.tonic && isModeTonic(note, this.mode))
     this.notesByDegree = generateNotesByDegree(this.notes)
     const signature = getKeySignatureFromKeyNotes(this.notes)
     if (isTypeError(signature)) {
