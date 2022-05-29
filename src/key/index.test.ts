@@ -1,5 +1,5 @@
 import { adjustNote, convertKeyTonesToNotes, getKeySignatureFromKeyNotes, getKeyTones } from './index'
-import { AnyNote, Tone } from '../note'
+import { Note, Tone } from '../note'
 
 describe('Test getKeySignatureFromKeyNotes', () => {
   test('Execute getKeySignatureFromKeyNotes with no sharps or flats', () => {
@@ -31,7 +31,7 @@ describe('Test getKeySignatureFromKeyNotes', () => {
   })
 
   test('Execute getKeySignatureFromKeyNotes with 15 sharps', () => {
-    expect(getKeySignatureFromKeyNotes(['C###', 'D##', 'E##', 'F##', 'G##', 'A##', 'B##'] as AnyNote[])).toStrictEqual(TypeError(`Invalid key. Cannot have more than 14 sharps or flats`))
+    expect(getKeySignatureFromKeyNotes(['C###', 'D##', 'E##', 'F##', 'G##', 'A##', 'B##'] as Note[])).toStrictEqual(TypeError(`Invalid key. Cannot have more than 14 sharps or flats`))
   })
 })
 

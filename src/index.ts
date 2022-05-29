@@ -1,13 +1,6 @@
-import { Key } from "./key"
-import { AeolianMode, IonianMode, Mode } from "./mode"
+import { IonianMode, MODE_BY_NAME } from "./mode"
 
-const ionian = new Mode('Ionian')
+const ionian = new IonianMode()
+const dorian = MODE_BY_NAME['Dorian']
 
-console.log(ionian.chordBases)
-
-const aeolian = new AeolianMode()
-
-console.log(aeolian.key('F').notesByDegree['b4'])
-
-const cIonian = new Key('C', 'Phrygian')
-console.log(cIonian)
+console.log(ionian.key('C'))

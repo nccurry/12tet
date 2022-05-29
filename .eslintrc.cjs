@@ -10,6 +10,7 @@ module.exports = {
   ],
   "rules": {
     "semi": [1, "never"],
-    "object-curly-spacing": [1, "always"]
+    "object-curly-spacing": [1, "always"],
+    "@typescript-eslint/no-explicit-any": "off"
   }
 }

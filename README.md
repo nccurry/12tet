@@ -7,10 +7,10 @@ https://en.wikipedia.org/wiki/Mode_(music)
 // List all mode names
 console.log(MODE_NAMES)
 
-// List all tonic notes in the Ionian mode
+// List all tonic notes in the Ionian mode, including theoretical tonic notes
 console.log(IONIAN_TONICS)
 
-// List all standard tonic notes in the Aeolian mode
+// List all standard tonic notes in the Aeolian mode, ignoring theoretical tonic notes
 console.log(AEOLIAN_STANDARD_TONICS)
 
 // Create a new Ionian Mode instance
@@ -21,7 +21,7 @@ console.log(ionian.tonics) // [ 'C',   'G',   'D',   'A',   'E', ..., 'Abb', 'Eb
 console.log(ionian.chordBases) // [ 'maj', 'min', 'min', 'maj', 'maj', 'min', 'dim' ]
 
 // Create a new Aeolian Mode instance
-// Using the more specific Mode class provides better type checking
+// Using the more specific AeolianMode class provides better type checking
 const aeolian = new AeolianMode()
 
 // Interact with a specific Aeolian key

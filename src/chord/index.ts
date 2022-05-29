@@ -1,14 +1,8 @@
 import { Interval, IntervalDistance } from "../interval"
 import { wrapValue, rotateArray, removeDuplicates } from '../utils'
-import { AnyNote, interval, simplifyNote, StandardNote } from '../note'
+import { Note, interval, StandardNote } from '../note'
 import {
-  AeolianStandardTonic,
   IonianStandardTonic,
-  IonianMode,
-  LocrianStandardTonic,
-  MixolydianStandardTonic,
-  Mode,
-  LydianStandardTonic, DorianStandardTonic, PhrygianStandardTonic, IonianTonic, AeolianTonic
 } from '../mode'
 
 // Data / Types
@@ -117,7 +111,7 @@ function getAlterationIntervals (chordType: ChordType, alteration: ChordAlterati
   const degreeIndex = wrapValue(Number(alteration[1]) - 1, 7)
   return {
     base: chordTypeIntervals[chordType][degreeIndex],
-    altered: wrapValue(chordTypeIntervals[chordType][degreeIndex] + adjustment, 12)
+    altered: wrapValue(chordTypeIntervals[chordType][degreeIndex] + adjustment, 12) as IntervalDistance
   }
 }
 
@@ -141,14 +135,14 @@ function getAdditionInterval (chordType: ChordType, addition: ChordAddition): In
 // }
 
 export abstract class ChordData {
-  readonly root: AnyNote
+  readonly root: Note
   readonly type: ChordType
   extension: ChordExtension
   additions: ChordAddition[]
   alterations: ChordAlteration[]
-  slash: AnyNote
+  slash: Note
 
-  protected constructor(root: AnyNote, type: ChordType, config?: ChordConfig) {
+  protected constructor(root: Note, type: ChordType, config?: ChordConfig) {
     this.root = root
     this.type = type
     this.extension = config && config.extension ? config.extension : 5
@@ -159,7 +153,7 @@ export abstract class ChordData {
 }
 
 export class Chord extends ChordData {
-  constructor(root: AnyNote, type: ChordType, config?: ChordConfig) {
+  constructor(root: Note, type: ChordType, config?: ChordConfig) {
     super(root, type, config)
   }
 

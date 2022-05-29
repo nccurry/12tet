@@ -64,6 +64,11 @@ export function isTypeError(error: unknown): error is Error {
   return error instanceof TypeError
 }
 
+// Get array element at index. Wraps around array if index is greater than the array size or negative
+export function getWrappedArrayElement<A> (array: A[], index: number): A {
+  return array[wrapValue(index, array.length)]
+}
+
 function removeArrayElement<A> (array: A[], index: number): A[] {
   const arrayCopy = getShallowCopy(array)
 
@@ -99,10 +104,6 @@ export function getEvenArrayElements<A> (array: A[]): A[] {
   return elements
 }
 
-export function getWrappedArrayElement<A> (array: A[], index: number): A {
-  return array[wrapValue(index, array.length)]
-}
-
 export function getEvenNumbers (max: number): number[] {
   const numbers: number[] = []
   if (max >= 0) {
@@ -131,3 +132,4 @@ function indexesOf<A> (array: A[], value: A): number[] {
   }
   return indexes
 }
+
