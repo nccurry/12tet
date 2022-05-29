@@ -1,6 +1,5 @@
 import { ChordNumeral, DiatonicChordType } from "../chord"
 import { ShortIntervalName } from "../interval"
-import { Note } from '../note'
 import { AeolianKey, DorianKey, IonianKey, Key, LocrianKey, LydianKey, MixolydianKey, PhrygianKey } from "../key"
 
 export const MODE_NAMES = ['Ionian', 'Dorian', 'Phrygian', 'Lydian', 'Mixolydian', 'Aeolian', 'Locrian'] as const
@@ -31,10 +30,10 @@ export function isAlteredModeDegreeNumber (degree: any): degree is AlteredModeDe
   return ALTERED_MODE_DEGREE_NUMBERS.includes(degree)
 }
 
-export const ANY_MODE_DEGREE_NUMBER = [...STANDARD_MODE_DEGREE_NUMBERS, ...ALTERED_MODE_DEGREE_NUMBERS] as const
-export type AnyModeDegreeNumber = typeof ANY_MODE_DEGREE_NUMBER[number]
-export function isAnyModeDegreeNumber (degree: any): degree is AnyModeDegreeNumber {
-  return ANY_MODE_DEGREE_NUMBER.includes(degree)
+export const MODE_DEGREE_NUMBER = [...STANDARD_MODE_DEGREE_NUMBERS, ...ALTERED_MODE_DEGREE_NUMBERS] as const
+export type ModeDegreeNumber = typeof MODE_DEGREE_NUMBER[number]
+export function isModeDegreeNumber (degree: any): degree is ModeDegreeNumber {
+  return MODE_DEGREE_NUMBER.includes(degree)
 }
 
 export const MODE_DEGREE_NAMES = ['Tonic', 'Supertonic', 'Mediant', 'Subdominant', 'Dominant', 'Submediant', 'Subtonic', 'Leading Tone'] as const

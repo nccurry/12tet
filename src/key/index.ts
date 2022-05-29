@@ -14,7 +14,7 @@ import {
   Tone, TONES_BY_NOTE, TONES
 } from '../note'
 import {
-  AnyModeDegreeNumber,
+  ModeDegreeNumber,
   isModeTonic,
   ModeKeySignature,
   ModeName,
@@ -164,8 +164,8 @@ export function adjustNote(note: Note, adjustment: 'b' | '#' | ''): Note {
 
 // Given a list of notes, return an object with degree keys and note values
 // It is assumed that the notes are given in order - i.e. index 0 is the first degree of the key
-export function generateNotesByDegree(notes: Note[]): Record<AnyModeDegreeNumber, Note> {
-  const notesByDegree: { [key in AnyModeDegreeNumber]?: Note } = {}
+export function generateNotesByDegree(notes: Note[]): Record<ModeDegreeNumber, Note> {
+  const notesByDegree: { [key in ModeDegreeNumber]?: Note } = {}
   STANDARD_MODE_DEGREE_NUMBERS.forEach((degree, index)=> {
     notesByDegree[degree] = notes[index]
   })
@@ -174,7 +174,7 @@ export function generateNotesByDegree(notes: Note[]): Record<AnyModeDegreeNumber
     notesByDegree[degree] = adjustNote(notes[parseInt(degree[1]) - 1], degree[0] as 'b' | '#' | '')
   })
 
-  return notesByDegree as Record<AnyModeDegreeNumber, Note>
+  return notesByDegree as Record<ModeDegreeNumber, Note>
 }
 
 export interface KeyData {
@@ -182,7 +182,7 @@ export interface KeyData {
   readonly mode: ModeName
   readonly notes: Note[]
   readonly signature: ModeKeySignature
-  readonly notesByDegree: Record<AnyModeDegreeNumber, Note>
+  readonly notesByDegree: Record<ModeDegreeNumber, Note>
   readonly enharmonicEquivalents: Note[]
   readonly theoreticalKey: boolean
   readonly tones: Tone[]
@@ -193,7 +193,7 @@ export class Key implements KeyData {
   readonly mode: ModeName
   readonly notes: Note[]
   readonly signature: ModeKeySignature
-  readonly notesByDegree: Record<AnyModeDegreeNumber, Note>
+  readonly notesByDegree: Record<ModeDegreeNumber, Note>
   readonly enharmonicEquivalents: Note[]
   readonly theoreticalKey: boolean
   readonly tones: Tone[]
