@@ -246,9 +246,7 @@ export function getInterval(intervalIdentifier: IntervalIdentifier): IntervalDat
   }
 }
 
-// An abstract class representing the dat of a single interval
-// Used as a type when passing around interval information
-export abstract class IntervalData {
+export interface IntervalData {
   // The length of the interval in semitones
   readonly length: IntervalDistance
 
@@ -263,6 +261,16 @@ export abstract class IntervalData {
 
   // The intervals tension rating
   readonly tension: number
+}
+
+// An abstract class representing the dat of a single interval
+// Used as a type when passing around interval information
+export class Interval implements IntervalData {
+  readonly length: IntervalDistance
+  readonly name: IntervalName
+  readonly shortName: ShortIntervalName
+  readonly alternateNames: AlternateIntervalName[]
+  readonly tension: number
 
   constructor(intervalIdentifier: IntervalIdentifier) {
     const interval = getInterval(intervalIdentifier)
@@ -276,16 +284,13 @@ export abstract class IntervalData {
       this.tension = interval.tension
     }
   }
+
+  distance (interval: Interval) {
+    return wrapValue(interval.length - this.length, 12)
+  }
 }
 
 // IntervalData type guard
 export function isIntervalData (interval: any): interval is IntervalData {
   return (interval as IntervalData).name !== undefined && (interval as IntervalData).shortName !== undefined
-}
-
-// A class representing a single interval
-export class Interval extends IntervalData {
-  distance (interval: Interval) {
-    return wrapValue(interval.length - this.length, 12)
-  }
 }

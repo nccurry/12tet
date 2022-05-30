@@ -14,15 +14,15 @@ console.log(IONIAN_TONICS)
 // List all standard tonic notes in the Aeolian mode, ignoring theoretical tonic notes
 console.log(AEOLIAN_STANDARD_TONICS)
 
-// Create a new Ionian Mode instance
-const ionianMode = new IonianMode()
+// Get the Ionian mode
+const ionianMode = mode('Ionian')
 
 // Interact with the Ionian mode
 console.log(ionianMode.tonics) // [ 'C',   'G',   'D',   'A',   'E', ..., 'Abb', 'Ebb', 'Bbb', 'Fb' ]
 console.log(ionianMode.chordBases) // [ 'maj', 'min', 'min', 'maj', 'maj', 'min', 'dim' ]
 
-// Create a new Aeolian mode instance
-const aeolianMode = MODE_BY_NAME['Aeolian']
+// Get the Aeolian mode
+const aeolianMode = mode('Aeolian')
 
 // Interact with a specific Aeolian key
 console.log(aeolianMode.key('C').signature) // 3b

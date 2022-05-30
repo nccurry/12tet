@@ -1,6 +1,6 @@
 import { Interval, IntervalDistance } from "../interval"
 import { wrapValue, rotateArray, removeDuplicates } from '../utils'
-import { Note, interval, StandardNote } from '../note'
+import { Note, StandardNote } from '../note'
 import {
   IonianStandardTonic,
 } from '../mode'

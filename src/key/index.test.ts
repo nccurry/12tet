@@ -43,17 +43,17 @@ describe('Test getKeyTones', () => {
 
 describe('Test convertKeyTonesToNotes', () => {
   test('Execute convertKeyTonesToNotes', () => {
-    const keyTones: Tone[] = [{ "index": 0, "notes": ["B#", "C", "Dbb"] }, { "index": 2, "notes": ["C##", "D", "Ebb"] }, { "index": 4, "notes": ["D##", "E", "Fb"] }, { "index": 5, "notes": ["E#", "F", "Gbb"] }, { "index": 7, "notes": ["F##", "G", "Abb"] }, { "index": 9, "notes": ["G##", "A", "Bbb"] }, { "index": 11, "notes": ["A##", "B", "Cb"] }]
+    const keyTones: Tone[] = [["B#", "C", "Dbb"], ["C##", "D", "Ebb"], ["D##", "E", "Fb"], ["E#", "F", "Gbb"], ["F##", "G", "Abb"], ["G##", "A", "Bbb"], ["A##", "B", "Cb"]]
     expect(convertKeyTonesToNotes('C', keyTones)).toStrictEqual(['C', 'D', 'E', 'F', 'G', 'A', 'B'])
   })
 
   test('Execute convertKeyTonesToNotes with less than 7 tones', () => {
-    const keyTones: Tone[] = [{ "index": 0, "notes": ["B#", "C", "Dbb"] }]
+    const keyTones: Tone[] = [["B#", "C", "Dbb"]]
     expect(convertKeyTonesToNotes('C', keyTones)).toStrictEqual(TypeError(`The list of key tones does not have 7 tones`))
   })
 
   test('Execute convertKeyTonesToNotes with wrong tonic', () => {
-    const keyTones: Tone[] = [{ "index": 0, "notes": ["B#", "C", "Dbb"] }, { "index": 2, "notes": ["C##", "D", "Ebb"] }, { "index": 4, "notes": ["D##", "E", "Fb"] }, { "index": 5, "notes": ["E#", "F", "Gbb"] }, { "index": 7, "notes": ["F##", "G", "Abb"] }, { "index": 9, "notes": ["G##", "A", "Bbb"] }, { "index": 11, "notes": ["A##", "B", "Cb"] }]
+    const keyTones: Tone[] = [["B#", "C", "Dbb"], ["C##", "D", "Ebb"], ["D##", "E", "Fb"], ["E#", "F", "Gbb"], ["F##", "G", "Abb"], ["G##", "A", "Bbb"], ["A##", "B", "Cb"]]
     expect(convertKeyTonesToNotes('D', keyTones)).toStrictEqual(TypeError(`The first key tone ${["B#", "C", "Dbb"]} does not include the tonic note D`))
   })
 })

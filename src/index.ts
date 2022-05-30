@@ -1,6 +1,6 @@
-import { IonianMode, MODE_BY_NAME } from "./mode"
+import { mode, ModeName } from "./mode"
 
-const ionian = new IonianMode()
-const dorian = MODE_BY_NAME['Dorian']
+const modeName: ModeName = 'Ionian'
+const ionian = mode(modeName)
 
-console.log(ionian.key('C'))
+console.log(ionian.keyByTonic('A'))

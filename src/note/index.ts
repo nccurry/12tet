@@ -61,11 +61,11 @@ export function isNoteRegister (register: any): register is NoteRegister {
 }
 
 export function getNextNaturalNote(note: Note): NaturalNote | TypeError {
-  NATURAL_NOTES.forEach((naturalNote, index) => {
-    if (naturalNote === note[0]) {
-      return getWrappedArrayElement([...NATURAL_NOTES], index + 1)
+  for (let i = 0; i < NATURAL_NOTES.length; i++) {
+    if (NATURAL_NOTES[i] === note[0]) {
+      return getWrappedArrayElement([...NATURAL_NOTES], i + 1)
     }
-  })
+  }
 
   return TypeError(`Could not find next natural note for note ${note}`)
 }
@@ -145,3 +145,5 @@ export const TONES_BY_NOTE: Record<Note, { tone: Tone, index: number }> = tonesB
 //     return tone
 //   }
 // }
+export class interval {
+}

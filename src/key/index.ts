@@ -11,11 +11,12 @@ import {
   isStandardSharpNote,
   isTheoreticalFlatNote,
   isTheoreticalSharpNote,
-  Tone, TONES_BY_NOTE, TONES
+  Tone,
+  TONES_BY_NOTE,
+  TONES
 } from '../note'
 import {
   ModeDegreeNumber,
-  isModeTonic,
   ModeKeySignature,
   ModeName,
   ALTERED_MODE_DEGREE_NUMBERS,
@@ -28,8 +29,8 @@ import {
   MixolydianTonic,
   AeolianTonic,
   LocrianTonic,
-  ISMODETONIC_BY_MODE_NAME,
-  MODE_BY_NAME
+  isModeTonicByModeName,
+  MODE_DATA, Tonic,
 } from '../mode'
 
 // Given the notes of a key, return the key signature
@@ -59,11 +60,11 @@ export function getKeySignatureFromKeyNotes(notes: Note[]): ModeKeySignature | T
 }
 
 // Given a tonic note and a mode, return an array of Tones
-export function getKeyTones(tonic: Note, mode: ModeName): Tone[] {
+export function getKeyTones(tonic: Note, modeName: ModeName): Tone[] {
   const tone = TONES_BY_NOTE[tonic]
   let toneIndexes: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
   toneIndexes = rotateArray(toneIndexes, tone.index)
-  const modeTonePattern = MODE_BY_NAME[mode].semitoneStructure
+  const modeTonePattern = MODE_DATA[modeName].semitoneStructure
 
   // Generate tones
   const keyTones: Tone[] = []
@@ -98,11 +99,13 @@ export function convertKeyTonesToNotes(tonic: Note, keyTones: Tone[]): Note[] | 
   // We exploit the fact that every valid mode has only a single instance of each of A, B, C, D, E, F, G
   // and that every tone always contains different 2-3 instances of each of A, B, C, D, E, F, G
   // So if the last note was B# we know the next note has to have a root C
-  keyTones.forEach((tone, index) => {
-    if (index === 0) {
+  for (let i = 0; i < keyTones.length; i++) {
+    const tone = keyTones[i]
+
+    if (i === 0) {
       notes.push(tonic)
     } else {
-      const lastNaturalNote = notes[index - 1][0]
+      const lastNaturalNote = notes[i - 1][0]
       if (isNaturalNote(lastNaturalNote)) {
         const nextNaturalNote = getNextNaturalNote(lastNaturalNote)
 
@@ -119,7 +122,7 @@ export function convertKeyTonesToNotes(tonic: Note, keyTones: Tone[]): Note[] | 
         return TypeError(`Note ${lastNaturalNote} is not a valid natural note`)
       }
     }
-  })
+  }
 
   if (notes.length != 7) {
     return TypeError(`The generated list of notes ${notes} does not contain 7 notes`)
@@ -177,8 +180,8 @@ export function generateNotesByDegree(notes: Note[]): Record<ModeDegreeNumber, N
   return notesByDegree as Record<ModeDegreeNumber, Note>
 }
 
-export interface KeyData {
-  readonly tonic: Note
+export interface Key {
+  readonly tonic: Tonic
   readonly mode: ModeName
   readonly notes: Note[]
   readonly signature: ModeKeySignature
@@ -188,104 +191,97 @@ export interface KeyData {
   readonly tones: Tone[]
 }
 
-export class Key implements KeyData {
-  readonly tonic: Note
-  readonly mode: ModeName
-  readonly notes: Note[]
-  readonly signature: ModeKeySignature
-  readonly notesByDegree: Record<ModeDegreeNumber, Note>
-  readonly enharmonicEquivalents: Note[]
-  readonly theoreticalKey: boolean
-  readonly tones: Tone[]
-
-  constructor(tonic: Note, mode: ModeName) {
-    // Not every mode has a key with a tonic of every possible theoretical note
-    // For example there is no B## Ionian
-    // If we're given a mismatch, simplify to the lowest enharmonic equivalent and use that
-    if (!isModeTonic(tonic, mode)) {
-      throw TypeError(`There is no key in mode ${mode} with tonic ${tonic}`)
-    } else {
-      this.tonic = tonic
-    }
-    this.mode = mode
-    this.tones = getKeyTones(this.tonic, this.mode)
-    const notes = convertKeyTonesToNotes(this.tonic, this.tones)
-    if (isTypeError(notes)) {
-      throw notes
-    } else {
-      this.notes = notes
-    }
-    this.enharmonicEquivalents = this.tones[0].filter(note => note !== this.tonic && ISMODETONIC_BY_MODE_NAME[this.mode](note))
-    this.notesByDegree = generateNotesByDegree(this.notes)
-    const signature = getKeySignatureFromKeyNotes(this.notes)
-    if (isTypeError(signature)) {
-      throw signature
-    } else {
-      this.signature = signature
-    }
-    this.theoreticalKey = parseInt(this.signature[0]) > 7
-  }
-}
-
-export class IonianKey extends Key {
+export interface IonianKey extends Key {
   readonly tonic: IonianTonic
-
-  constructor(tonic: IonianTonic) {
-    super(tonic, 'Ionian')
-    this.tonic = tonic
-  }
 }
 
-export class DorianKey extends Key {
+export interface DorianKey extends Key {
   readonly tonic: DorianTonic
-
-  constructor(tonic: DorianTonic) {
-    super(tonic, 'Dorian')
-    this.tonic = tonic
-  }
 }
 
-export class PhrygianKey extends Key {
+export interface PhrygianKey extends Key {
   readonly tonic: PhrygianTonic
-
-  constructor(tonic: PhrygianTonic) {
-    super(tonic, 'Phrygian')
-    this.tonic = tonic
-  }
 }
 
-export class LydianKey extends Key {
+export interface LydianKey extends Key {
   readonly tonic: LydianTonic
-
-  constructor(tonic: LydianTonic) {
-    super(tonic, 'Lydian')
-    this.tonic = tonic
-  }
 }
 
-export class MixolydianKey extends Key {
+export interface MixolydianKey extends Key {
   readonly tonic: MixolydianTonic
-
-  constructor(tonic: MixolydianTonic) {
-    super(tonic, 'Mixolydian')
-    this.tonic = tonic
-  }
 }
 
-export class AeolianKey extends Key {
+export interface AeolianKey extends Key {
   readonly tonic: AeolianTonic
-
-  constructor(tonic: AeolianTonic) {
-    super(tonic, 'Aeolian')
-    this.tonic = tonic
-  }
 }
 
-export class LocrianKey extends Key {
+export interface LocrianKey extends Key {
   readonly tonic: LocrianTonic
+}
 
-  constructor(tonic: LocrianTonic) {
-    super(tonic, 'Locrian')
-    this.tonic = tonic
+export function key(tonic: IonianTonic, modeName: 'Ionian'): IonianKey
+export function key(tonic: DorianTonic, modeName: 'Dorian'): DorianKey
+export function key(tonic: PhrygianTonic, modeName: 'Phrygian'): PhrygianKey
+export function key(tonic: LydianTonic, modeName: 'Lydian'): LydianKey
+export function key(tonic: MixolydianTonic, modeName: 'Mixolydian'): MixolydianKey
+export function key(tonic: AeolianTonic, modeName: 'Aeolian'): AeolianKey
+export function key(tonic: LocrianTonic, modeName: 'Locrian'): LocrianKey
+export function key(tonic: Tonic, modeName: ModeName): Key | TypeError {
+  if (!isModeTonicByModeName[modeName](tonic)) {
+    return TypeError(`There is no key in mode ${modeName} with tonic ${tonic}`)
+  } else {
+    const tones = getKeyTones(tonic, modeName)
+
+    const notes = convertKeyTonesToNotes(tonic, tones)
+    if (isTypeError(notes)) {
+      return notes
+    }
+
+    const signature = getKeySignatureFromKeyNotes(notes)
+    if (isTypeError(signature)) {
+      return signature
+    }
+
+    const key: Key = {
+      tonic: tonic,
+      mode: modeName,
+      tones: tones,
+      notes: notes,
+      enharmonicEquivalents: tones[0].filter(note => note !== tonic && isModeTonicByModeName[modeName](note)),
+      notesByDegree: generateNotesByDegree(notes),
+      signature: signature,
+      theoreticalKey: parseInt(signature[0]) > 7
+    }
+    return key
   }
 }
+
+export function ionianKey(tonic: IonianTonic): IonianKey {
+  return key(tonic, 'Ionian')
+}
+
+export function dorianKey(tonic: DorianTonic): DorianKey {
+  return key(tonic, 'Dorian')
+}
+
+export function phrygianKey(tonic: PhrygianTonic): PhrygianKey {
+  return key(tonic, 'Phrygian')
+}
+
+export function lydianKey(tonic: LydianTonic): LydianKey {
+  return key(tonic, 'Lydian')
+}
+
+export function mixolydianKey(tonic: MixolydianTonic): MixolydianKey {
+  return key(tonic, 'Mixolydian')
+}
+
+export function aeolianKey(tonic: AeolianTonic): AeolianKey {
+  return key(tonic, 'Aeolian')
+}
+
+export function locrianKey(tonic: LocrianTonic): LocrianKey {
+  return key(tonic, 'Locrian')
+}
+
+
