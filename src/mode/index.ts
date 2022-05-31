@@ -207,6 +207,7 @@ export function isTonic (note: any): note is Tonic {
   return TONICS.includes(note)
 }
 
+// Maps mode names to the associated isModeTonic type guard
 export const isModeTonicByModeName: {
   Ionian: (note: any) => note is IonianTonic,
   Dorian: (note: any) => note is DorianTonic,
@@ -226,54 +227,102 @@ export const isModeTonicByModeName: {
 }
 
 interface Mode {
+  // The name of the mode
   readonly name: ModeName
+
+  // Optional alternate name of the mode
   readonly alternateName?: string
+
+  // The numeral representative of the chord associated with each mode degree
   readonly chordNumerals: readonly ChordNumeral[]
+
+  // The short name of the chord name associated with each mode degree
   readonly chordBases: readonly DiatonicChordType[]
+
+  // The semitone distances between mode degrees
   readonly semitoneStructure: readonly number[]
+
+  // The short interval name between mode degree
   readonly intervals: readonly ShortIntervalName[]
+
+  // The adjustment in semitones from the Ionian mode for each mode degree
   readonly degreeAdjustmentFromIonian: readonly number[]
 }
 
 interface Ionian extends Mode {
+  // The list of standard and theoretical mode tonics
   readonly tonics: readonly IonianTonic[]
+
+  // A function that returns the key object associated with each mode tonic
   readonly keyByTonic: (tonic: IonianTonic) => IonianKey
+
+  // A function that returns the key object associated with each key signature
   readonly keyBySignature: (signature: ModeKeySignature) => IonianKey
 }
 
 interface Dorian extends Mode {
+  // The list of standard and theoretical mode tonics
   readonly tonics: readonly DorianTonic[]
+
+  // A function that returns the key object associated with each mode tonic
   readonly keyByTonic: (tonic: DorianTonic) => DorianKey
+
+  // A function that returns the key object associated with each key signature
   readonly keyBySignature: (signature: ModeKeySignature) => DorianKey
 }
 
 interface Phrygian extends Mode {
+  // The list of standard and theoretical mode tonics
   readonly tonics: readonly PhrygianTonic[]
+
+  // A function that returns the key object associated with each mode tonic
   readonly keyByTonic: (tonic: PhrygianTonic) => PhrygianKey
+
+  // A function that returns the key object associated with each key signature
   readonly keyBySignature: (signature: ModeKeySignature) => PhrygianKey
 }
 
 interface Lydian extends Mode {
+  // The list of standard and theoretical mode tonics
   readonly tonics: readonly LydianTonic[]
+
+  // A function that returns the key object associated with each mode tonic
   readonly keyByTonic: (tonic: LydianTonic) => LydianKey
+
+  // A function that returns the key object associated with each key signature
   readonly keyBySignature: (signature: ModeKeySignature) => LydianKey
 }
 
 interface Mixolydian extends Mode {
+  // The list of standard and theoretical mode tonics
   readonly tonics: readonly MixolydianTonic[]
+
+  // A function that returns the key object associated with each mode tonic
   readonly keyByTonic: (tonic: MixolydianTonic) => MixolydianKey
+
+  // A function that returns the key object associated with each key signature
   readonly keyBySignature: (signature: ModeKeySignature) => MixolydianKey
 }
 
 interface Aeolian extends Mode {
+  // The list of standard and theoretical mode tonics
   readonly tonics: readonly AeolianTonic[]
+
+  // A function that returns the key object associated with each mode tonic
   readonly keyByTonic: (tonic: AeolianTonic) => AeolianKey
+
+  // A function that returns the key object associated with each key signature
   readonly keyBySignature: (signature: ModeKeySignature) => AeolianKey
 }
 
 interface Locrian extends Mode {
+  // The list of standard and theoretical mode tonics
   readonly tonics: readonly LocrianTonic[]
+
+  // A function that returns the key object associated with each mode tonic
   readonly keyByTonic: (tonic: LocrianTonic) => LocrianKey
+
+  // A function that returns the key object associated with each key signature
   readonly keyBySignature: (signature: ModeKeySignature) => LocrianKey
 }
 
@@ -286,6 +335,7 @@ type KeyByTonic =
   Record<AeolianTonic, AeolianKey> |
   Record<LocrianTonic, LocrianKey>
 
+// Generates an object mapping mode tonics to the associated key
 function keyByTonic(modeName: 'Ionian'): Record<IonianTonic, IonianKey>
 function keyByTonic(modeName: 'Dorian'): Record<DorianTonic, DorianKey>
 function keyByTonic(modeName: 'Phrygian'): Record<PhrygianTonic, PhrygianKey>
@@ -343,6 +393,7 @@ type KeyBySignature =
   Record<ModeKeySignature, AeolianKey> |
   Record<ModeKeySignature, LocrianKey>
 
+// Generates an object mapping key signature to the associated key for a given mode
 function keyBySignature(modeName: 'Ionian'): Record<ModeKeySignature, IonianKey>
 function keyBySignature(modeName: 'Dorian'): Record<ModeKeySignature, DorianKey>
 function keyBySignature(modeName: 'Phrygian'): Record<ModeKeySignature, PhrygianKey>
@@ -398,6 +449,7 @@ function keyBySignature(modeName: ModeName): KeyBySignature {
   }
 }
 
+// Metadata for each mod
 export const MODE_DATA: Record<ModeName, Ionian | Dorian | Phrygian | Lydian | Mixolydian | Aeolian | Locrian> = {
   Ionian: {
     name: 'Ionian',
@@ -480,6 +532,7 @@ export const MODE_DATA: Record<ModeName, Ionian | Dorian | Phrygian | Lydian | M
   }
 }
 
+// Returns a given mode object
 export function mode(modeName: 'Ionian'): Ionian
 export function mode(modeName: 'Dorian'): Dorian
 export function mode(modeName: 'Phrygian'): Phrygian

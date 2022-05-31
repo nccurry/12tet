@@ -60,14 +60,15 @@ export function isNoteRegister (register: any): register is NoteRegister {
   return NOTE_REGISTER.includes(register)
 }
 
-export function getNextNaturalNote(note: Note): NaturalNote | TypeError {
+// Given a note, return the next natural note - i.e. B# => C, Cbb => D
+export function getNextNaturalNote(note: Note): NaturalNote {
   for (let i = 0; i < NATURAL_NOTES.length; i++) {
     if (NATURAL_NOTES[i] === note[0]) {
       return getWrappedArrayElement([...NATURAL_NOTES], i + 1)
     }
   }
 
-  return TypeError(`Could not find next natural note for note ${note}`)
+  throw TypeError(`Could not find next natural note for note ${note}`)
 }
 
 // A Tone is a grouping of enharnomically equivalent notes
@@ -101,49 +102,3 @@ function tonesByNote (): Record<Note, { tone: Tone, index: number }> {
 }
 
 export const TONES_BY_NOTE: Record<Note, { tone: Tone, index: number }> = tonesByNote()
-
-// // Given a note, reduce it to its lowest standard enharmonic equivalents
-// // If a mode is also provided, reduce it to a single standard tonic note in that mode
-// export function simplifyNote(note: StandardNote): StandardNote
-// export function simplifyNote(note: TheoreticalNote): StandardNote[]
-// export function simplifyNote(note: Note, mode: IonianModeName): IonianStandardTonic
-// export function simplifyNote(note: Note, mode: DorianModeName): DorianStandardTonic
-// export function simplifyNote(note: Note, mode: PhrygianModeName): PhrygianStandardTonic
-// export function simplifyNote(note: Note, mode: LydianModeName): LydianStandardTonic
-// export function simplifyNote(note: Note, mode: MixolydianModeName): MixolydianStandardTonic
-// export function simplifyNote(note: Note, mode: AeolianModeName): AeolianStandardTonic
-// export function simplifyNote(note: Note, mode: LocrianModeName): LocrianStandardTonic
-// export function simplifyNote(note: Note, mode: ModeName): StandardNote
-// export function simplifyNote(note: Note, mode?: ModeName): StandardNote[] | StandardNote | undefined {
-//   const tone = TONES_BY_NOTE[note]
-//   const toneNotes = tone.tone.filter(toneNote => toneNote !== note)
-//   const standardNotes = toneNotes.filter(isStandardNote)
-//   if (isStandardNote(note) && !mode) {
-//     return note
-//   } else if (isTheoreticalNote(note) && !mode) {
-//     return standardNotes
-//   } else if (mode) {
-//     return standardNotes.filter(note => isModeStandardTonic(note, mode))[0]
-//   }
-// }
-//
-// // Given two notes, return the interval between them
-// export function interval (firstNote: Note, secondNote: Note): Interval {
-//   return new Interval(wrapValue(TONES_BY_NOTE[firstNote].index - TONES_BY_NOTE[secondNote].index, 12))
-// }
-//
-// // Return the notes an interval above the given note
-// // If a mode is provided,
-// export function transpose (note: Note, intervalIdentifier: IntervalIdentifier, mode: ModeName): StandardNote
-// export function transpose (note: Note, intervalIdentifier: IntervalIdentifier): Tone
-// export function transpose (note: Note, intervalIdentifier: IntervalIdentifier, mode?: ModeName): Tone | StandardNote {
-//   const interval = new Interval(intervalIdentifier)
-//   const tone = TONES[wrapValue(TONES_BY_NOTE[note].index + interval.length, 12)]
-//   if (mode) {
-//     return simplifyNote(tone[0], mode)
-//   } else {
-//     return tone
-//   }
-// }
-export class interval {
-}

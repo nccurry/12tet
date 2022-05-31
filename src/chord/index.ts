@@ -1,35 +1,42 @@
-import { Interval, IntervalDistance } from "../interval"
-import { wrapValue, rotateArray, removeDuplicates } from '../utils'
-import { Note, StandardNote } from '../note'
+import {
+  Interval,
+  IntervalDistance } from "../interval"
+import {
+  wrapValue,
+  rotateArray,
+  removeDuplicates
+} from '../utils'
+import {
+  Note,
+  StandardNote
+} from '../note'
 import {
   IonianStandardTonic,
 } from '../mode'
 
-// Data / Types
+export const DIATONIC_CHORD_TYPES = ['maj', 'min', 'dim'] as const
+export type DiatonicChordType = typeof DIATONIC_CHORD_TYPES[number]
 
-export const diatonicChordType = ['maj', 'min', 'dim'] as const
-export type DiatonicChordType = typeof diatonicChordType[number]
+export const CHORD_TYPES = [...DIATONIC_CHORD_TYPES, 'dom', 'sus2', 'sus4', 'aug', 'dimsus2', 'dimsus4', 'augsus2', 'augsus4'] as const
+export type ChordType = typeof CHORD_TYPES[number]
 
-export const chordType = [...diatonicChordType, 'dom', 'sus2', 'sus4', 'aug', 'dimsus2', 'dimsus4', 'augsus2', 'augsus4'] as const
-export type ChordType = typeof chordType[number]
+export const CHORD_ADDITIONS = ['add2', 'add4', 'add6', 'add9', 'add11', 'add13'] as const
+export type ChordAddition = typeof CHORD_ADDITIONS[number]
 
-export const chordAdditions = ['add2', 'add4', 'add6', 'add9', 'add11', 'add13'] as const
-export type ChordAddition = typeof chordAdditions[number]
+export const CHORD_ALTERATIONS = ['b1', '#1', 'b2', '#2', 'b3', '#3', 'b4', '#4', 'b5', '#5', 'b6', '#6', 'b7', '#7', 'b9', '#9', 'b11', '#11', 'b13', '#13'] as const
+export type ChordAlteration = typeof CHORD_ALTERATIONS[number]
 
-export const chordAlteration = ['b1', '#1', 'b2', '#2', 'b3', '#3', 'b4', '#4', 'b5', '#5', 'b6', '#6', 'b7', '#7', 'b9', '#9', 'b11', '#11', 'b13', '#13'] as const
-export type ChordAlteration = typeof chordAlteration[number]
+export const CHORD_EXTENSIONS = [5, 7, 9, 11, 13] as const
+export type ChordExtension = typeof CHORD_EXTENSIONS[number]
 
-export const chordExtensions = [5, 7, 9, 11, 13] as const
-export type ChordExtension = typeof chordExtensions[number]
-
-export const chordDegreeNumbers = [1, 2, 3, 4, 5, 6, 7, 9, 11, 13] as const
-export type ChordDegreeNumber = typeof chordDegreeNumbers[number]
+export const CHORD_DEGREE_NUMBERS = [1, 2, 3, 4, 5, 6, 7, 9, 11, 13] as const
+export type ChordDegreeNumber = typeof CHORD_DEGREE_NUMBERS[number]
 
 // https://en.wikipedia.org/wiki/Roman_numeral_analysis#Modes
 // \u1d47 -> superscript b
 // \u2070 -> superscript 0
 // \u2075 -> superscript 5
-export const chordNumerals = [
+export const CHORD_NUMERALS = [
   'I', 'i', 'i\u2070',
   'II', '\u1d47II', 'ii', 'ii\u2070',
   '\u1d47III', 'iii', '\u1d47iii', 'iii\u2070',
@@ -38,10 +45,10 @@ export const chordNumerals = [
   '\u1d47VI', 'vi', 'vi\u2070',
   '\u1d47VII', 'vii', '\u1d47vii', 'vii\u2070'
 ] as const
-export type ChordNumeral = typeof chordNumerals[number]
+export type ChordNumeral = typeof CHORD_NUMERALS[number]
 
 // Tone intervals in chord bases
-const chordTypeIntervals: Record<ChordType, IntervalDistance[]> = {
+const CHORD_TYPE_INTERVALS: Record<ChordType, IntervalDistance[]> = {
   // 1, 2, 3, 4, 5, 6, 7
   maj: [0, 2, 4, 5, 7, 9, 11],
   // b3, b7
@@ -73,9 +80,6 @@ interface ChordConfig {
   alterations?: ChordAlteration[],
   slash?: StandardNote
 }
-
-
-// Functions / Classes
 
 // function simplifyChord (root: AnyNote, type: ChordType): { root: StandardNote, type: ChordType } {
 //   switch (type) {
@@ -110,14 +114,14 @@ function getAlterationIntervals (chordType: ChordType, alteration: ChordAlterati
   }
   const degreeIndex = wrapValue(Number(alteration[1]) - 1, 7)
   return {
-    base: chordTypeIntervals[chordType][degreeIndex],
-    altered: wrapValue(chordTypeIntervals[chordType][degreeIndex] + adjustment, 12) as IntervalDistance
+    base: CHORD_TYPE_INTERVALS[chordType][degreeIndex],
+    altered: wrapValue(CHORD_TYPE_INTERVALS[chordType][degreeIndex] + adjustment, 12) as IntervalDistance
   }
 }
 
 function getAdditionInterval (chordType: ChordType, addition: ChordAddition): IntervalDistance {
   const degree = Number(addition[3])
-  return chordTypeIntervals[chordType][wrapValue(degree - 1, 12)]
+  return CHORD_TYPE_INTERVALS[chordType][wrapValue(degree - 1, 12)]
 }
 
 
@@ -166,7 +170,7 @@ export class Chord extends ChordData {
     let chordIntervals: IntervalDistance[] = []
     for (let i = 0; i < this.extension; i++) {
       if (i % 2 === 0) {
-        chordIntervals.push(chordTypeIntervals[this.type][wrapValue(i, 7)])
+        chordIntervals.push(CHORD_TYPE_INTERVALS[this.type][wrapValue(i, 7)])
       }
     }
 

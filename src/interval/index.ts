@@ -102,8 +102,6 @@ export function isIntervalDistance (intervalDistance: any): intervalDistance is 
   return Number.isInteger(intervalDistance)
 }
 
-// An abstract class representing the dat of a single interval
-// Used as a type when passing around interval information
 export interface Interval {
   // The length of the interval in semitones
   readonly length: IntervalDistance

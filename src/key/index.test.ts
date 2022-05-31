@@ -37,7 +37,7 @@ describe('Test getKeySignatureFromKeyNotes', () => {
 
 describe('Test getKeyTones', () => {
   test('Execute getKeyTones with C Ionian', () => {
-    expect(getKeyTones('C', 'Ionian')).toStrictEqual([{ "index": 0, "notes": ["B#", "C", "Dbb"] }, { "index": 2, "notes": ["C##", "D", "Ebb"] }, { "index": 4, "notes": ["D##", "E", "Fb"] }, { "index": 5, "notes": ["E#", "F", "Gbb"] }, { "index": 7, "notes": ["F##", "G", "Abb"] }, { "index": 9, "notes": ["G##", "A", "Bbb"] }, { "index": 11, "notes": ["A##", "B", "Cb"] }])
+    expect(getKeyTones('C', 'Ionian')).toStrictEqual([["B#", "C", "Dbb"], ["C##", "D", "Ebb"], ["D##", "E", "Fb"], ["E#", "F", "Gbb"], ["F##", "G", "Abb"], ["G##", "A", "Bbb"], ["A##", "B", "Cb"]])
   })
 })
 
