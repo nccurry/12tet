@@ -1,10 +1,10 @@
-import { getInterval, Interval, IntervalIdentifier, isIntervalData } from './index'
+import { interval, Interval, IntervalIdentifier, isInterval } from './index'
 import { isTypeError } from "../utils"
 
 describe('Test getInterval function', () => {
   test('Execute getInterval function with shortName', () => {
-    const interval = getInterval('P8')
-    if (isIntervalData(interval)) {
+    const interval = interval('P8')
+    if (isInterval(interval)) {
       expect(interval.name).toStrictEqual('Perfect Octave')
     } else {
       fail('getInterval returned unexpected TypeError')
@@ -12,8 +12,8 @@ describe('Test getInterval function', () => {
   })
 
   test('Execute getInterval function with name', () => {
-    const interval = getInterval('Perfect Octave')
-    if (isIntervalData(interval)) {
+    const interval = interval('Perfect Octave')
+    if (isInterval(interval)) {
       expect(interval.name).toStrictEqual('Perfect Octave')
     } else {
       fail('getInterval returned unexpected TypeError')
@@ -21,8 +21,8 @@ describe('Test getInterval function', () => {
   })
 
   test('Execute getInterval function with interval distance', () => {
-    const interval = getInterval(12)
-    if (isIntervalData(interval)) {
+    const interval = interval(12)
+    if (isInterval(interval)) {
       expect(interval.name).toStrictEqual('Perfect Octave')
     } else {
       fail('getInterval returned unexpected TypeError')
@@ -30,8 +30,8 @@ describe('Test getInterval function', () => {
   })
 
   test('Execute getInterval function with complex interval distance', () => {
-    const interval = getInterval(24)
-    if (isIntervalData(interval)) {
+    const interval = interval(24)
+    if (isInterval(interval)) {
       expect(interval.name).toStrictEqual('Perfect Octave')
     } else {
       fail('getInterval returned unexpected TypeError')
@@ -39,8 +39,8 @@ describe('Test getInterval function', () => {
   })
 
   test('Execute getInterval function with bad interval identifier', () => {
-    const interval = getInterval('wrong' as IntervalIdentifier)
-    if (isIntervalData(interval)) {
+    const interval = interval('wrong' as IntervalIdentifier)
+    if (isInterval(interval)) {
       fail('getInterval should return a TypeError with a bad interval identifier')
     } else {
       expect(isTypeError(interval)).toStrictEqual(true)
