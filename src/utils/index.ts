@@ -87,8 +87,6 @@ function removeArrayElement<A> (array: A[], index: number): A[] {
 // https://stackoverflow.com/questions/52856496/typescript-object-keys-return-string
 export const getTypedObjectKeys = Object.keys as <T extends object>(obj: T) => T[]
 
-
-
 export function arrayDifference <T>(array1: readonly T[], array2: readonly T[]) {
   return array1.filter((v) => !array2.includes(v))
 }

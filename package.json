@@ -25,11 +25,11 @@
   "author": "Nick Curry <code@nickcurry.com>",
   "license": "MIT",
   "devDependencies": {
-    "@types/jest": "^27.5.1",
-    "@typescript-eslint/eslint-plugin": "^5.26.0",
-    "@typescript-eslint/parser": "^5.26.0",
-    "eslint": "^8.16.0",
-    "ts-jest": "^28.0.3",
-    "typescript": "^4.7.2"
+    "@types/jest": "^28.1.3",
+    "@typescript-eslint/eslint-plugin": "^5.29.0",
+    "@typescript-eslint/parser": "^5.29.0",
+    "eslint": "^8.18.0",
+    "ts-jest": "^28.0.5",
+    "typescript": "^4.7.4"
   }
 }

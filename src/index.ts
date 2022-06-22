@@ -1,6 +1,3 @@
-import { mode, ModeName } from "./mode"
+import { chord } from "./chord"
 
-const modeName: ModeName = 'Ionian'
-const ionian = mode(modeName)
-
-console.log(ionian.keyByTonic('A'))
+console.log(chord('G', { base: 'maj' }))

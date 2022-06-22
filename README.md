@@ -46,13 +46,13 @@ console.log(ALTERNATE_INTERVAL_NAMES)
 console.log(INTERVAL_SHORT_NAMES)
 
 // Create new Interval instance with semitone distance
-const p8_1 = new Interval(12)
+const p8_1 = interval(12)
 
 // Create new Interval instance with short name
-const p8_2 = new Interval('P8')
+const p8_2 = interval('P8')
 
 // Create new Interval instance with long name
-const p8_3 = new Interval('Perfect Octave')
+const p8_3 = interval('Perfect Octave')
 
 // Interact with the Interval instance
 console.log(p8_1.name) // Perfect Octave
@@ -66,7 +66,7 @@ Functions and classes to interact with musical [keys](https://en.wikipedia.org/w
 
 ```typescript
 // Create a new key
-const cIonian = new IonianKey('C')
+const cIonian = key('C', 'Ionian')
 
 // Interact with the key
 console.log(cIonian.signature) // ''

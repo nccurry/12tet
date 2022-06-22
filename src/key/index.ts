@@ -283,5 +283,3 @@ export function aeolianKey(tonic: AeolianTonic): AeolianKey {
 export function locrianKey(tonic: LocrianTonic): LocrianKey {
   return key(tonic, 'Locrian')
 }
-
-
