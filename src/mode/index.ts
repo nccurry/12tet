@@ -39,22 +39,22 @@ export function isModeKeySignature (signature: any): signature is ModeKeySignatu
   return MODE_KEY_SIGNATURES.includes(signature)
 }
 
-export const STANDARD_MODE_DEGREE_NUMBERS = [1, 2, 3, 4, 5, 6, 7] as const
-export type StandardModeDegreeNumber = typeof STANDARD_MODE_DEGREE_NUMBERS[number]
-export function isStandardModeDegreeNumber (degree: any): degree is StandardModeDegreeNumber {
-  return STANDARD_MODE_DEGREE_NUMBERS.includes(degree)
+export const STANDARD_MODE_DEGREE = ['1', '2', '3', '4', '5', '6', '7'] as const
+export type StandardModeDegree = typeof STANDARD_MODE_DEGREE[number]
+export function isStandardModeDegree (degree: any): degree is StandardModeDegree {
+  return STANDARD_MODE_DEGREE.includes(degree)
 }
 
-export const ALTERED_MODE_DEGREE_NUMBERS = ['b1', '#1', 'b2', '#2', 'b3', '#3', 'b4', '#4', 'b5', '#5', 'b6', '#6', 'b7', '#7'] as const
-export type AlteredModeDegreeNumber = typeof ALTERED_MODE_DEGREE_NUMBERS[number]
-export function isAlteredModeDegreeNumber (degree: any): degree is AlteredModeDegreeNumber {
-  return ALTERED_MODE_DEGREE_NUMBERS.includes(degree)
+export const ALTERED_MODE_DEGREE = ['b1', '#1', 'b2', '#2', 'b3', '#3', 'b4', '#4', 'b5', '#5', 'b6', '#6', 'b7', '#7'] as const
+export type AlteredModeDegree = typeof ALTERED_MODE_DEGREE[number]
+export function isAlteredModeDegree (degree: any): degree is AlteredModeDegree {
+  return ALTERED_MODE_DEGREE.includes(degree)
 }
 
-export const MODE_DEGREE_NUMBER = [...STANDARD_MODE_DEGREE_NUMBERS, ...ALTERED_MODE_DEGREE_NUMBERS] as const
-export type ModeDegreeNumber = typeof MODE_DEGREE_NUMBER[number]
-export function isModeDegreeNumber (degree: any): degree is ModeDegreeNumber {
-  return MODE_DEGREE_NUMBER.includes(degree)
+export const MODE_DEGREE = [...STANDARD_MODE_DEGREE, ...ALTERED_MODE_DEGREE] as const
+export type ModeDegree = typeof MODE_DEGREE[number]
+export function isModeDegree (degree: any): degree is ModeDegree {
+  return MODE_DEGREE.includes(degree)
 }
 
 export const MODE_DEGREE_NAMES = ['Tonic', 'Supertonic', 'Mediant', 'Subdominant', 'Dominant', 'Submediant', 'Subtonic', 'Leading Tone'] as const

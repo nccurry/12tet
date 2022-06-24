@@ -1,5 +1,8 @@
 
 // rotateArray moves array elements forward or backward by the offset amount
+import { Note } from "../note"
+import { ModeDegree } from "../mode"
+
 export function rotateArray<T> (array: T[], offset: number): T[] {
   const arrayCopy = getShallowCopy(array)
 
@@ -69,7 +72,7 @@ export function getWrappedArrayElement<A> (array: A[], index: number): A {
   return array[wrapValue(index, array.length)]
 }
 
-function removeArrayElement<A> (array: A[], index: number): A[] {
+export function removeArrayElement<A> (array: A[], index: number): A[] {
   const arrayCopy = getShallowCopy(array)
 
   // If the index is negative, count from the end of the array
@@ -102,7 +105,11 @@ export function getEvenArrayElements<A> (array: A[]): A[] {
   return elements
 }
 
-export function getEvenNumbers (max: number): number[] {
+export function getEvenNumbers (max: number | string): number[] {
+  if (typeof max === 'string') {
+    max = parseInt(max)
+  }
+
   const numbers: number[] = []
   if (max >= 0) {
     for (let i = 0; i <= max; i++) {
@@ -130,4 +137,8 @@ function indexesOf<A> (array: A[], value: A): number[] {
   }
   return indexes
 }
+
+
+
+
 

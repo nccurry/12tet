@@ -2,7 +2,7 @@
 
 ## Mode
 
-Functions and classes to interact with musical [modes](https://en.wikipedia.org/wiki/Mode_(music)).
+Constants and functions to interact with musical [modes](https://en.wikipedia.org/wiki/Mode_(music)).
 
 ```typescript
 // List all mode names
@@ -33,7 +33,7 @@ console.log(aeolianMode.key('F').notesByDegree['b4']) // A
 
 ## Interval
 
-Functions and classes to interact with musical [intervals](https://en.wikipedia.org/wiki/Interval_(music)).
+Constants and functions to interact with musical [intervals](https://en.wikipedia.org/wiki/Interval_(music)).
 
 ```typescript
 // List all interval names
@@ -60,9 +60,18 @@ console.log(p8_2.tension) // 0
 console.log(p8_3.alternateNames) // ['Augmented Seventh']
 ```
 
+## Note
+
+Constants and functions to interact with musical notes.
+
+```typescript
+// List all Natural Notes
+console.log(NATURAL_NOTES) // ['C', 'D', 'E', 'F', 'G', 'A', 'B']
+```
+
 ## Key
 
-Functions and classes to interact with musical [keys](https://en.wikipedia.org/wiki/Key_(music)).
+Constants and functions to interact with musical [keys](https://en.wikipedia.org/wiki/Key_(music)).
 
 ```typescript
 // Create a new key

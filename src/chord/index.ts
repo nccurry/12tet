@@ -6,15 +6,21 @@ import {
 import {
   wrapValue,
   rotateArray,
-  removeDuplicates, getEvenNumbers
+  removeDuplicates, getEvenNumbers, removeArrayElement
 } from '../utils'
 import {
   Note,
   StandardNote
 } from '../note'
 import {
-  ALTERED_MODE_DEGREE_NUMBERS,
-  IonianStandardTonic, IonianTonic, mode, MODE_DEGREE_NUMBER,
+  ALTERED_MODE_DEGREE,
+  IonianStandardTonic,
+  IonianTonic, isModeDegree,
+  mode,
+  MODE_DEGREE,
+  ModeDegree,
+  STANDARD_MODE_DEGREE,
+  StandardModeDegree,
 } from '../mode'
 import { ionianKey, key } from "../key"
 
@@ -24,20 +30,52 @@ export type DiatonicChordType = typeof DIATONIC_CHORD_BASE[number]
 export const CHORD_BASES = [...DIATONIC_CHORD_BASE, 'dom', 'sus2', 'sus4', 'aug'] as const
 export type ChordBase = typeof CHORD_BASES[number]
 
-export const CHORD_ADDITIONS = ['add2', 'add4', 'add6', 'add9', 'add11', 'add13'] as const
+export const CHORD_ADDITIONS = ['2', '4', '6', '9', '11', '13'] as const
 export type ChordAddition = typeof CHORD_ADDITIONS[number]
 
-export const CHORD_EXTENSIONS = [5, 7, 9, 11, 13] as const
+export const CHORD_EXTENSIONS = ['7', '9', '11', '13'] as const
 export type ChordExtension = typeof CHORD_EXTENSIONS[number]
 
-export const STANDARD_CHORD_DEGREE_NUMBERS = [...MODE_DEGREE_NUMBER, 9, 11, 13] as const
-export type StandardChordDegreeNumber = typeof STANDARD_CHORD_DEGREE_NUMBERS[number]
+export const STANDARD_CHORD_DEGREE = [...MODE_DEGREE, '9', '11', '13'] as const
+export type StandardChordDegreeNumber = typeof STANDARD_CHORD_DEGREE[number]
 
-export const ALTERED_CHORD_DEGREE_NUMBERSS = [...ALTERED_MODE_DEGREE_NUMBERS, 'b9', '#9', 'b11', '#11', 'b13', '#13'] as const
-export type AlteredChordDegreeNumber = typeof ALTERED_CHORD_DEGREE_NUMBERSS[number]
+export const ALTERED_CHORD_DEGREE = [...ALTERED_MODE_DEGREE, 'b9', '#9', 'b11', '#11', 'b13', '#13'] as const
+export type AlteredChordDegreeNumber = typeof ALTERED_CHORD_DEGREE[number]
 
-export const CHORD_DEGREE_NUMBERS = [...STANDARD_CHORD_DEGREE_NUMBERS, ...ALTERED_CHORD_DEGREE_NUMBERSS]
-export type ChordDegreeNumber = typeof CHORD_DEGREE_NUMBERS[number]
+export const CHORD_DEGREE = [...STANDARD_CHORD_DEGREE, ...ALTERED_CHORD_DEGREE]
+export type ChordDegree = typeof CHORD_DEGREE[number]
+export function isChordDegree (degreeNumber: any): degreeNumber is ChordDegree {
+  return CHORD_DEGREE.includes(degreeNumber)
+}
+
+export function chordDegreesToModeDegrees(chordDegrees: ChordDegree[]): ModeDegree[] {
+  const modeDegrees = chordDegrees.map(degree => {
+    switch (degree) {
+      case 'b9':
+        return 'b2'
+      case '#9':
+        return '#2'
+      case '9':
+        return '2'
+      case 'b11':
+        return 'b4'
+      case '#11':
+        return '#4'
+      case '11':
+        return '4'
+      case 'b13':
+        return 'b6'
+      case '#13':
+        return '#6'
+      case '13':
+        return '6'
+      default:
+        return degree
+    }
+  })
+
+  return modeDegrees.filter(isModeDegree)
+}
 
 // https://en.wikipedia.org/wiki/Roman_numeral_analysis#Modes
 // \u1d47 -> superscript b
@@ -54,20 +92,20 @@ export const CHORD_NUMERALS = [
 ] as const
 export type ChordNumeral = typeof CHORD_NUMERALS[number]
 
-const CHORD_DEGREES_BY_BASE: Record<ChordBase, ChordDegreeNumber[]> = {
-  maj: [1, 3, 5, 7, 9, 11, 13],
+const CHORD_DEGREES_BY_BASE: Record<ChordBase, ChordDegree[]> = {
+  maj: ['1', '3', '5', '7', '9', '11', '13'],
   // b3, b7
-  min: [1, 'b3', 5, 'b7', 9, 11, 13],
+  min: ['1', 'b3', '5', 'b7', '9', '11', '13'],
   // b3, b5
-  dim: [1, 'b3', 'b5', 7, 9, 11, 13],
+  dim: ['1', 'b3', 'b5', '7', '9', '11', '13'],
   // b7
-  dom: [1, 3, 5, 'b7', 9, 11, 13],
+  dom: ['1', '3', '5', 'b7', '9', '11', '13'],
   // #5
-  aug: [1, 3, '#5', 7, 9, 11, 13],
+  aug: ['1', '3', '#5', '7', '9', '11', '13'],
   // 3 -> 2
-  sus2: [1, 2, 5, 7, 9, 11, 13],
+  sus2: ['1', '2', '5', '7', '9', '11', '13'],
   // 3 -> 4
-  sus4: [1, 4, 5, 7, 9, 11, 13]
+  sus4: ['1', '4', '5', '7', '9', '11', '13']
 }
 
 interface ChordType {
@@ -81,21 +119,86 @@ interface ChordType {
 export interface Chord {
   root: Note
   base: ChordBase
-  extension: ChordExtension
-  additions: ChordAddition[]
-  alterations: AlteredChordDegreeNumber[]
-  slash: Note
+  extension?: ChordExtension
+  additions?: ChordAddition[]
+  alterations?: AlteredChordDegreeNumber[]
+  slash?: Note
   intervals: Interval[]
+  degrees: ChordDegree[]
   notes: Note[]
   name: string
 }
 
-export function chord(tonic: IonianTonic, type: ChordType) {
+// Strip b or #
+function degreeNumber(degree: ChordDegree | ModeDegree): number {
+  if (degree[0] !== '#' && degree[0] !== 'b') {
+    return parseInt(degree)
+  } else {
+    return parseInt(degree.slice(1, degree.length))
+  }
+}
+
+function generateChordName(tonic: IonianTonic, type: ChordType): string {
+  let name = `${tonic}${type.base}${type.extension || ''}`
+  if (type.alterations) {
+    type.alterations.forEach(alteration => { name = name.concat(alteration)})
+  }
+
+  if (type.additions) {
+    type.additions.forEach(addition => {name = name.concat(`add${addition}`)})
+  }
+
+  if (type.slash) {
+    name = name.concat(`/${type.slash}`)
+  }
+
+  return name
+}
+
+export function chord(tonic: IonianTonic, type: ChordType): Chord {
   const chordKey = key(tonic, 'Ionian')
-  const chordDegrees = getEvenNumbers(type.extension || 5).map(element => (element + 1).toString())
-  chordDegrees.concat(type.additions || [])
-  chordDegrees.concat(type.alterations || [])
-  return [chordKey.notesByDegree[1], chordKey.notesByDegree[3], chordKey.notesByDegree[5]]
+  const extensionIndex = type.extension ? Math.ceil(parseInt(type.extension) / 2) : 3
+  let chordDegrees: ChordDegree[] = CHORD_DEGREES_BY_BASE[type.base].slice(0, extensionIndex)
+
+  if (type.additions) {
+    type.additions.forEach(addition => {
+      for (let i = chordDegrees.length - 1; i >= 0; i--) {
+        const chordDegree = chordDegrees[i]
+        if (degreeNumber(chordDegree) < degreeNumber(addition)) {
+          chordDegrees.splice(i + 1, 0, addition)
+          break
+        }
+      }
+    })
+  }
+
+  if (type.alterations) {
+    type.alterations.forEach(alteration => {
+      const unalteredIndex = chordDegrees.findIndex(degree => degree === alteration[1])
+      if (unalteredIndex) {
+        chordDegrees = removeArrayElement(chordDegrees, unalteredIndex)
+      }
+
+      for (let i = chordDegrees.length - 1; i >= 0; i--) {
+        const chordDegree = chordDegrees[i]
+        if (degreeNumber(chordDegree) < degreeNumber(alteration)) {
+          chordDegrees.splice(i + 1, 0, alteration)
+          break
+        }
+      }
+    })
+  }
+
+  const modeDegrees = chordDegreesToModeDegrees(chordDegrees)
+
+  return {
+    ...type,
+    root: tonic,
+    notes: modeDegrees.map(degree => chordKey.notesByDegree[degree]),
+    name: generateChordName(tonic, type),
+    intervals: [],
+    degrees: chordDegrees
+  }
 }
 
 // Tone intervals in chord bases

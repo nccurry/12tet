@@ -13,14 +13,14 @@ import {
   isTheoreticalSharpNote,
   Tone,
   TONES_BY_NOTE,
-  TONES
+  TONES, NOTES
 } from '../note'
 import {
-  ModeDegreeNumber,
+  ModeDegree,
   ModeKeySignature,
   ModeName,
-  ALTERED_MODE_DEGREE_NUMBERS,
-  STANDARD_MODE_DEGREE_NUMBERS,
+  ALTERED_MODE_DEGREE,
+  STANDARD_MODE_DEGREE,
   isModeKeySignature,
   IonianTonic,
   DorianTonic,
@@ -30,7 +30,7 @@ import {
   AeolianTonic,
   LocrianTonic,
   isModeTonicByModeName,
-  MODE_DATA, Tonic,
+  MODE_DATA, Tonic, isModeDegree,
 } from '../mode'
 
 // Given the notes of a key, return the key signature
@@ -167,17 +167,38 @@ export function adjustNote(note: Note, adjustment: 'b' | '#' | ''): Note {
 
 // Given a list of notes, return an object with degree keys and note values
 // It is assumed that the notes are given in order - i.e. index 0 is the first degree of the key
-export function generateNotesByDegree(notes: Note[]): Record<ModeDegreeNumber, Note> {
-  const notesByDegree: { [key in ModeDegreeNumber]?: Note } = {}
-  STANDARD_MODE_DEGREE_NUMBERS.forEach((degree, index)=> {
+export function generateNotesByDegree(notes: Note[]): Record<ModeDegree, Note> {
+  const notesByDegree: { [key in ModeDegree]?: Note } = {}
+  STANDARD_MODE_DEGREE.forEach((degree, index)=> {
     notesByDegree[degree] = notes[index]
   })
 
-  ALTERED_MODE_DEGREE_NUMBERS.forEach(degree => {
+  ALTERED_MODE_DEGREE.forEach(degree => {
     notesByDegree[degree] = adjustNote(notes[parseInt(degree[1]) - 1], degree[0] as 'b' | '#' | '')
   })
 
-  return notesByDegree as Record<ModeDegreeNumber, Note>
+  return notesByDegree as Record<ModeDegree, Note>
+}
+
+function invertObject (object: Record<ModeDegree, Note>): { [key in Note]?: ModeDegree } {
+  const entries = Object.entries(object)
+  return Object.entries(object).reduce((acc, [key, value]) => (acc[value] = key, acc), {})
+}
+
+function generateDegreesByNote(notesByDegree: Record<ModeDegree, Note>): Record<Note, ModeDegree> {
+  const degreesByNote: { [key in Note]?: ModeDegree } = {}
+  NOTES.forEach(note => {
+    for (const [degree, degreeNote] of Object.entries(notesByDegree)) {
+      const tone = TONES_BY_NOTE[note]
+      if (degreeNote === note) {
+        degreesByNote[note] = degree as ModeDegree
+      } else {
+
+      }
+    }
+  })
+
+  return degreesByNote as Record<Note, ModeDegree>
 }
 
 export interface Key {
@@ -185,10 +206,11 @@ export interface Key {
   readonly mode: ModeName
   readonly notes: Note[]
   readonly signature: ModeKeySignature
-  readonly notesByDegree: Record<ModeDegreeNumber, Note>
+  readonly notesByDegree: Record<ModeDegree, Note>
   readonly enharmonicEquivalents: Note[]
   readonly theoreticalKey: boolean
   readonly tones: Tone[]
+  readonly degreesByNote: Record<Note, ModeDegree>
 }
 
 export interface IonianKey extends Key {
