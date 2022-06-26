@@ -1,7 +1,7 @@
 import {
   wrapValue,
   rotateArray,
-  sumTo, isTypeError
+  sumTo, isTypeError, arrayDifference
 } from '../utils'
 import {
   Note,
@@ -30,7 +30,7 @@ import {
   AeolianTonic,
   LocrianTonic,
   isModeTonicByModeName,
-  MODE_DATA, Tonic, isModeDegree,
+  MODE_DATA, Tonic, isModeDegree, MODE_DEGREE,
 } from '../mode'
 
 // Given the notes of a key, return the key signature
@@ -180,22 +180,25 @@ export function generateNotesByDegree(notes: Note[]): Record<ModeDegree, Note> {
   return notesByDegree as Record<ModeDegree, Note>
 }
 
-function invertObject (object: Record<ModeDegree, Note>): { [key in Note]?: ModeDegree } {
-  const entries = Object.entries(object)
-  return Object.entries(object).reduce((acc, [key, value]) => (acc[value] = key, acc), {})
+function invertNotesByDegree (notesByDegree: Record<ModeDegree, Note>): { [key in Note]?: ModeDegree } {
+  const degreesByNote: { [key in Note]?: ModeDegree } = {}
+
+  MODE_DEGREE.forEach(degree => {
+    degreesByNote[notesByDegree[degree]] = degree
+  })
+
+  return degreesByNote
 }
 
 function generateDegreesByNote(notesByDegree: Record<ModeDegree, Note>): Record<Note, ModeDegree> {
-  const degreesByNote: { [key in Note]?: ModeDegree } = {}
-  NOTES.forEach(note => {
-    for (const [degree, degreeNote] of Object.entries(notesByDegree)) {
-      const tone = TONES_BY_NOTE[note]
-      if (degreeNote === note) {
-        degreesByNote[note] = degree as ModeDegree
-      } else {
-
+  const degreesByNote = invertNotesByDegree(notesByDegree)
+  Object.keys(degreesByNote).forEach(degreeNote => {
+    const tone = TONES_BY_NOTE[degreeNote as Note]
+    tone.tone.forEach(toneNote => {
+      if (toneNote !== degreeNote) {
+        degreesByNote[toneNote] = degreesByNote[degreeNote as Note]
       }
-    }
+    })
   })
 
   return degreesByNote as Record<Note, ModeDegree>
@@ -264,15 +267,18 @@ export function key(tonic: Tonic, modeName: ModeName): Key | TypeError {
       return signature
     }
 
+    const notesByDegree = generateNotesByDegree(notes)
+
     const key: Key = {
       tonic: tonic,
       mode: modeName,
       tones: tones,
       notes: notes,
       enharmonicEquivalents: tones[0].filter(note => note !== tonic && isModeTonicByModeName[modeName](note)),
-      notesByDegree: generateNotesByDegree(notes),
+      notesByDegree: notesByDegree,
       signature: signature,
-      theoreticalKey: parseInt(signature[0]) > 7
+      theoreticalKey: parseInt(signature[0]) > 7,
+      degreesByNote: generateDegreesByNote(notesByDegree)
     }
     return key
   }
