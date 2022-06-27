@@ -6,7 +6,7 @@ import {
 import {
   wrapValue,
   rotateArray,
-  removeDuplicates, getEvenNumbers, removeArrayElement
+  removeDuplicates, getEvenNumbers, removeArrayElement, getShallowCopy
 } from '../utils'
 import {
   Note,
@@ -155,6 +155,22 @@ function generateChordName(tonic: IonianTonic, type: ChordType): string {
   return name
 }
 
+function insertDegree(degrees: ChordDegree[], degree: ChordDegree): ChordDegree[]
+function insertDegree(degrees: ModeDegree[], degree: ModeDegree): ModeDegree[]
+function insertDegree(degrees: ModeDegree[] | ChordDegree[], degree: ModeDegree | ChordDegree): ModeDegree[] | ChordDegree[] {
+  const degreesCopy = getShallowCopy(degrees)
+
+  for (let i = degreesCopy.length - 1; i >= 0; i--) {
+    const chordDegree = degreesCopy[i]
+    if (degreeNumber(chordDegree) < degreeNumber(degree)) {
+      degreesCopy.splice(i + 1, 0, degree)
+      break
+    }
+  }
+
+  return degreesCopy
+}
+
 export function chord(tonic: IonianTonic, type: ChordType): Chord {
   const chordKey = key(tonic, 'Ionian')
   const extensionIndex = type.extension ? Math.ceil(parseInt(type.extension) / 2) : 3
@@ -162,13 +178,7 @@ export function chord(tonic: IonianTonic, type: ChordType): Chord {
 
   if (type.additions) {
     type.additions.forEach(addition => {
-      for (let i = chordDegrees.length - 1; i >= 0; i--) {
-        const chordDegree = chordDegrees[i]
-        if (degreeNumber(chordDegree) < degreeNumber(addition)) {
-          chordDegrees.splice(i + 1, 0, addition)
-          break
-        }
-      }
+      chordDegrees = insertDegree(chordDegrees, addition)
     })
   }
 
@@ -179,14 +189,19 @@ export function chord(tonic: IonianTonic, type: ChordType): Chord {
         chordDegrees = removeArrayElement(chordDegrees, unalteredIndex)
       }
 
-      for (let i = chordDegrees.length - 1; i >= 0; i--) {
-        const chordDegree = chordDegrees[i]
-        if (degreeNumber(chordDegree) < degreeNumber(alteration)) {
-          chordDegrees.splice(i + 1, 0, alteration)
-          break
-        }
-      }
+      chordDegrees = insertDegree(chordDegrees, alteration)
     })
+  }
+
+  if (type.slash) {
+    const slashDegree = chordKey.degreesByNote[type.slash]
+
+    chordDegrees = insertDegree(chordDegrees, slashDegree)
+
+    const slashDegreeIndex = chordDegrees.findIndex(degree => degree === slashDegree)
+    if (slashDegreeIndex) {
+      chordDegrees = rotateArray(chordDegrees, slashDegreeIndex)
+    }
   }
 
   const modeDegrees = chordDegreesToModeDegrees(chordDegrees)
@@ -197,7 +212,8 @@ export function chord(tonic: IonianTonic, type: ChordType): Chord {
     notes: modeDegrees.map(degree => chordKey.notesByDegree[degree]),
     name: generateChordName(tonic, type),
     intervals: [],
-    degrees: chordDegrees
+    degrees: chordDegrees,
+    slash: type.slash
   }
 }
 
