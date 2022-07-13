@@ -48,31 +48,33 @@ export function isChordDegree (degreeNumber: any): degreeNumber is ChordDegree {
   return CHORD_DEGREE.includes(degreeNumber)
 }
 
+export function chordDegreeToModeDegree(chordDegree: ChordDegree): ModeDegree {
+  switch (chordDegree) {
+    case 'b9':
+      return 'b2'
+    case '#9':
+      return '#2'
+    case '9':
+      return '2'
+    case 'b11':
+      return 'b4'
+    case '#11':
+      return '#4'
+    case '11':
+      return '4'
+    case 'b13':
+      return 'b6'
+    case '#13':
+      return '#6'
+    case '13':
+      return '6'
+    default:
+      return chordDegree
+  }
+}
+
 export function chordDegreesToModeDegrees(chordDegrees: ChordDegree[]): ModeDegree[] {
-  const modeDegrees = chordDegrees.map(degree => {
-    switch (degree) {
-      case 'b9':
-        return 'b2'
-      case '#9':
-        return '#2'
-      case '9':
-        return '2'
-      case 'b11':
-        return 'b4'
-      case '#11':
-        return '#4'
-      case '11':
-        return '4'
-      case 'b13':
-        return 'b6'
-      case '#13':
-        return '#6'
-      case '13':
-        return '6'
-      default:
-        return degree
-    }
-  })
+  const modeDegrees = chordDegrees.map(chordDegree => chordDegreeToModeDegree(chordDegree))
 
   return modeDegrees.filter(isModeDegree)
 }
@@ -113,7 +115,7 @@ interface ChordType {
   extension?: ChordExtension,
   additions?: ChordAddition[],
   alterations?: AlteredChordDegreeNumber[],
-  slash?: StandardNote
+  slash?: ChordDegree
 }
 
 export interface Chord {
@@ -122,7 +124,8 @@ export interface Chord {
   extension?: ChordExtension
   additions?: ChordAddition[]
   alterations?: AlteredChordDegreeNumber[]
-  slash?: Note
+  slash?: ChordDegree
+  slashNote?: Note
   intervals: Interval[]
   degrees: ChordDegree[]
   notes: Note[]
@@ -149,7 +152,8 @@ function generateChordName(tonic: IonianTonic, type: ChordType): string {
   }
 
   if (type.slash) {
-    name = name.concat(`/${type.slash}`)
+    const slashNote = key(tonic, 'Ionian').notesByDegree[chordDegreeToModeDegree(type.slash)]
+    name = name.concat(`/${slashNote}`)
   }
 
   return name
@@ -194,13 +198,13 @@ export function chord(tonic: IonianTonic, type: ChordType): Chord {
   }
 
   if (type.slash) {
-    const slashDegree = chordKey.degreesByNote[type.slash]
+    chordDegrees = insertDegree(chordDegrees, type.slash)
 
-    chordDegrees = insertDegree(chordDegrees, slashDegree)
-
-    const slashDegreeIndex = chordDegrees.findIndex(degree => degree === slashDegree)
+    const slashDegreeIndex = chordDegrees.findIndex(degree => degree === type.slash)
     if (slashDegreeIndex) {
       chordDegrees = rotateArray(chordDegrees, slashDegreeIndex)
+    } else {
+      console.error('There was a problem finding the slash degree index.')
     }
   }
 
@@ -213,7 +217,8 @@ export function chord(tonic: IonianTonic, type: ChordType): Chord {
     name: generateChordName(tonic, type),
     intervals: [],
     degrees: chordDegrees,
-    slash: type.slash
+    slash: type.slash,
+    slashNote: type.slash ? chordKey.notesByDegree[chordDegreeToModeDegree(type.slash)] : undefined
   }
 }
 

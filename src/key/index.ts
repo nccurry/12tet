@@ -1,7 +1,7 @@
 import {
   wrapValue,
   rotateArray,
-  sumTo, isTypeError, arrayDifference
+  sumTo, isTypeError, arrayDifference, getWrappedArrayElement
 } from '../utils'
 import {
   Note,
@@ -81,6 +81,36 @@ export function getKeyTones(tonic: Note, modeName: ModeName): Tone[] {
   }
 
   return keyTones
+}
+
+export function keyTonesByDegree(tonic: Note, modeName: ModeName): Record<ModeDegree, Tone> {
+  const keyTonesByDegree: { [key in ModeDegree]?: Tone } = {}
+
+  const tonicTone = TONES_BY_NOTE[tonic]
+  let toneIndexes: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+  const modeTonePattern = MODE_DATA[modeName].semitoneStructure
+
+  // Start toneIndexes on the index of the tonic tone
+  toneIndexes = rotateArray(toneIndexes, tonicTone.index)
+
+  STANDARD_MODE_DEGREE.forEach(standardModeDegree => {
+    // Get the number of semitones between the tonic and this tone
+    // -1 to make an array index out of a mode degree
+    // -1 because the modeTonePattern maps the semitones at the 0th element to the II degree of the mode
+    const semitones = standardModeDegree === '1' ? 0 : sumTo([...modeTonePattern], parseInt(standardModeDegree) - 1 - 1)
+
+    // Get the tone index of the degree and its # and b equivalents
+    const flatToneIndex = getWrappedArrayElement(toneIndexes, semitones - 1)
+    const toneIndex = getWrappedArrayElement(toneIndexes, semitones)
+    const sharptToneIndex = getWrappedArrayElement(toneIndexes, semitones + 1)
+
+    // Set the values of the degree tone and its # and b equivalents
+    keyTonesByDegree[`b${standardModeDegree}`] = TONES[flatToneIndex]
+    keyTonesByDegree[standardModeDegree] = TONES[toneIndex]
+    keyTonesByDegree[`#${standardModeDegree}`] = TONES[sharptToneIndex]
+  })
+
+  return keyTonesByDegree as Record<ModeDegree, Tone>
 }
 
 // Given a tonic and an array of Tones, simplify to an array of notes
@@ -180,40 +210,15 @@ export function generateNotesByDegree(notes: Note[]): Record<ModeDegree, Note> {
   return notesByDegree as Record<ModeDegree, Note>
 }
 
-function invertNotesByDegree (notesByDegree: Record<ModeDegree, Note>): { [key in Note]?: ModeDegree } {
-  const degreesByNote: { [key in Note]?: ModeDegree } = {}
-
-  MODE_DEGREE.forEach(degree => {
-    degreesByNote[notesByDegree[degree]] = degree
-  })
-
-  return degreesByNote
-}
-
-function generateDegreesByNote(notesByDegree: Record<ModeDegree, Note>): Record<Note, ModeDegree> {
-  const degreesByNote = invertNotesByDegree(notesByDegree)
-  Object.keys(degreesByNote).forEach(degreeNote => {
-    const tone = TONES_BY_NOTE[degreeNote as Note]
-    tone.tone.forEach(toneNote => {
-      if (toneNote !== degreeNote) {
-        degreesByNote[toneNote] = degreesByNote[degreeNote as Note]
-      }
-    })
-  })
-
-  return degreesByNote as Record<Note, ModeDegree>
-}
-
 export interface Key {
   readonly tonic: Tonic
   readonly mode: ModeName
   readonly notes: Note[]
   readonly signature: ModeKeySignature
+  readonly tonesByDegree: Record<ModeDegree, Tone>
   readonly notesByDegree: Record<ModeDegree, Note>
   readonly enharmonicEquivalents: Note[]
   readonly theoreticalKey: boolean
-  readonly tones: Tone[]
-  readonly degreesByNote: Record<Note, ModeDegree>
 }
 
 export interface IonianKey extends Key {
@@ -272,13 +277,12 @@ export function key(tonic: Tonic, modeName: ModeName): Key | TypeError {
     const key: Key = {
       tonic: tonic,
       mode: modeName,
-      tones: tones,
       notes: notes,
-      enharmonicEquivalents: tones[0].filter(note => note !== tonic && isModeTonicByModeName[modeName](note)),
+      tonesByDegree: keyTonesByDegree(tonic, modeName),
       notesByDegree: notesByDegree,
+      enharmonicEquivalents: tones[0].filter(note => note !== tonic && isModeTonicByModeName[modeName](note)),
       signature: signature,
-      theoreticalKey: parseInt(signature[0]) > 7,
-      degreesByNote: generateDegreesByNote(notesByDegree)
+      theoreticalKey: parseInt(signature[0]) > 7
     }
     return key
   }

@@ -1,4 +1,4 @@
-import { getWrappedArrayElement, wrapValue } from '../utils'
+import { getWrappedArrayElement } from '../utils'
 
 export const NATURAL_NOTES = ['C', 'D', 'E', 'F', 'G', 'A', 'B'] as const
 export type NaturalNote = typeof NATURAL_NOTES[number]

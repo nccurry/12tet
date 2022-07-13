@@ -120,11 +120,17 @@ export interface Interval {
 }
 
 export function isInterval (interval: any): interval is Interval {
-  return (interval as Interval).name !== undefined && (interval as Interval).shortName !== undefined
+  return (interval as Interval).name !== undefined &&
+      (interval as Interval).shortName !== undefined
 }
 
 // An identifier that uniquely identifies a given interval
-export type IntervalIdentifier = IntervalName | ShortIntervalName | IntervalDistance | ComplexIntervalDistance | Interval
+export type IntervalIdentifier =
+    IntervalName |
+    ShortIntervalName |
+    IntervalDistance |
+    ComplexIntervalDistance |
+    Interval
 
 // Metadata of the inter-octave intervals
 const INTERVAL_DATA: Record<ShortIntervalName, Interval> = {
