@@ -6,9 +6,9 @@ module.exports = {
   ],
   extends: [
     'eslint:recommended',
-    'plugin:@typescript-eslint/recommended',
+    'plugin:@typescript-eslint/recommended'
   ],
-  "rules": {
+  rules: {
     "semi": [1, "never"],
     "object-curly-spacing": [1, "always"],
     "@typescript-eslint/no-explicit-any": "off"
