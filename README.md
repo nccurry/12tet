@@ -15,13 +15,13 @@ import {
 } from 'musicomatic'
 
 // List all mode names
-console.log(MODE_NAMES)
+console.log(MODE_NAMES) // ['Ionian', 'Dorian', 'Phrygian', ..., Locrian]
 
 // List all tonic notes in the Ionian mode, including theoretical tonic notes
-console.log(IONIAN_TONICS)
+console.log(IONIAN_TONICS) // ['C', 'G', 'D', 'A', 'E', ..., 'Bbb', 'Fb']
 
 // List all standard tonic notes in the Aeolian mode, ignoring theoretical tonic notes
-console.log(AEOLIAN_STANDARD_TONICS)
+console.log(AEOLIAN_STANDARD_TONICS) // ['A',  'E',  'B',  'F#', 'C#', ..., 'Bb', 'F']
 
 // Get the Ionian mode
 const ionianMode = mode('Ionian')
@@ -53,13 +53,13 @@ import {
 } from 'musicomatic'
 
 // List all interval names
-console.log(INTERVAL_NAMES)
+console.log(INTERVAL_NAMES) // ['Perfect Unison', 'Minor Second', 'Major Second', ..., 'Major Seventh', 'Perfect Octave']
 
 // List all alternate interval names
-console.log(ALTERNATE_INTERVAL_NAMES)
+console.log(ALTERNATE_INTERVAL_NAMES) // ['Semitone', 'Tone', 'Trisemitone', 'Tritone', ..., 'Half Step', 'Whole Step']
 
 // List all interval short names
-console.log(INTERVAL_SHORT_NAMES)
+console.log(SHORT_INTERVAL_NAMES) // ['P1', 'm2', 'M2', 'm3', 'M3', 'P4', ..., M7, P8]
 
 // Create new Interval instance with semitone distance
 const p8_1 = interval(12)
@@ -95,10 +95,12 @@ import {
 } from 'musicomatic'
 
 // Create a new key
-const cIonian = key('C', 'Ionian')
+const gIonian = key('G', 'Ionian')
 
 // Interact with the key
-console.log(cIonian.signature) // ''
+console.log(gIonian.signature) // 1#
+console.log(gIonian.tonic) // G
+console.log(gIonian.enharmonicEquivalents) // ['F##', 'Abb']
 ```
 
 ## Development
