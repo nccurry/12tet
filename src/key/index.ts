@@ -1,7 +1,9 @@
 import {
   wrapValue,
   rotateArray,
-  sumTo, isTypeError, arrayDifference, getWrappedArrayElement
+  sumTo,
+  isTypeError,
+  getWrappedArrayElement
 } from '../utils'
 import {
   Note,
@@ -13,14 +15,14 @@ import {
   isTheoreticalSharpNote,
   Tone,
   TONES_BY_NOTE,
-  TONES, NOTES
+  TONES
 } from '../note'
 import {
   ModeDegree,
   ModeKeySignature,
   ModeName,
-  ALTERED_MODE_DEGREE,
-  STANDARD_MODE_DEGREE,
+  ALTERED_MODE_DEGREES,
+  STANDARD_MODE_DEGREES,
   isModeKeySignature,
   IonianTonic,
   DorianTonic,
@@ -30,7 +32,8 @@ import {
   AeolianTonic,
   LocrianTonic,
   isModeTonicByModeName,
-  MODE_DATA, Tonic, isModeDegree, MODE_DEGREE,
+  MODE_DATA,
+  Tonic
 } from '../mode'
 
 // Given the notes of a key, return the key signature
@@ -93,7 +96,7 @@ export function keyTonesByDegree(tonic: Note, modeName: ModeName): Record<ModeDe
   // Start toneIndexes on the index of the tonic tone
   toneIndexes = rotateArray(toneIndexes, tonicTone.index)
 
-  STANDARD_MODE_DEGREE.forEach(standardModeDegree => {
+  STANDARD_MODE_DEGREES.forEach(standardModeDegree => {
     // Get the number of semitones between the tonic and this tone
     // -1 to make an array index out of a mode degree
     // -1 because the modeTonePattern maps the semitones at the 0th element to the II degree of the mode
@@ -199,11 +202,11 @@ export function adjustNote(note: Note, adjustment: 'b' | '#' | ''): Note {
 // It is assumed that the notes are given in order - i.e. index 0 is the first degree of the key
 export function generateNotesByDegree(notes: Note[]): Record<ModeDegree, Note> {
   const notesByDegree: { [key in ModeDegree]?: Note } = {}
-  STANDARD_MODE_DEGREE.forEach((degree, index)=> {
+  STANDARD_MODE_DEGREES.forEach((degree, index)=> {
     notesByDegree[degree] = notes[index]
   })
 
-  ALTERED_MODE_DEGREE.forEach(degree => {
+  ALTERED_MODE_DEGREES.forEach(degree => {
     notesByDegree[degree] = adjustNote(notes[parseInt(degree[1]) - 1], degree[0] as 'b' | '#' | '')
   })
 

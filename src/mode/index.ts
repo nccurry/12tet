@@ -1,6 +1,6 @@
 import {
   ChordNumeral,
-  DiatonicChordType
+  DiatonicChordBase
 } from "../chord"
 import {
   ShortIntervalName
@@ -39,22 +39,22 @@ export function isModeKeySignature (signature: any): signature is ModeKeySignatu
   return MODE_KEY_SIGNATURES.includes(signature)
 }
 
-export const STANDARD_MODE_DEGREE = ['1', '2', '3', '4', '5', '6', '7'] as const
-export type StandardModeDegree = typeof STANDARD_MODE_DEGREE[number]
+export const STANDARD_MODE_DEGREES = ['1', '2', '3', '4', '5', '6', '7'] as const
+export type StandardModeDegree = typeof STANDARD_MODE_DEGREES[number]
 export function isStandardModeDegree (degree: any): degree is StandardModeDegree {
-  return STANDARD_MODE_DEGREE.includes(degree)
+  return STANDARD_MODE_DEGREES.includes(degree)
 }
 
-export const ALTERED_MODE_DEGREE = ['b1', '#1', 'b2', '#2', 'b3', '#3', 'b4', '#4', 'b5', '#5', 'b6', '#6', 'b7', '#7'] as const
-export type AlteredModeDegree = typeof ALTERED_MODE_DEGREE[number]
+export const ALTERED_MODE_DEGREES = ['b1', '#1', 'b2', '#2', 'b3', '#3', 'b4', '#4', 'b5', '#5', 'b6', '#6', 'b7', '#7'] as const
+export type AlteredModeDegree = typeof ALTERED_MODE_DEGREES[number]
 export function isAlteredModeDegree (degree: any): degree is AlteredModeDegree {
-  return ALTERED_MODE_DEGREE.includes(degree)
+  return ALTERED_MODE_DEGREES.includes(degree)
 }
 
-export const MODE_DEGREE = [...STANDARD_MODE_DEGREE, ...ALTERED_MODE_DEGREE] as const
-export type ModeDegree = typeof MODE_DEGREE[number]
+export const MODE_DEGREES = [...STANDARD_MODE_DEGREES, ...ALTERED_MODE_DEGREES] as const
+export type ModeDegree = typeof MODE_DEGREES[number]
 export function isModeDegree (degree: any): degree is ModeDegree {
-  return MODE_DEGREE.includes(degree)
+  return MODE_DEGREES.includes(degree)
 }
 
 export const MODE_DEGREE_NAMES = ['Tonic', 'Supertonic', 'Mediant', 'Subdominant', 'Dominant', 'Submediant', 'Subtonic', 'Leading Tone'] as const
@@ -226,7 +226,7 @@ export const isModeTonicByModeName: {
   Locrian: isLocrianTonic
 }
 
-interface Mode {
+export interface Mode {
   // The name of the mode
   readonly name: ModeName
 
@@ -237,7 +237,7 @@ interface Mode {
   readonly chordNumerals: readonly ChordNumeral[]
 
   // The short name of the chord name associated with each mode degree
-  readonly chordBases: readonly DiatonicChordType[]
+  readonly chordBases: readonly DiatonicChordBase[]
 
   // The semitone distances between mode degrees
   readonly semitoneStructure: readonly number[]
@@ -249,7 +249,7 @@ interface Mode {
   readonly degreeAdjustmentFromIonian: readonly number[]
 }
 
-interface Ionian extends Mode {
+export interface IonianMode extends Mode {
   // The list of standard and theoretical mode tonics
   readonly tonics: readonly IonianTonic[]
 
@@ -260,7 +260,7 @@ interface Ionian extends Mode {
   readonly keyBySignature: (signature: ModeKeySignature) => IonianKey
 }
 
-interface Dorian extends Mode {
+export interface DorianMode extends Mode {
   // The list of standard and theoretical mode tonics
   readonly tonics: readonly DorianTonic[]
 
@@ -271,7 +271,7 @@ interface Dorian extends Mode {
   readonly keyBySignature: (signature: ModeKeySignature) => DorianKey
 }
 
-interface Phrygian extends Mode {
+export interface PhrygianMode extends Mode {
   // The list of standard and theoretical mode tonics
   readonly tonics: readonly PhrygianTonic[]
 
@@ -282,7 +282,7 @@ interface Phrygian extends Mode {
   readonly keyBySignature: (signature: ModeKeySignature) => PhrygianKey
 }
 
-interface Lydian extends Mode {
+export interface LydianMode extends Mode {
   // The list of standard and theoretical mode tonics
   readonly tonics: readonly LydianTonic[]
 
@@ -293,7 +293,7 @@ interface Lydian extends Mode {
   readonly keyBySignature: (signature: ModeKeySignature) => LydianKey
 }
 
-interface Mixolydian extends Mode {
+export interface MixolydianMode extends Mode {
   // The list of standard and theoretical mode tonics
   readonly tonics: readonly MixolydianTonic[]
 
@@ -304,7 +304,7 @@ interface Mixolydian extends Mode {
   readonly keyBySignature: (signature: ModeKeySignature) => MixolydianKey
 }
 
-interface Aeolian extends Mode {
+export interface AeolianMode extends Mode {
   // The list of standard and theoretical mode tonics
   readonly tonics: readonly AeolianTonic[]
 
@@ -315,7 +315,7 @@ interface Aeolian extends Mode {
   readonly keyBySignature: (signature: ModeKeySignature) => AeolianKey
 }
 
-interface Locrian extends Mode {
+export interface LocrianMode extends Mode {
   // The list of standard and theoretical mode tonics
   readonly tonics: readonly LocrianTonic[]
 
@@ -450,7 +450,7 @@ function keyBySignature(modeName: ModeName): KeyBySignature {
 }
 
 // Metadata for each mod
-export const MODE_DATA: Record<ModeName, Ionian | Dorian | Phrygian | Lydian | Mixolydian | Aeolian | Locrian> = {
+export const MODE_DATA: Record<ModeName, IonianMode | DorianMode | PhrygianMode | LydianMode | MixolydianMode | AeolianMode | LocrianMode> = {
   Ionian: {
     name: 'Ionian',
     alternateName: 'Major',
@@ -533,13 +533,13 @@ export const MODE_DATA: Record<ModeName, Ionian | Dorian | Phrygian | Lydian | M
 }
 
 // Returns a given mode object
-export function mode(modeName: 'Ionian'): Ionian
-export function mode(modeName: 'Dorian'): Dorian
-export function mode(modeName: 'Phrygian'): Phrygian
-export function mode(modeName: 'Lydian'): Lydian
-export function mode(modeName: 'Mixolydian'): Mixolydian
-export function mode(modeName: 'Aeolian'): Aeolian
-export function mode(modeName: 'Locrian'): Locrian
-export function mode(modeName: ModeName): Ionian | Dorian | Phrygian | Lydian | Mixolydian | Aeolian | Locrian {
+export function mode(modeName: 'Ionian'): IonianMode
+export function mode(modeName: 'Dorian'): DorianMode
+export function mode(modeName: 'Phrygian'): PhrygianMode
+export function mode(modeName: 'Lydian'): LydianMode
+export function mode(modeName: 'Mixolydian'): MixolydianMode
+export function mode(modeName: 'Aeolian'): AeolianMode
+export function mode(modeName: 'Locrian'): LocrianMode
+export function mode(modeName: ModeName): IonianMode | DorianMode | PhrygianMode | LydianMode | MixolydianMode | AeolianMode | LocrianMode {
   return MODE_DATA[modeName]
 }

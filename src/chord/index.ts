@@ -1,51 +1,63 @@
 import {
-  interval,
-  Interval,
-  IntervalDistance, StandardIntervalDistance
+  Interval, isInterval,
 } from "../interval"
 import {
-  wrapValue,
   rotateArray,
-  removeDuplicates, getEvenNumbers, removeArrayElement, getShallowCopy
+  removeArrayElement,
+  getShallowCopy
 } from '../utils'
 import {
+  isNote,
   Note,
-  StandardNote
 } from '../note'
 import {
-  ALTERED_MODE_DEGREE,
-  IonianStandardTonic,
+  ALTERED_MODE_DEGREES,
   IonianTonic, isModeDegree,
-  mode,
-  MODE_DEGREE,
+  MODE_DEGREES,
   ModeDegree,
-  STANDARD_MODE_DEGREE,
-  StandardModeDegree,
 } from '../mode'
 import { ionianKey, key } from "../key"
 
-export const DIATONIC_CHORD_BASE = ['maj', 'min', 'dim'] as const
-export type DiatonicChordType = typeof DIATONIC_CHORD_BASE[number]
+export const DIATONIC_CHORD_BASES = ['maj', 'min', 'dim'] as const
+export type DiatonicChordBase = typeof DIATONIC_CHORD_BASES[number]
+export function isDiatonicChordBase (chordType: any): chordType is DiatonicChordBase {
+  return DIATONIC_CHORD_BASES.includes(chordType)
+}
 
-export const CHORD_BASES = [...DIATONIC_CHORD_BASE, 'dom', 'sus2', 'sus4', 'aug'] as const
+export const CHORD_BASES = [...DIATONIC_CHORD_BASES, 'dom', 'sus2', 'sus4', 'aug'] as const
 export type ChordBase = typeof CHORD_BASES[number]
+export function isChordBase (chordType: any): chordType is ChordBase {
+  return CHORD_BASES.includes(chordType)
+}
 
 export const CHORD_ADDITIONS = ['2', '4', '6', '9', '11', '13'] as const
 export type ChordAddition = typeof CHORD_ADDITIONS[number]
+export function isChordAddition (chordAddition: any): chordAddition is ChordAddition {
+  return CHORD_ADDITIONS.includes(chordAddition)
+}
 
 export const CHORD_EXTENSIONS = ['7', '9', '11', '13'] as const
 export type ChordExtension = typeof CHORD_EXTENSIONS[number]
+export function isChordExtension (chordExtension: any): chordExtension is ChordExtension {
+  return CHORD_EXTENSIONS.includes(chordExtension)
+}
 
-export const STANDARD_CHORD_DEGREE = [...MODE_DEGREE, '9', '11', '13'] as const
-export type StandardChordDegreeNumber = typeof STANDARD_CHORD_DEGREE[number]
+export const STANDARD_CHORD_DEGREES = [...MODE_DEGREES, '9', '11', '13'] as const
+export type StandardChordDegree = typeof STANDARD_CHORD_DEGREES[number]
+export function isStandardChordDegree (degreeNumber: any): degreeNumber is StandardChordDegree {
+  return STANDARD_CHORD_DEGREES.includes(degreeNumber)
+}
 
-export const ALTERED_CHORD_DEGREE = [...ALTERED_MODE_DEGREE, 'b9', '#9', 'b11', '#11', 'b13', '#13'] as const
-export type AlteredChordDegreeNumber = typeof ALTERED_CHORD_DEGREE[number]
+export const ALTERED_CHORD_DEGREES = [...ALTERED_MODE_DEGREES, 'b9', '#9', 'b11', '#11', 'b13', '#13'] as const
+export type AlteredChordDegree = typeof ALTERED_CHORD_DEGREES[number]
+export function isAlteredChordDegree (degreeNumber: any): degreeNumber is AlteredChordDegree {
+  return ALTERED_CHORD_DEGREES.includes(degreeNumber)
+}
 
-export const CHORD_DEGREE = [...STANDARD_CHORD_DEGREE, ...ALTERED_CHORD_DEGREE]
-export type ChordDegree = typeof CHORD_DEGREE[number]
+export const CHORD_DEGREES = [...STANDARD_CHORD_DEGREES, ...ALTERED_CHORD_DEGREES]
+export type ChordDegree = typeof CHORD_DEGREES[number]
 export function isChordDegree (degreeNumber: any): degreeNumber is ChordDegree {
-  return CHORD_DEGREE.includes(degreeNumber)
+  return CHORD_DEGREES.includes(degreeNumber)
 }
 
 export function chordDegreeToModeDegree(chordDegree: ChordDegree): ModeDegree {
@@ -110,11 +122,11 @@ const CHORD_DEGREES_BY_BASE: Record<ChordBase, ChordDegree[]> = {
   sus4: ['1', '4', '5', '7', '9', '11', '13']
 }
 
-interface ChordType {
+export interface ChordType {
   base: ChordBase,
   extension?: ChordExtension,
   additions?: ChordAddition[],
-  alterations?: AlteredChordDegreeNumber[],
+  alterations?: AlteredChordDegree[],
   slash?: ChordDegree
 }
 
@@ -123,13 +135,60 @@ export interface Chord {
   base: ChordBase
   extension?: ChordExtension
   additions?: ChordAddition[]
-  alterations?: AlteredChordDegreeNumber[]
+  alterations?: AlteredChordDegree[]
   slash?: ChordDegree
   slashNote?: Note
   intervals: Interval[]
   degrees: ChordDegree[]
   notes: Note[]
   name: string
+}
+
+export function isChord(chord: any): chord is Chord {
+  if (!chord.root || !isNote(chord.root)) {
+    return false
+  }
+  if (!chord.base || !isChordBase(chord.base)) {
+    return false
+  }
+  if (chord.extension && !isChordExtension(chord.extension)) {
+    return false
+  }
+  for (let i=0; i < chord.additions.length; i++) {
+    if (!isChordAddition(chord.additions[i])) {
+      return false
+    }
+  }
+  for (let i=0; i < chord.alterations.length; i++) {
+    if (!isAlteredChordDegree(chord.alterations[i])) {
+      return false
+    }
+  }
+  if (chord.slash && !isChordDegree(chord.slash)){
+    return false
+  }
+  if (chord.slashNote && !isNote(chord.slashNote)) {
+    return false
+  }
+  for (let i=0; i < chord.intervals.length; i++) {
+    if (!isInterval(chord.intervals[i])) {
+      return false
+    }
+  }
+  for (let i=0; i < chord.degrees.length; i++) {
+    if (!isChordDegree(chord.degrees[i])) {
+      return false
+    }
+  }
+  for (let i=0; i < chord.notes.length; i++) {
+    if (!isNote(chord.notes[i])) {
+      return false
+    }
+  }
+  if (!chord.name || typeof chord.name !== "string") {
+    return false
+  }
+  return true
 }
 
 // Strip b or #
@@ -221,173 +280,3 @@ export function chord(tonic: IonianTonic, type: ChordType): Chord {
     slashNote: type.slash ? chordKey.notesByDegree[chordDegreeToModeDegree(type.slash)] : undefined
   }
 }
-
-// Tone intervals in chord bases
-// const CHORD_TYPE_INTERVALS: Record<ChordType, StandardIntervalDistance[]> = {
-//   // 1, 2, 3, 4, 5, 6, 7
-//   maj: [0, 2, 4, 5, 7, 9, 11],
-//   // b3, b7
-//   min: [0, 2, 3, 5, 7, 9, 10],
-//   // b3, b5
-//   dim: [0, 2, 3, 5, 6, 9, 11],
-//   // b7
-//   dom: [0, 2, 4, 5, 7, 9, 10],
-//   // #5
-//   aug: [0, 2, 4, 5, 8, 9, 11],
-//   // 3 -> 2
-//   sus2: [0, 2, 2, 5, 7, 9, 11],
-//   // 3 -> 4
-//   sus4: [0, 2, 5, 5, 7, 9, 11],
-//   // b3, b5, 3 -> 2
-//   dimsus2: [0, 2, 2, 5, 6, 9, 11],
-//   // b3, b5, 3 -> 4
-//   dimsus4: [0, 2, 6, 5, 6, 9, 11],
-//   // #5, 3 -> 2
-//   augsus2: [0, 2, 2, 5, 8, 9, 11],
-//   // #5, 3 -> 4
-//   augsus4: [0, 2, 5, 5, 8, 9, 11]
-// }
-
-
-
-
-// function getAlterationIntervals (chordType: ChordType, alteration: ChordAlteration): { base: IntervalDistance, altered: IntervalDistance } {
-//   const accidental = alteration[0]
-//   let adjustment = 0
-//   if (accidental === "#") {
-//     adjustment += 1
-//   } else if (accidental === "b") {
-//     adjustment -= 1
-//   }
-//   const degreeIndex = wrapValue(Number(alteration[1]) - 1, 7)
-//   return {
-//     base: CHORD_TYPE_INTERVALS[chordType][degreeIndex],
-//     altered: wrapValue(CHORD_TYPE_INTERVALS[chordType][degreeIndex] + adjustment, 12) as IntervalDistance
-//   }
-// }
-//
-// function getAdditionInterval (chordType: ChordType, addition: ChordAddition): IntervalDistance {
-//   const degree = Number(addition[3])
-//   return CHORD_TYPE_INTERVALS[chordType][wrapValue(degree - 1, 12)]
-// }
-
-
-// function getChordIntervalFromKeyNote(chordType: ChordType, note: ModeNote): IntervalData {
-//   const chordKeyNotes =
-// }
-
-// function notes (c: ChordData): Note[] {
-//   return chord.intervals(c).map(interval => {
-//     const transposed = note.transpose(c.root, interval)
-//     const signature = (new Mode('Ionian')).keySignature(c.root)
-//
-//     return 'A'
-//   })
-// }
-
-
-
-// class ChordClass {
-//   constructor(root: Note, type: ChordType, config?: ChordConfig) {
-//     super(root, type, config)
-//   }
-//
-//   generateVoicings (): StandardNote[][] {
-//     return []
-//   }
-//
-//   private intervals (): Interval[] {
-//     // Get base chord intervals based on extension
-//     let chordIntervals: IntervalDistance[] = []
-//     for (let i = 0; i < this.extension; i++) {
-//       if (i % 2 === 0) {
-//         chordIntervals.push(CHORD_TYPE_INTERVALS[this.type][wrapValue(i, 7)])
-//       }
-//     }
-//
-//     // Add chord addition intervals
-//     this.additions.forEach(addition => {
-//       chordIntervals.push(getAdditionInterval(this.type, addition))
-//     })
-//
-//     // Replace chord alteration intervals
-//     this.alterations.forEach(alteration => {
-//       const intervals = getAlterationIntervals(this.type, alteration)
-//       chordIntervals = chordIntervals.map(interval => {
-//         if (interval === intervals.base) {
-//           return intervals.altered
-//         } else {
-//           return interval
-//         }
-//       })
-//     })
-//
-//     // Add slash interval
-//     let slashInterval: Interval | undefined
-//     if (this.slash != this.root) {
-//       slashInterval = interval(this.root, this.slash)
-//       chordIntervals.push(slashInterval.length)
-//     }
-//
-//     chordIntervals = removeDuplicates(chordIntervals)
-//
-//     chordIntervals.sort((a, b) => a - b)
-//
-//     // Set slash interval first
-//     if (slashInterval) {
-//       while (chordIntervals[0] !== slashInterval.length) {
-//         chordIntervals = rotateArray(chordIntervals, 1)
-//       }
-//     }
-//
-//     const intervalData = chordIntervals.map(intervalDistance => new Interval(intervalDistance))
-//
-//     return intervalData
-//   }
-//
-//   notes (): ModeNote {
-//     const intervals = this.intervals()
-//     const mode = new IonianMode().key(this.root)
-//     return intervals.map(interval => {
-//
-//     })
-//   }
-// }
-
-// export class MajorChord extends Chord {
-//   constructor(root: IonianStandardTonic, config?: ChordConfig) {
-//     super(root, 'maj', config)
-//   }
-// }
-
-// export class AnyMajorChord extends Chord {
-//   constructor(root: IonianAnyKey, config?: ChordConfig) {
-//     super(root, config)
-//   }
-// }
-//
-// export class MinorChord extends Chord {
-//   constructor(root: AeolianStandardKey, config?: ChordConfig) {
-//     super(root, config)
-//   }
-// }
-//
-// export class AnyMinorChord extends Chord {
-//   constructor(root: AeolianAnyKey, config?: ChordConfig) {
-//     super(root, config)
-//   }
-// }
-//
-// export class DiminishedChord extends Chord {
-//   constructor(root: LocrianStandardKey, config?: ChordConfig) {
-//     super(root, config)
-//   }
-// }
-//
-// export class DominantChord extends Chord {
-//   constructor(root: MixolydianStandardKey, config?: ChordConfig) {
-//     super(root, config)
-//   }
-// }
-//
-

@@ -4,7 +4,7 @@ import { ModeDegree } from "../mode"
 
 type Voicing = IntervalDistance[]
 
-interface VoicingOptions {
+export interface VoicingOptions {
   minToneSpread: IntervalDistance,
   maxToneSpread: IntervalDistance,
   maxSize: number,

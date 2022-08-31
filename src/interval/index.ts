@@ -79,19 +79,20 @@ export function isAlternateIntervalName (interval: any): interval is AlternateIn
 }
 
 // Abbreviated inter-octave interval names
-const SHORT_INTERVAL_NAMES = ['P1', 'm2', 'M2', 'm3', 'M3', 'P4', 'TT', 'P5', 'm6', 'M6', 'm7', 'M7', 'P8'] as const
+export const SHORT_INTERVAL_NAMES = ['P1', 'm2', 'M2', 'm3', 'M3', 'P4', 'TT', 'P5', 'm6', 'M6', 'm7', 'M7', 'P8'] as const
 export type ShortIntervalName = typeof SHORT_INTERVAL_NAMES[number]
 export function isShortIntervalName (interval: any): interval is ShortIntervalName {
   return SHORT_INTERVAL_NAMES.includes(interval)
 }
 
 // A number representing the semitone distance between two intervals inside an octaves length
+export const STANDARD_INTERVAL_DISTANCES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 export type StandardIntervalDistance = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
 export function isStandardIntervalDistance (intervalDistance: any): intervalDistance is StandardIntervalDistance {
   return intervalDistance <= 12
 }
 
-// A number representive the semitone distance between two intervals outside an octaves length
+// A number representative the semitone distance between two intervals outside an octaves length
 export type ComplexIntervalDistance = number
 export function isComplexIntervalDistance (intervalDistance: any): intervalDistance is ComplexIntervalDistance {
   return intervalDistance > 12
@@ -118,7 +119,6 @@ export interface Interval {
   // The intervals tension rating
   readonly tension: number
 }
-
 export function isInterval (interval: any): interval is Interval {
   return (interval as Interval).name !== undefined &&
       (interval as Interval).shortName !== undefined
@@ -132,8 +132,21 @@ export type IntervalIdentifier =
     ComplexIntervalDistance |
     Interval
 
+export function isIntervalIdentifier (intervalIdentifier: any): intervalIdentifier is IntervalIdentifier {
+  if (isIntervalName(intervalIdentifier) ||
+      isShortIntervalName(intervalIdentifier) ||
+      isIntervalDistance(intervalIdentifier) ||
+      isComplexIntervalDistance(intervalIdentifier) ||
+      isInterval(intervalIdentifier)
+  ) {
+    return true
+  } else {
+    return false
+  }
+}
+
 // Metadata of the inter-octave intervals
-const INTERVAL_DATA: Record<ShortIntervalName, Interval> = {
+export const INTERVAL_DATA: Record<ShortIntervalName, Interval> = {
   P1: {
     length: 0,
     name: 'Perfect Unison',
@@ -226,6 +239,7 @@ const INTERVAL_DATA: Record<ShortIntervalName, Interval> = {
     tension: 0
   }
 }
+
 export function interval(intervalIdentifier: IntervalIdentifier): Interval {
   if (isInterval(intervalIdentifier)) {
     return intervalIdentifier
