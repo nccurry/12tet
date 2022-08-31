@@ -1,5 +1,5 @@
-import { interval, Interval, IntervalIdentifier, isInterval } from './index'
-import { isTypeError } from "../utils"
+import { interval, Interval, IntervalIdentifier, isInterval } from '../../src/interval'
+import { isTypeError } from "../../src/utils"
 
 describe('Test getInterval function', () => {
   test('Execute getInterval function with shortName', () => {

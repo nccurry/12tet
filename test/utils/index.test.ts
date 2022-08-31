@@ -1,4 +1,4 @@
-import { getShallowCopy, isTypeError, removeDuplicates, rotateArray, sumTo, wrapValue } from './index'
+import { getShallowCopy, isTypeError, removeDuplicates, rotateArray, sumTo, wrapValue } from '../../src/utils'
 
 describe('Test offsetArray function', () => {
   test('Execute offsetArray with positive integer', () => {

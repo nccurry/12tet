@@ -1,5 +1,5 @@
-import { adjustNote, convertKeyTonesToNotes, getKeySignatureFromKeyNotes, getKeyTones } from './index'
-import { Note, Tone } from '../note'
+import { adjustNote, convertKeyTonesToNotes, getKeySignatureFromKeyNotes, getKeyTones } from '../../src/key'
+import { Note, Tone } from '../../src/note'
 
 describe('Test getKeySignatureFromKeyNotes', () => {
   test('Execute getKeySignatureFromKeyNotes with no sharps or flats', () => {
