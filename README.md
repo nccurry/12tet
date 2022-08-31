@@ -5,6 +5,15 @@
 Constants and functions to interact with musical [modes](https://en.wikipedia.org/wiki/Mode_(music)).
 
 ```typescript
+import {
+    MODE_NAMES,
+    IONIAN_TONICS,
+    AEOLIAN_STANDARD_TONICS,
+    mode,
+    ionianMode,
+    aeolianMode
+} from 'musicomatic'
+
 // List all mode names
 console.log(MODE_NAMES)
 
@@ -36,6 +45,13 @@ console.log(aeolianMode.key('F').notesByDegree['b4']) // A
 Constants and functions to interact with musical [intervals](https://en.wikipedia.org/wiki/Interval_(music)).
 
 ```typescript
+import {
+    INTERVAL_NAMES,
+    ALTERNATE_INTERVAL_NAMES,
+    INTERVAL_SHORT_NAMES,
+    interval
+} from 'musicomatic'
+
 // List all interval names
 console.log(INTERVAL_NAMES)
 
@@ -74,6 +90,10 @@ console.log(NATURAL_NOTES) // ['C', 'D', 'E', 'F', 'G', 'A', 'B']
 Constants and functions to interact with musical [keys](https://en.wikipedia.org/wiki/Key_(music)).
 
 ```typescript
+import {
+    key
+} from 'musicomatic'
+
 // Create a new key
 const cIonian = key('C', 'Ionian')
 
