@@ -1,6 +1,6 @@
 {
   "name": "musicomatic",
-  "version": "0.0.5-development",
+  "version": "0.0.1-alpha",
   "description": "Music theory library for generating and working with chords, modes, intervals, etc.",
   "main": "./lib/src/index.js",
   "types": "./lib/src/index.d.ts",
@@ -40,7 +40,7 @@
     "@types/jest": "^29.0.0",
     "@typescript-eslint/eslint-plugin": "^5.36.1",
     "@typescript-eslint/parser": "^5.36.1",
-    "eslint": "^8.23.0",
+    "eslint": "^8.22.0",
     "ts-jest": "^28.0.8",
     "typescript": "^4.8.2",
     "ts-results": "^3.3.0"
