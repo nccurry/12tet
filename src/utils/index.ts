@@ -138,7 +138,21 @@ function indexesOf<A> (array: A[], value: A): number[] {
   return indexes
 }
 
+export function generateOrderedCombinations<A> (array: A[], result: A[][], combinationSize = array.length - 1): void {
+  // Protect you from yourself
+  if (Math.abs(array.length - combinationSize) > 9) {
+    console.error(`You are attempting to generate too many ordered combinations of size ${combinationSize} from an array of length ${array.length}. Try reducing the array length or pickSize`)
+    return
+  }
 
+  if (array.length === combinationSize) {
+    result.push(array)
+  } else if (array.length > combinationSize) {
+    for (let i = 0; i < array.length; i++) {
+      generateOrderedCombinations(removeArrayElement(array, i), result, combinationSize)
+    }
+  }
+}
 
 
 

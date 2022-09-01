@@ -211,7 +211,7 @@ function generateChordName(tonic: IonianTonic, type: ChordType): string {
   }
 
   if (type.slash) {
-    const slashNote = key(tonic, 'Ionian').notesByDegree[chordDegreeToModeDegree(type.slash)]
+    const slashNote = key(tonic, 'Ionian').noteByDegree[chordDegreeToModeDegree(type.slash)]
     name = name.concat(`/${slashNote}`)
   }
 
@@ -272,11 +272,11 @@ export function chord(tonic: IonianTonic, type: ChordType): Chord {
   return {
     ...type,
     root: tonic,
-    notes: modeDegrees.map(degree => chordKey.notesByDegree[degree]),
+    notes: modeDegrees.map(degree => chordKey.noteByDegree[degree]),
     name: generateChordName(tonic, type),
     intervals: [],
     degrees: chordDegrees,
     slash: type.slash,
-    slashNote: type.slash ? chordKey.notesByDegree[chordDegreeToModeDegree(type.slash)] : undefined
+    slashNote: type.slash ? chordKey.noteByDegree[chordDegreeToModeDegree(type.slash)] : undefined
   }
 }

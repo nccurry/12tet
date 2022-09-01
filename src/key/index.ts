@@ -86,12 +86,12 @@ export function getKeyTones(tonic: Note, modeName: ModeName): Tone[] {
   return keyTones
 }
 
-export function keyTonesByDegree(tonic: Note, modeName: ModeName): Record<ModeDegree, Tone> {
+export function getKeyTonesByDegree(tonic: Note, modeName: ModeName): Record<ModeDegree, Tone> {
   const keyTonesByDegree: { [key in ModeDegree]?: Tone } = {}
 
   const tonicTone = TONES_BY_NOTE[tonic]
   let toneIndexes: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-  const modeTonePattern = MODE_DATA[modeName].semitoneStructure
+  const modeSemitoneLengths = MODE_DATA[modeName].semitoneStructure
 
   // Start toneIndexes on the index of the tonic tone
   toneIndexes = rotateArray(toneIndexes, tonicTone.index)
@@ -100,7 +100,7 @@ export function keyTonesByDegree(tonic: Note, modeName: ModeName): Record<ModeDe
     // Get the number of semitones between the tonic and this tone
     // -1 to make an array index out of a mode degree
     // -1 because the modeTonePattern maps the semitones at the 0th element to the II degree of the mode
-    const semitones = standardModeDegree === '1' ? 0 : sumTo([...modeTonePattern], parseInt(standardModeDegree) - 1 - 1)
+    const semitones = standardModeDegree === '1' ? 0 : sumTo([...modeSemitoneLengths], parseInt(standardModeDegree) - 1 - 1)
 
     // Get the tone index of the degree and its # and b equivalents
     const flatToneIndex = getWrappedArrayElement(toneIndexes, semitones - 1)
@@ -117,7 +117,7 @@ export function keyTonesByDegree(tonic: Note, modeName: ModeName): Record<ModeDe
 }
 
 // Given a tonic and an array of Tones, simplify to an array of notes
-export function convertKeyTonesToNotes(tonic: Note, keyTones: Tone[]): Note[] | TypeError {
+export function convertDiatonicKeyTonesToNotes(tonic: Note, keyTones: [Tone, Tone, Tone, Tone, Tone, Tone, Tone]): Note[] | TypeError {
   if (keyTones.length != 7) {
     return TypeError(`The list of key tones does not have 7 tones`)
   }
@@ -165,11 +165,7 @@ export function convertKeyTonesToNotes(tonic: Note, keyTones: Tone[]): Note[] | 
 }
 
 // Get the note a sharp or flat above or below a given note
-export function adjustNote(note: Note, adjustment: 'b' | '#' | ''): Note {
-  if (adjustment === '') {
-    return note
-  }
-
+export function adjustNote(note: Note, adjustment: 'b' | '#'): Note {
   const toneAdjustment = adjustment === 'b' ? -1 : 1
   const tone = TONES[wrapValue(TONES_BY_NOTE[note].index + toneAdjustment, 12)]
 
@@ -200,17 +196,29 @@ export function adjustNote(note: Note, adjustment: 'b' | '#' | ''): Note {
 
 // Given a list of notes, return an object with degree keys and note values
 // It is assumed that the notes are given in order - i.e. index 0 is the first degree of the key
-export function generateNotesByDegree(notes: Note[]): Record<ModeDegree, Note> {
+export function generateNoteByDegree(notes: Note[]): Record<ModeDegree, Note> {
   const notesByDegree: { [key in ModeDegree]?: Note } = {}
   STANDARD_MODE_DEGREES.forEach((degree, index)=> {
     notesByDegree[degree] = notes[index]
   })
 
   ALTERED_MODE_DEGREES.forEach(degree => {
-    notesByDegree[degree] = adjustNote(notes[parseInt(degree[1]) - 1], degree[0] as 'b' | '#' | '')
+    notesByDegree[degree] = adjustNote(notes[parseInt(degree[1]) - 1], degree[0] as 'b' | '#')
   })
 
   return notesByDegree as Record<ModeDegree, Note>
+}
+
+export function getDegreeByNote(tonesByDegree: Record<ModeDegree, Tone>): Record<Note, ModeDegree> {
+  const degreesByNote: { [key in Note]?: ModeDegree } = {}
+
+  Object.keys(tonesByDegree).forEach(degree => {
+    tonesByDegree[degree as ModeDegree].forEach(note => {
+      degreesByNote[note] = degree as ModeDegree
+    })
+  })
+
+  return degreesByNote as Record<Note, ModeDegree>
 }
 
 export interface Key {
@@ -218,8 +226,9 @@ export interface Key {
   readonly mode: ModeName
   readonly notes: Note[]
   readonly signature: ModeKeySignature
-  readonly tonesByDegree: Record<ModeDegree, Tone>
-  readonly notesByDegree: Record<ModeDegree, Note>
+  readonly toneByDegree: Record<ModeDegree, Tone>
+  readonly noteByDegree: Record<ModeDegree, Note>
+  readonly degreeByNote: Record<Note, ModeDegree>
   readonly enharmonicEquivalents: Note[]
   readonly theoreticalKey: boolean
 }
@@ -262,33 +271,36 @@ export function key(tonic: LocrianTonic, modeName: 'Locrian'): LocrianKey
 export function key(tonic: Tonic, modeName: ModeName): Key | TypeError {
   if (!isModeTonicByModeName[modeName](tonic)) {
     return TypeError(`There is no key in mode ${modeName} with tonic ${tonic}`)
-  } else {
-    const tones = getKeyTones(tonic, modeName)
-
-    const notes = convertKeyTonesToNotes(tonic, tones)
-    if (isTypeError(notes)) {
-      return notes
-    }
-
-    const signature = getKeySignatureFromKeyNotes(notes)
-    if (isTypeError(signature)) {
-      return signature
-    }
-
-    const notesByDegree = generateNotesByDegree(notes)
-
-    const key: Key = {
-      tonic: tonic,
-      mode: modeName,
-      notes: notes,
-      tonesByDegree: keyTonesByDegree(tonic, modeName),
-      notesByDegree: notesByDegree,
-      enharmonicEquivalents: tones[0].filter(note => note !== tonic && isModeTonicByModeName[modeName](note)),
-      signature: signature,
-      theoreticalKey: parseInt(signature[0]) > 7
-    }
-    return key
   }
+
+  const tonesByDegree = getKeyTonesByDegree(tonic, modeName)
+  const degreesByNote = getDegreeByNote(tonesByDegree)
+  const diatonicTones = STANDARD_MODE_DEGREES.map(degree => tonesByDegree[degree]) as [Tone, Tone, Tone, Tone, Tone, Tone, Tone]
+
+  const notes = convertDiatonicKeyTonesToNotes(tonic, diatonicTones)
+  if (isTypeError(notes)) {
+    return notes
+  }
+
+  const notesByDegree = generateNoteByDegree(notes)
+
+  const signature = getKeySignatureFromKeyNotes(notes)
+  if (isTypeError(signature)) {
+    return signature
+  }
+
+  const key: Key = {
+    tonic: tonic,
+    mode: modeName,
+    notes: notes,
+    toneByDegree: tonesByDegree,
+    noteByDegree: notesByDegree,
+    degreeByNote: degreesByNote,
+    enharmonicEquivalents: diatonicTones[0].filter(note => note !== tonic && isModeTonicByModeName[modeName](note)),
+    signature: signature,
+    theoreticalKey: parseInt(signature[0]) > 7
+  }
+  return key
 }
 
 export function ionianKey(tonic: IonianTonic): IonianKey {

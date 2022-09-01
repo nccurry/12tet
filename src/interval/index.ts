@@ -1,4 +1,10 @@
-import { wrapValue } from "../utils"
+import {
+  wrapValue
+} from "../utils"
+import {
+  Note,
+  TONES_BY_NOTE
+} from "../note";
 
 // Standard inter-octave interval names
 export const INTERVAL_NAMES = [
@@ -238,6 +244,13 @@ export const INTERVAL_DATA: Record<ShortIntervalName, Interval> = {
     alternateNames: ['Augmented Seventh'],
     tension: 0
   }
+}
+
+export function intervalDistance(firstNote: Note, secondNote: Note): IntervalDistance {
+  const firstTone = TONES_BY_NOTE[firstNote]
+  const secondTone = TONES_BY_NOTE[secondNote]
+  const distance = secondTone.index >= firstTone.index ? secondTone.index - firstTone.index : (11 - firstTone.index) + secondTone .index
+  return distance === 0 ? 12 : distance // Prefer Perfect Octaves over Perfect Unisons
 }
 
 export function interval(intervalIdentifier: IntervalIdentifier): Interval {

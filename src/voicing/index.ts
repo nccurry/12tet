@@ -13,6 +13,7 @@ export interface VoicingOptions {
   guaranteeDegrees?: ModeDegree[]
 }
 
-export const voicing = {
-  generate: function (chord: Required<Chord>, voicing: VoicingOptions) {}
+export function generateVoicing (chord: Chord, voicing: VoicingOptions): IntervalDistance[] {
+
+  return []
 }
