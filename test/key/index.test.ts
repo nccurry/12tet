@@ -1,5 +1,13 @@
-import { adjustNote, convertKeyTonesToNotes, getKeySignatureFromKeyNotes, getKeyTones } from '../../src/key'
-import { Note, Tone } from '../../src/note'
+import {
+  adjustNote,
+  convertDiatonicKeyTonesToNotes,
+  getKeySignatureFromKeyNotes,
+  getKeyTones
+} from '../../src/key'
+import {
+  Note,
+  Tone
+} from '../../src/note'
 
 describe('Test getKeySignatureFromKeyNotes', () => {
   test('Execute getKeySignatureFromKeyNotes with no sharps or flats', () => {
@@ -43,18 +51,13 @@ describe('Test getKeyTones', () => {
 
 describe('Test convertKeyTonesToNotes', () => {
   test('Execute convertKeyTonesToNotes', () => {
-    const keyTones: Tone[] = [["B#", "C", "Dbb"], ["C##", "D", "Ebb"], ["D##", "E", "Fb"], ["E#", "F", "Gbb"], ["F##", "G", "Abb"], ["G##", "A", "Bbb"], ["A##", "B", "Cb"]]
-    expect(convertKeyTonesToNotes('C', keyTones)).toStrictEqual(['C', 'D', 'E', 'F', 'G', 'A', 'B'])
-  })
-
-  test('Execute convertKeyTonesToNotes with less than 7 tones', () => {
-    const keyTones: Tone[] = [["B#", "C", "Dbb"]]
-    expect(convertKeyTonesToNotes('C', keyTones)).toStrictEqual(TypeError(`The list of key tones does not have 7 tones`))
+    const keyTones: [Tone, Tone, Tone, Tone, Tone, Tone, Tone] = [["B#", "C", "Dbb"], ["C##", "D", "Ebb"], ["D##", "E", "Fb"], ["E#", "F", "Gbb"], ["F##", "G", "Abb"], ["G##", "A", "Bbb"], ["A##", "B", "Cb"]]
+    expect(convertDiatonicKeyTonesToNotes('C', keyTones)).toStrictEqual(['C', 'D', 'E', 'F', 'G', 'A', 'B'])
   })
 
   test('Execute convertKeyTonesToNotes with wrong tonic', () => {
-    const keyTones: Tone[] = [["B#", "C", "Dbb"], ["C##", "D", "Ebb"], ["D##", "E", "Fb"], ["E#", "F", "Gbb"], ["F##", "G", "Abb"], ["G##", "A", "Bbb"], ["A##", "B", "Cb"]]
-    expect(convertKeyTonesToNotes('D', keyTones)).toStrictEqual(TypeError(`The first key tone ${["B#", "C", "Dbb"]} does not include the tonic note D`))
+    const keyTones: [Tone, Tone, Tone, Tone, Tone, Tone, Tone] = [["B#", "C", "Dbb"], ["C##", "D", "Ebb"], ["D##", "E", "Fb"], ["E#", "F", "Gbb"], ["F##", "G", "Abb"], ["G##", "A", "Bbb"], ["A##", "B", "Cb"]]
+    expect(convertDiatonicKeyTonesToNotes('D', keyTones)).toStrictEqual(TypeError(`The first key tone ${["B#", "C", "Dbb"]} does not include the tonic note D`))
   })
 })
 
