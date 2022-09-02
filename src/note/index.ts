@@ -1,4 +1,4 @@
-import { getWrappedArrayElement } from '../utils'
+import {getWrappedArrayElement, removeArrayElement} from '../utils'
 
 export const NATURAL_NOTES = ['C', 'D', 'E', 'F', 'G', 'A', 'B'] as const
 export type NaturalNote = typeof NATURAL_NOTES[number]
@@ -102,3 +102,13 @@ function tonesByNote (): Record<Note, { tone: Tone, index: number }> {
 }
 
 export const TONES_BY_NOTE: Record<Note, { tone: Tone, index: number }> = tonesByNote()
+
+export function enharmonicEquivalents(note: Note): Note[] {
+  const tone = TONES_BY_NOTE[note].tone
+  const noteIndex = tone.indexOf(note)
+  if (noteIndex !== -1) {
+    return removeArrayElement(tone, noteIndex)
+  } else {
+    return tone // This should never happen
+  }
+}

@@ -15,7 +15,7 @@ import {
   isTheoreticalSharpNote,
   Tone,
   TONES_BY_NOTE,
-  TONES
+  TONES, isTheoreticalNote, isStandardNote, NaturalNote, StandardSharpNote, StandardFlatNote
 } from '../note'
 import {
   ModeDegree,
@@ -172,25 +172,42 @@ export function adjustNote(note: Note, adjustment: 'b' | '#'): Note {
   const adjustedToneNaturalNote = tone.filter(isNaturalNote)
   const adjustedToneStandardSharpNote = tone.filter(isStandardSharpNote)
   const adjustedToneStandardFlatNote = tone.filter(isStandardFlatNote)
+  const adjustedToneTheoreticalSharpNote = tone.filter(isTheoreticalSharpNote)
+  const adjustedToneTheoreticalFlatNote = tone.filter(isTheoreticalFlatNote)
 
-  // Prefer natural notes over all others
-  if (adjustedToneNaturalNote.length) {
-    return adjustedToneNaturalNote[0]
-  // Prefer standard sharps, if given a theoretical sharp
+  // Adjust the note directly
+  if (isNaturalNote(note)) {
+    return `${note}${adjustment}` as Note
+  // or subtract a b
+  } else if ((isStandardFlatNote(note) || isTheoreticalFlatNote(note)) && adjustment == '#') {
+    return note.slice(0, -1) as Note
+  // or subtract a #
+  } else if ((isStandardSharpNote(note) || isTheoreticalSharpNote(note)) && adjustment == 'b') {
+    return note.slice(0, -1) as Note
+  // or add a #
+  } else if (isStandardSharpNote(note) && adjustment === '#') {
+    return `${note}${adjustment}` as Note
+  // or add a b
+  } else if (isStandardFlatNote(note) && adjustment === 'b') {
+    return `${note}${adjustment}` as Note
+  // or use another theoretical sharp
+  } else if (isTheoreticalSharpNote(note) && adjustedToneTheoreticalSharpNote.length) {
+    return adjustedToneTheoreticalSharpNote[0]
+  // or use another theoretical flat
+  } else if (isTheoreticalFlatNote(note) && adjustedToneTheoreticalFlatNote.length) {
+    return adjustedToneTheoreticalFlatNote[0]
+  // or use a standard sharp if given a theoretical sharp
   } else if (isTheoreticalSharpNote(note) && adjustedToneStandardSharpNote.length) {
     return adjustedToneStandardSharpNote[0]
-  // Prefer standard flats, if given a theoretical flat
+  // or use a standard flat if given a theeoretical flat
   } else if (isTheoreticalFlatNote(note) && adjustedToneStandardFlatNote.length) {
     return adjustedToneStandardFlatNote[0]
-  // If adding a sharp, use a standard sharp if possible
-  } else if (adjustedToneStandardSharpNote.length && adjustment === '#') {
-    return adjustedToneStandardSharpNote[0]
-  // If adding a flat, use a standard flat if possible
-  } else if (adjustedToneStandardFlatNote.length && adjustment === 'b') {
-    return adjustedToneStandardFlatNote[0]
-  // If we can't do any of the above, return whatever standard note we have
+  // or just use a natural note
+  } else if (adjustedToneNaturalNote.length) {
+    return adjustedToneNaturalNote[0]
+  // and if all else fails use any standard note
   } else {
-    return adjustedToneStandardSharpNote[0] || adjustedToneStandardFlatNote[0]
+    return adjustedToneNaturalNote[0] || adjustedToneStandardSharpNote[0] || adjustedToneStandardFlatNote[0]
   }
 }
 
@@ -209,16 +226,15 @@ export function generateNoteByDegree(notes: Note[]): Record<ModeDegree, Note> {
   return notesByDegree as Record<ModeDegree, Note>
 }
 
-export function getDegreeByNote(tonesByDegree: Record<ModeDegree, Tone>): Record<Note, ModeDegree> {
+// TODO: Fix this
+export function getDegreesByNote(notesByDegree: Record<ModeDegree, Note>): { [key in Note]?: ModeDegree } {
   const degreesByNote: { [key in Note]?: ModeDegree } = {}
 
-  Object.keys(tonesByDegree).forEach(degree => {
-    tonesByDegree[degree as ModeDegree].forEach(note => {
-      degreesByNote[note] = degree as ModeDegree
-    })
+  Object.keys(notesByDegree).forEach(degree => {
+    degreesByNote[notesByDegree[degree as ModeDegree]] = degree as ModeDegree
   })
 
-  return degreesByNote as Record<Note, ModeDegree>
+  return degreesByNote
 }
 
 export interface Key {
@@ -228,7 +244,7 @@ export interface Key {
   readonly signature: ModeKeySignature
   readonly toneByDegree: Record<ModeDegree, Tone>
   readonly noteByDegree: Record<ModeDegree, Note>
-  readonly degreeByNote: Record<Note, ModeDegree>
+  readonly degreesByNote: { [key in Note]?: ModeDegree }
   readonly enharmonicEquivalents: Note[]
   readonly theoreticalKey: boolean
 }
@@ -274,7 +290,6 @@ export function key(tonic: Tonic, modeName: ModeName): Key | TypeError {
   }
 
   const tonesByDegree = getKeyTonesByDegree(tonic, modeName)
-  const degreesByNote = getDegreeByNote(tonesByDegree)
   const diatonicTones = STANDARD_MODE_DEGREES.map(degree => tonesByDegree[degree]) as [Tone, Tone, Tone, Tone, Tone, Tone, Tone]
 
   const notes = convertDiatonicKeyTonesToNotes(tonic, diatonicTones)
@@ -283,6 +298,7 @@ export function key(tonic: Tonic, modeName: ModeName): Key | TypeError {
   }
 
   const notesByDegree = generateNoteByDegree(notes)
+  const degreesByNote = getDegreesByNote(notesByDegree)
 
   const signature = getKeySignatureFromKeyNotes(notes)
   if (isTypeError(signature)) {
@@ -295,10 +311,10 @@ export function key(tonic: Tonic, modeName: ModeName): Key | TypeError {
     notes: notes,
     toneByDegree: tonesByDegree,
     noteByDegree: notesByDegree,
-    degreeByNote: degreesByNote,
+    degreesByNote: degreesByNote,
     enharmonicEquivalents: diatonicTones[0].filter(note => note !== tonic && isModeTonicByModeName[modeName](note)),
     signature: signature,
-    theoreticalKey: parseInt(signature[0]) > 7
+    theoreticalKey: parseInt(signature.slice(0, -1)) > 7
   }
   return key
 }
