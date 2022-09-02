@@ -1,5 +1,8 @@
 import {
-  Interval, isInterval,
+  interval,
+  intervalDistance,
+  isInterval,
+  ShortIntervalName,
 } from "../interval"
 import {
   rotateArray,
@@ -138,7 +141,7 @@ export interface Chord {
   alterations?: AlteredChordDegree[]
   slash?: ChordDegree
   slashNote?: Note
-  intervals: Interval[]
+  intervals: ShortIntervalName[]
   degrees: ChordDegree[]
   notes: Note[]
   name: string
@@ -269,12 +272,24 @@ export function chord(tonic: IonianTonic, type: ChordType): Chord {
 
   const modeDegrees = chordDegreesToModeDegrees(chordDegrees)
 
+  const notes = modeDegrees.map(degree => chordKey.noteByDegree[degree])
+
+  const intervals: ShortIntervalName[] = []
+  for (let i = 0; i < notes.length; i++) {
+    // The first note is always a perfect unison
+    if (i === 0) {
+      intervals.push(interval(0).shortName)
+    } else {
+      intervals.push(interval(intervalDistance(tonic, notes[i])).shortName)
+    }
+  }
+
   return {
     ...type,
     root: tonic,
-    notes: modeDegrees.map(degree => chordKey.noteByDegree[degree]),
+    notes: notes,
     name: generateChordName(tonic, type),
-    intervals: [],
+    intervals: intervals,
     degrees: chordDegrees,
     slash: type.slash,
     slashNote: type.slash ? chordKey.noteByDegree[chordDegreeToModeDegree(type.slash)] : undefined
