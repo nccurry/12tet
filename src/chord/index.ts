@@ -226,6 +226,7 @@ function insertDegree(degrees: ModeDegree[], degree: ModeDegree): ModeDegree[]
 function insertDegree(degrees: ModeDegree[] | ChordDegree[], degree: ModeDegree | ChordDegree): ModeDegree[] | ChordDegree[] {
   const degreesCopy = getShallowCopy(degrees)
 
+  // Start at the end and work backwards
   for (let i = degreesCopy.length - 1; i >= 0; i--) {
     const chordDegree = degreesCopy[i]
     if (degreeNumber(chordDegree) < degreeNumber(degree)) {
@@ -260,12 +261,19 @@ export function chord(tonic: IonianTonic, type: ChordType): Chord {
   }
 
   if (type.slash) {
-    chordDegrees = insertDegree(chordDegrees, type.slash)
+    let slashDegreeIndex = chordDegrees.findIndex(degree => degree === type.slash)
 
-    const slashDegreeIndex = chordDegrees.findIndex(degree => degree === type.slash)
+    // Insert our slash degree, if it doesn't already exist
+    if (slashDegreeIndex === -1) {
+      chordDegrees = insertDegree(chordDegrees, type.slash)
+    }
+
+    slashDegreeIndex = chordDegrees.findIndex(degree => degree === type.slash)
+
     if (slashDegreeIndex) {
       chordDegrees = rotateArray(chordDegrees, slashDegreeIndex)
     } else {
+      // This should never happen
       console.error('There was a problem finding the slash degree index.')
     }
   }
@@ -276,8 +284,8 @@ export function chord(tonic: IonianTonic, type: ChordType): Chord {
 
   const intervals: ShortIntervalName[] = []
   for (let i = 0; i < notes.length; i++) {
-    // The first note is always a perfect unison
-    if (i === 0) {
+    // For the sake of chords, the tonic is always a perfect unison
+    if (notes[i] === tonic) {
       intervals.push(interval(0).shortName)
     } else {
       intervals.push(interval(intervalDistance(tonic, notes[i])).shortName)
