@@ -1,6 +1,6 @@
 import {
   interval,
-  intervalDistance,
+  getIntervalBetweenNotes,
   isInterval,
   ShortIntervalName,
 } from "../interval"
@@ -19,7 +19,9 @@ import {
   MODE_DEGREES,
   ModeDegree,
 } from '../mode'
-import { ionianKey, key } from "../key"
+import {
+  key
+} from "../key"
 
 export const DIATONIC_CHORD_BASES = ['maj', 'min', 'dim'] as const
 export type DiatonicChordBase = typeof DIATONIC_CHORD_BASES[number]
@@ -288,7 +290,7 @@ export function chord(tonic: IonianTonic, type: ChordType): Chord {
     if (notes[i] === tonic) {
       intervals.push(interval(0).shortName)
     } else {
-      intervals.push(interval(intervalDistance(tonic, notes[i])).shortName)
+      intervals.push(interval(getIntervalBetweenNotes(tonic, notes[i])).shortName)
     }
   }
 

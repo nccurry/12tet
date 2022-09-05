@@ -1,8 +1,4 @@
-
 // rotateArray moves array elements forward or backward by the offset amount
-import { Note } from "../note"
-import { ModeDegree } from "../mode"
-
 export function rotateArray<T> (array: T[], offset: number): T[] {
   const arrayCopy = getShallowCopy(array)
 

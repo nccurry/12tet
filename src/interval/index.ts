@@ -5,6 +5,11 @@ import {
   Note,
   TONES_BY_NOTE
 } from "../note";
+import {
+  MODE_BASE_BY_NAME,
+  ModeDegree,
+  ModeName
+} from "../mode";
 
 // Standard inter-octave interval names
 export const INTERVAL_NAMES = [
@@ -246,9 +251,37 @@ export const INTERVAL_DATA: Record<ShortIntervalName, Interval> = {
   }
 }
 
-export function intervalDistance(firstNote: Note, secondNote: Note): IntervalDistance {
-  const firstTone = TONES_BY_NOTE[firstNote]
-  const secondTone = TONES_BY_NOTE[secondNote]
+export function intervalByDegree(modeName: ModeName): Record<ModeDegree, Interval> {
+  const m = MODE_BASE_BY_NAME[modeName]
+
+  const intervalByDegree: { [key in ModeDegree]?: Interval } = {}
+  m.intervals.forEach((intervalShortName, index) => {
+    if (index === 7) {
+      return
+    }
+
+    const neutralInterval = interval(intervalShortName)
+    const sharpInterval = interval(wrapValue(neutralInterval.length + 1, 13)) // 13 because we want perfect octaves on #7
+    const flatInterval = interval(wrapValue(neutralInterval.length - 1, 12))
+
+    intervalByDegree[`${index + 1}` as ModeDegree] = neutralInterval
+    intervalByDegree[`#${index + 1}` as ModeDegree] = sharpInterval
+    intervalByDegree[`b${index + 1}` as ModeDegree] = flatInterval
+  })
+
+  return intervalByDegree as Record<ModeDegree, Interval>
+}
+
+export function getIntervalBetweenIntervals(first: IntervalIdentifier, second: IntervalIdentifier): IntervalDistance {
+  const firstInterval = interval(first)
+  const secondInterval = interval(second)
+  const distance = secondInterval.length >= firstInterval.length ? secondInterval.length - firstInterval.length : (12 - firstInterval.length) + secondInterval.length
+  return distance === 0 ? 12 : distance // Prefer Perfect Octaves over Perfect Unisons
+}
+
+export function getIntervalBetweenNotes(first: Note, second: Note): IntervalDistance {
+  const firstTone = TONES_BY_NOTE[first]
+  const secondTone = TONES_BY_NOTE[second]
   const distance = secondTone.index >= firstTone.index ? secondTone.index - firstTone.index : (11 - firstTone.index) + secondTone .index
   return distance === 0 ? 12 : distance // Prefer Perfect Octaves over Perfect Unisons
 }

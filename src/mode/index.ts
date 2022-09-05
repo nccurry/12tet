@@ -3,6 +3,7 @@ import {
   DiatonicChordBase
 } from "../chord"
 import {
+  Interval, intervalByDegree,
   ShortIntervalName
 } from "../interval"
 import {
@@ -29,11 +30,37 @@ export function isModeName (name: any): name is ModeName {
   return MODE_NAMES.includes(name)
 }
 
-export const MODE_KEY_SIGNATURES = [
-  '',
-  '1#', '2#', '3#', '4#', '5#', '6#', '7#', '8#', '9#', '10#', '11#', '12#', '13#', '14#',
-  '1b', '2b', '3b', '4b', '5b', '6b', '7b', '8b', '9b', '10b', '11b', '12b', '13b', '14b',
-] as const
+export const NEUTRAL_MODE_KEY_SIGNATURES = [''] as const
+export type NeutralModeKeySignature = typeof NEUTRAL_MODE_KEY_SIGNATURES[number]
+export function isNeutralModeKeySignature (signature: any): signature is NeutralModeKeySignature {
+  return NEUTRAL_MODE_KEY_SIGNATURES.includes(signature)
+}
+
+export const STANDARD_SHARP_MODE_KEY_SIGNATURES = ['1#', '2#', '3#', '4#', '5#', '6#', '7#'] as const
+export type StandardSharpModeKeySignature = typeof STANDARD_SHARP_MODE_KEY_SIGNATURES[number]
+export function isStandardSharpModeKeySignature (signature: any): signature is StandardSharpModeKeySignature {
+  return STANDARD_SHARP_MODE_KEY_SIGNATURES.includes(signature)
+}
+
+export const THEORETICAL_SHARP_MODE_KEY_SIGNATURES = ['8#', '9#', '10#', '11#', '12#', '13#', '14#'] as const
+export type TheoreticalSharpModeKeySignature = typeof THEORETICAL_SHARP_MODE_KEY_SIGNATURES[number]
+export function isTheoreticalSharpModeKeySignature (signature: any): signature is TheoreticalSharpModeKeySignature {
+  return THEORETICAL_SHARP_MODE_KEY_SIGNATURES.includes(signature)
+}
+
+export const STANDARD_FLAT_MODE_KEY_SIGNATURES = ['1b', '2b', '3b', '4b', '5b', '6b', '7b'] as const
+export type StandardFlatModeKeySignature = typeof STANDARD_FLAT_MODE_KEY_SIGNATURES[number]
+export function isStandardFlatModeKeySignature (signature: any): signature is StandardFlatModeKeySignature {
+  return STANDARD_FLAT_MODE_KEY_SIGNATURES.includes(signature)
+}
+
+export const THEORETICAL_FLAT_MODE_KEY_SIGNATURES = ['8b', '9b', '10b', '11b', '12b', '13b', '14b'] as const
+export type TheoreticalFlatModeKeySignature = typeof THEORETICAL_FLAT_MODE_KEY_SIGNATURES[number]
+export function isTheoreticalFlatModeKeySignature (signature: any): signature is TheoreticalFlatModeKeySignature {
+  return THEORETICAL_FLAT_MODE_KEY_SIGNATURES.includes(signature)
+}
+
+export const MODE_KEY_SIGNATURES = [...NEUTRAL_MODE_KEY_SIGNATURES, ...STANDARD_SHARP_MODE_KEY_SIGNATURES, ...THEORETICAL_SHARP_MODE_KEY_SIGNATURES, ...STANDARD_FLAT_MODE_KEY_SIGNATURES, ...THEORETICAL_FLAT_MODE_KEY_SIGNATURES] as const
 export type ModeKeySignature = typeof MODE_KEY_SIGNATURES[number]
 export function isModeKeySignature (signature: any): signature is ModeKeySignature {
   return MODE_KEY_SIGNATURES.includes(signature)
@@ -226,7 +253,7 @@ export const isModeTonicByModeName: {
   Locrian: isLocrianTonic
 }
 
-export interface Mode {
+export interface ModeBase {
   // The name of the mode
   readonly name: ModeName
 
@@ -249,82 +276,105 @@ export interface Mode {
   readonly degreeAdjustmentFromIonian: readonly number[]
 }
 
-export interface IonianMode extends Mode {
+export interface IonianMode extends ModeBase {
   // The list of standard and theoretical mode tonics
   readonly tonics: readonly IonianTonic[]
 
   // A function that returns the key object associated with each mode tonic
-  readonly keyByTonic: (tonic: IonianTonic) => IonianKey
+  readonly keyByTonic: Record<IonianTonic, IonianKey>
 
   // A function that returns the key object associated with each key signature
-  readonly keyBySignature: (signature: ModeKeySignature) => IonianKey
+  readonly keyBySignature: Record<ModeKeySignature, IonianKey>
+
+  // Mode intervals by mode degree
+  readonly intervalByDegree: Record<ModeDegree, Interval>
 }
 
-export interface DorianMode extends Mode {
+export interface DorianMode extends ModeBase {
   // The list of standard and theoretical mode tonics
   readonly tonics: readonly DorianTonic[]
 
   // A function that returns the key object associated with each mode tonic
-  readonly keyByTonic: (tonic: DorianTonic) => DorianKey
+  readonly keyByTonic: Record<DorianTonic, DorianKey>
 
   // A function that returns the key object associated with each key signature
-  readonly keyBySignature: (signature: ModeKeySignature) => DorianKey
+  readonly keyBySignature: Record<ModeKeySignature, DorianKey>
+
+  // Mode intervals by mode degree
+  readonly intervalByDegree: Record<ModeDegree, Interval>
 }
 
-export interface PhrygianMode extends Mode {
+export interface PhrygianMode extends ModeBase {
   // The list of standard and theoretical mode tonics
   readonly tonics: readonly PhrygianTonic[]
 
   // A function that returns the key object associated with each mode tonic
-  readonly keyByTonic: (tonic: PhrygianTonic) => PhrygianKey
+  readonly keyByTonic: Record<PhrygianTonic, PhrygianKey>
 
   // A function that returns the key object associated with each key signature
-  readonly keyBySignature: (signature: ModeKeySignature) => PhrygianKey
+  readonly keyBySignature: Record<ModeKeySignature, PhrygianKey>
+
+  // Mode intervals by mode degree
+  readonly intervalByDegree: Record<ModeDegree, Interval>
 }
 
-export interface LydianMode extends Mode {
+export interface LydianMode extends ModeBase {
   // The list of standard and theoretical mode tonics
   readonly tonics: readonly LydianTonic[]
 
   // A function that returns the key object associated with each mode tonic
-  readonly keyByTonic: (tonic: LydianTonic) => LydianKey
+  readonly keyByTonic: Record<LydianTonic, LydianKey>
 
   // A function that returns the key object associated with each key signature
-  readonly keyBySignature: (signature: ModeKeySignature) => LydianKey
+  readonly keyBySignature: Record<ModeKeySignature, LydianKey>
+
+  // Mode intervals by mode degree
+  readonly intervalByDegree: Record<ModeDegree, Interval>
 }
 
-export interface MixolydianMode extends Mode {
+export interface MixolydianMode extends ModeBase {
   // The list of standard and theoretical mode tonics
   readonly tonics: readonly MixolydianTonic[]
 
   // A function that returns the key object associated with each mode tonic
-  readonly keyByTonic: (tonic: MixolydianTonic) => MixolydianKey
+  readonly keyByTonic: Record<MixolydianTonic, MixolydianKey>
 
   // A function that returns the key object associated with each key signature
-  readonly keyBySignature: (signature: ModeKeySignature) => MixolydianKey
+  readonly keyBySignature: Record<ModeKeySignature, MixolydianKey>
+
+  // Mode intervals by mode degree
+  readonly intervalByDegree: Record<ModeDegree, Interval>
 }
 
-export interface AeolianMode extends Mode {
+export interface AeolianMode extends ModeBase {
   // The list of standard and theoretical mode tonics
   readonly tonics: readonly AeolianTonic[]
 
   // A function that returns the key object associated with each mode tonic
-  readonly keyByTonic: (tonic: AeolianTonic) => AeolianKey
+  readonly keyByTonic: Record<AeolianTonic, AeolianKey>
 
   // A function that returns the key object associated with each key signature
-  readonly keyBySignature: (signature: ModeKeySignature) => AeolianKey
+  readonly keyBySignature: Record<ModeKeySignature, AeolianKey>
+
+  // Mode intervals by mode degree
+  readonly intervalByDegree: Record<ModeDegree, Interval>
 }
 
-export interface LocrianMode extends Mode {
+export interface LocrianMode extends ModeBase {
   // The list of standard and theoretical mode tonics
   readonly tonics: readonly LocrianTonic[]
 
   // A function that returns the key object associated with each mode tonic
-  readonly keyByTonic: (tonic: LocrianTonic) => LocrianKey
+  readonly keyByTonic: Record<LocrianTonic, LocrianKey>
 
   // A function that returns the key object associated with each key signature
-  readonly keyBySignature: (signature: ModeKeySignature) => LocrianKey
+  readonly keyBySignature: Record<ModeKeySignature, LocrianKey>
+
+  // Mode intervals by mode degree
+  readonly intervalByDegree: Record<ModeDegree, Interval>
 }
+
+export type Mode = IonianMode | DorianMode | PhrygianMode | LydianMode | MixolydianMode | AeolianMode | LocrianMode
 
 type KeyByTonic =
   Record<IonianTonic, IonianKey> |
@@ -343,7 +393,7 @@ function keyByTonic(modeName: 'Lydian'): Record<LydianTonic, LydianKey>
 function keyByTonic(modeName: 'Mixolydian'): Record<MixolydianTonic, MixolydianKey>
 function keyByTonic(modeName: 'Aeolian'): Record<AeolianTonic, AeolianKey>
 function keyByTonic(modeName: 'Locrian'): Record<LocrianTonic, LocrianKey>
-function keyByTonic(modeName: ModeName): KeyByTonic {
+function keyByTonic(modeName: 'Ionian' | 'Dorian' | 'Phrygian' | 'Lydian' | 'Mixolydian' | 'Aeolian' | 'Locrian'): KeyByTonic {
   const keyByTonic: { [key in Tonic]?: Key } = {}
   switch (modeName) {
     case 'Ionian':
@@ -401,7 +451,7 @@ function keyBySignature(modeName: 'Lydian'): Record<ModeKeySignature, LydianKey>
 function keyBySignature(modeName: 'Mixolydian'): Record<ModeKeySignature, MixolydianKey>
 function keyBySignature(modeName: 'Aeolian'): Record<ModeKeySignature, AeolianKey>
 function keyBySignature(modeName: 'Locrian'): Record<ModeKeySignature, LocrianKey>
-function keyBySignature(modeName: ModeName): KeyBySignature {
+function keyBySignature(modeName: 'Ionian' | 'Dorian' | 'Phrygian' | 'Lydian' | 'Mixolydian' | 'Aeolian' | 'Locrian'): KeyBySignature {
   const keyBySignature: { [key in ModeKeySignature]?: Key } = {}
   switch (modeName) {
     case 'Ionian':
@@ -449,8 +499,7 @@ function keyBySignature(modeName: ModeName): KeyBySignature {
   }
 }
 
-// Metadata for each mod
-export const MODE_DATA: Record<ModeName, IonianMode | DorianMode | PhrygianMode | LydianMode | MixolydianMode | AeolianMode | LocrianMode> = {
+export const MODE_BASE_BY_NAME: Record<ModeName, ModeBase> = {
   Ionian: {
     name: 'Ionian',
     alternateName: 'Major',
@@ -458,10 +507,7 @@ export const MODE_DATA: Record<ModeName, IonianMode | DorianMode | PhrygianMode 
     chordBases: ['maj', 'min', 'min', 'maj', 'maj', 'min', 'dim'],
     semitoneStructure: [2, 2, 1, 2, 2, 2, 1],
     intervals: ['P1', 'M2', 'M3', 'P4', 'P5', 'M6', 'M7', 'P8'],
-    degreeAdjustmentFromIonian: [0, 0, 0, 0, 0, 0, 0],
-    tonics: IONIAN_TONICS,
-    keyByTonic: (tonic: IonianTonic) => keyByTonic('Ionian')[tonic],
-    keyBySignature: (signature: ModeKeySignature) => keyBySignature('Ionian')[signature]
+    degreeAdjustmentFromIonian: [0, 0, 0, 0, 0, 0, 0]
   },
   Dorian: {
     name: 'Dorian',
@@ -470,9 +516,6 @@ export const MODE_DATA: Record<ModeName, IonianMode | DorianMode | PhrygianMode 
     semitoneStructure: [2, 1, 2, 2, 2, 1, 2],
     intervals: ['P1', 'M2', 'm3', 'P4', 'P5', 'M6', 'm7', 'P8'],
     degreeAdjustmentFromIonian: [0, 0, -1, 0, 0, 0, -1],
-    tonics: DORIAN_TONICS,
-    keyByTonic: (tonic: DorianTonic) => keyByTonic('Dorian')[tonic],
-    keyBySignature: (signature: ModeKeySignature) => keyBySignature('Dorian')[signature]
   },
   Phrygian: {
     name: 'Phrygian',
@@ -481,9 +524,6 @@ export const MODE_DATA: Record<ModeName, IonianMode | DorianMode | PhrygianMode 
     semitoneStructure: [1, 2, 2, 2, 1, 2, 2],
     intervals: ['P1', 'm2', 'm3', 'P4', 'P5', 'm6', 'm7'],
     degreeAdjustmentFromIonian: [0, -1, -1, 0, 0, -1, -1],
-    tonics: PHRYGIAN_TONICS,
-    keyByTonic: (tonic: PhrygianTonic) => keyByTonic('Phrygian')[tonic],
-    keyBySignature: (signature) =>  keyBySignature('Phrygian')[signature]
   },
   Lydian: {
     name: 'Lydian',
@@ -492,9 +532,6 @@ export const MODE_DATA: Record<ModeName, IonianMode | DorianMode | PhrygianMode 
     semitoneStructure: [2, 2, 2, 1, 2, 2, 1],
     intervals: ['P1', 'M2', 'M3', 'TT', 'P5', 'M6', 'M7'],
     degreeAdjustmentFromIonian: [0, 0, 0, 1, 0, 0, 0],
-    tonics: LYDIAN_TONICS,
-    keyByTonic: (tonic: LydianTonic) => keyByTonic('Lydian')[tonic],
-    keyBySignature:(signature: ModeKeySignature) => keyBySignature('Lydian')[signature]
   },
   Mixolydian: {
     name: 'Mixolydian',
@@ -503,9 +540,6 @@ export const MODE_DATA: Record<ModeName, IonianMode | DorianMode | PhrygianMode 
     semitoneStructure: [2, 2, 1, 2, 2, 1, 2],
     intervals: ['P1', 'M2', 'M3', 'P4', 'P5', 'M6', 'm7'],
     degreeAdjustmentFromIonian: [0, 0, 0, 0, 0, 0, -1],
-    tonics: MIXOLYDIAN_TONICS,
-    keyByTonic: (tonic: MixolydianTonic) => keyByTonic('Mixolydian')[tonic],
-    keyBySignature: (signature: ModeKeySignature) => keyBySignature('Mixolydian')[signature]
   },
   Aeolian: {
     name: 'Aeolian',
@@ -515,9 +549,6 @@ export const MODE_DATA: Record<ModeName, IonianMode | DorianMode | PhrygianMode 
     semitoneStructure: [2, 1, 2, 2, 1, 2, 2],
     intervals: ['P1', 'M2', 'm3', 'P4', 'P5', 'm6', 'm7'],
     degreeAdjustmentFromIonian: [0, 0, -1, 0, 0, -1, -1],
-    tonics: AEOLIAN_TONICS,
-    keyByTonic: (tonic: AeolianTonic) => keyByTonic('Aeolian')[tonic],
-    keyBySignature: (signature: ModeKeySignature) => keyBySignature('Aeolian')[signature]
   },
   Locrian: {
     name: 'Locrian',
@@ -526,13 +557,79 @@ export const MODE_DATA: Record<ModeName, IonianMode | DorianMode | PhrygianMode 
     semitoneStructure: [1, 2, 2, 1, 2, 2, 2],
     intervals: ['P1', 'm2', 'm3', 'P4', 'TT', 'm6', 'm7'],
     degreeAdjustmentFromIonian: [0, -1, -1, 0, -1, -1, -1],
-    tonics: LOCRIAN_TONICS,
-    keyByTonic: (tonic: LocrianTonic) => keyByTonic('Locrian')[tonic],
-    keyBySignature: (signature: ModeKeySignature) => keyBySignature('Locrian')[signature]
   }
 }
 
-// Returns a given mode object
+export function ionianMode(): IonianMode {
+  return {
+    ...MODE_BASE_BY_NAME['Ionian'],
+    tonics: IONIAN_TONICS,
+    intervalByDegree: intervalByDegree('Ionian'),
+    keyByTonic: keyByTonic('Ionian'),
+    keyBySignature: keyBySignature('Ionian')
+  }
+}
+
+export function dorianMode(): DorianMode {
+  return {
+    ...MODE_BASE_BY_NAME['Dorian'],
+    tonics: DORIAN_TONICS,
+    intervalByDegree: intervalByDegree('Dorian'),
+    keyByTonic: keyByTonic('Dorian'),
+    keyBySignature: keyBySignature('Dorian')
+  }
+}
+
+export function phrygianMode(): PhrygianMode {
+  return {
+    ...MODE_BASE_BY_NAME['Phrygian'],
+    tonics: PHRYGIAN_TONICS,
+    intervalByDegree: intervalByDegree('Phrygian'),
+    keyByTonic: keyByTonic('Phrygian'),
+    keyBySignature: keyBySignature('Phrygian')
+  }
+}
+
+export function lydianMode(): LydianMode {
+  return {
+    ...MODE_BASE_BY_NAME['Lydian'],
+    tonics: LYDIAN_TONICS,
+    intervalByDegree: intervalByDegree('Lydian'),
+    keyByTonic: keyByTonic('Lydian'),
+    keyBySignature: keyBySignature('Lydian')
+  }
+}
+
+export function mixolydianMode(): MixolydianMode {
+  return {
+    ...MODE_BASE_BY_NAME['Mixolydian'],
+    tonics: MIXOLYDIAN_TONICS,
+    intervalByDegree: intervalByDegree('Mixolydian'),
+    keyByTonic: keyByTonic('Mixolydian'),
+    keyBySignature: keyBySignature('Mixolydian')
+  }
+}
+
+export function aeolianMode(): AeolianMode {
+  return {
+    ...MODE_BASE_BY_NAME['Aeolian'],
+    tonics: AEOLIAN_TONICS,
+    intervalByDegree: intervalByDegree('Aeolian'),
+    keyByTonic: keyByTonic('Aeolian'),
+    keyBySignature: keyBySignature('Aeolian')
+  }
+}
+
+export function locrianMode(): LocrianMode {
+  return {
+    ...MODE_BASE_BY_NAME['Locrian'],
+    tonics: LOCRIAN_TONICS,
+    intervalByDegree: intervalByDegree('Locrian'),
+    keyByTonic: keyByTonic('Locrian'),
+    keyBySignature: keyBySignature('Locrian')
+  }
+}
+
 export function mode(modeName: 'Ionian'): IonianMode
 export function mode(modeName: 'Dorian'): DorianMode
 export function mode(modeName: 'Phrygian'): PhrygianMode
@@ -540,6 +637,21 @@ export function mode(modeName: 'Lydian'): LydianMode
 export function mode(modeName: 'Mixolydian'): MixolydianMode
 export function mode(modeName: 'Aeolian'): AeolianMode
 export function mode(modeName: 'Locrian'): LocrianMode
-export function mode(modeName: ModeName): IonianMode | DorianMode | PhrygianMode | LydianMode | MixolydianMode | AeolianMode | LocrianMode {
-  return MODE_DATA[modeName]
+export function mode(modeName: ModeName): Mode {
+  switch (modeName) {
+    case 'Ionian':
+      return ionianMode()
+    case 'Dorian':
+      return dorianMode()
+    case 'Phrygian':
+      return phrygianMode()
+    case 'Lydian':
+      return lydianMode()
+    case 'Mixolydian':
+      return mixolydianMode()
+    case 'Aeolian':
+      return aeolianMode()
+    case 'Locrian':
+      return locrianMode()
+  }
 }
