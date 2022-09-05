@@ -252,10 +252,8 @@ export const INTERVAL_DATA: Record<ShortIntervalName, Interval> = {
 }
 
 export function intervalByDegree(modeName: ModeName): Record<ModeDegree, Interval> {
-  const m = MODE_BASE_BY_NAME[modeName]
-
   const intervalByDegree: { [key in ModeDegree]?: Interval } = {}
-  m.intervals.forEach((intervalShortName, index) => {
+  MODE_BASE_BY_NAME[modeName].intervals.forEach((intervalShortName, index) => {
     if (index === 7) {
       return
     }

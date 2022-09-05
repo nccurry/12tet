@@ -276,105 +276,66 @@ export interface ModeBase {
   readonly degreeAdjustmentFromIonian: readonly number[]
 }
 
-export interface IonianMode extends ModeBase {
-  // The list of standard and theoretical mode tonics
-  readonly tonics: readonly IonianTonic[]
-
-  // A function that returns the key object associated with each mode tonic
-  readonly keyByTonic: Record<IonianTonic, IonianKey>
-
-  // A function that returns the key object associated with each key signature
-  readonly keyBySignature: Record<ModeKeySignature, IonianKey>
-
-  // Mode intervals by mode degree
-  readonly intervalByDegree: Record<ModeDegree, Interval>
+export const MODE_BASE_BY_NAME: Record<ModeName, ModeBase> = {
+  Ionian: {
+    name: 'Ionian',
+    alternateName: 'Major',
+    chordNumerals: ['I', 'ii', 'iii', 'IV', 'V', 'vi', 'vii\u2070'],
+    chordBases: ['maj', 'min', 'min', 'maj', 'maj', 'min', 'dim'],
+    semitoneStructure: [2, 2, 1, 2, 2, 2, 1],
+    intervals: ['P1', 'M2', 'M3', 'P4', 'P5', 'M6', 'M7', 'P8'],
+    degreeAdjustmentFromIonian: [0, 0, 0, 0, 0, 0, 0]
+  },
+  Dorian: {
+    name: 'Dorian',
+    chordNumerals: ['i', 'ii', '\u1d47III', 'IV', 'v', 'vi\u2070', '\u1d47VII'],
+    chordBases: ['min', 'min', 'maj', 'maj', 'min', 'dim', 'maj'],
+    semitoneStructure: [2, 1, 2, 2, 2, 1, 2],
+    intervals: ['P1', 'M2', 'm3', 'P4', 'P5', 'M6', 'm7', 'P8'],
+    degreeAdjustmentFromIonian: [0, 0, -1, 0, 0, 0, -1],
+  },
+  Phrygian: {
+    name: 'Phrygian',
+    chordNumerals: ['i', '\u1d47II', '\u1d47III', 'iv', 'v\u2070', '\u1d47VI', '\u1d47vii'],
+    chordBases: ['min', 'maj', 'maj', 'min', 'dim', 'maj', 'min'],
+    semitoneStructure: [1, 2, 2, 2, 1, 2, 2],
+    intervals: ['P1', 'm2', 'm3', 'P4', 'P5', 'm6', 'm7'],
+    degreeAdjustmentFromIonian: [0, -1, -1, 0, 0, -1, -1],
+  },
+  Lydian: {
+    name: 'Lydian',
+    chordNumerals: ['I', 'II', 'iii', '#iv\u2070', 'V', 'vi', 'vii'],
+    chordBases: ['maj', 'maj', 'min', 'dim', 'maj', 'min', 'min'],
+    semitoneStructure: [2, 2, 2, 1, 2, 2, 1],
+    intervals: ['P1', 'M2', 'M3', 'TT', 'P5', 'M6', 'M7'],
+    degreeAdjustmentFromIonian: [0, 0, 0, 1, 0, 0, 0],
+  },
+  Mixolydian: {
+    name: 'Mixolydian',
+    chordNumerals: ['I', 'ii', 'iii\u2070', 'IV', 'v', 'vi', '\u1d47VII'],
+    chordBases: ['maj', 'min', 'dim', 'maj', 'min', 'min', 'maj'],
+    semitoneStructure: [2, 2, 1, 2, 2, 1, 2],
+    intervals: ['P1', 'M2', 'M3', 'P4', 'P5', 'M6', 'm7'],
+    degreeAdjustmentFromIonian: [0, 0, 0, 0, 0, 0, -1],
+  },
+  Aeolian: {
+    name: 'Aeolian',
+    alternateName: 'Minor',
+    chordNumerals: ['i', 'ii\u2070', '\u1d47III', 'iv', 'v', '\u1d47VI', '\u1d47VII'],
+    chordBases: ['min', 'dim', 'maj', 'min', 'min', 'maj', 'maj'],
+    semitoneStructure: [2, 1, 2, 2, 1, 2, 2],
+    intervals: ['P1', 'M2', 'm3', 'P4', 'P5', 'm6', 'm7'],
+    degreeAdjustmentFromIonian: [0, 0, -1, 0, 0, -1, -1],
+  },
+  Locrian: {
+    name: 'Locrian',
+    chordNumerals: ['i\u2070', '\u1d47II', '\u1d47iii', 'iv', '\u1d47V', '\u1d47VI', '\u1d47vii'],
+    chordBases: ['dim', 'maj', 'min', 'min', 'maj', 'maj', 'min'],
+    semitoneStructure: [1, 2, 2, 1, 2, 2, 2],
+    intervals: ['P1', 'm2', 'm3', 'P4', 'TT', 'm6', 'm7'],
+    degreeAdjustmentFromIonian: [0, -1, -1, 0, -1, -1, -1],
+  }
 }
-
-export interface DorianMode extends ModeBase {
-  // The list of standard and theoretical mode tonics
-  readonly tonics: readonly DorianTonic[]
-
-  // A function that returns the key object associated with each mode tonic
-  readonly keyByTonic: Record<DorianTonic, DorianKey>
-
-  // A function that returns the key object associated with each key signature
-  readonly keyBySignature: Record<ModeKeySignature, DorianKey>
-
-  // Mode intervals by mode degree
-  readonly intervalByDegree: Record<ModeDegree, Interval>
-}
-
-export interface PhrygianMode extends ModeBase {
-  // The list of standard and theoretical mode tonics
-  readonly tonics: readonly PhrygianTonic[]
-
-  // A function that returns the key object associated with each mode tonic
-  readonly keyByTonic: Record<PhrygianTonic, PhrygianKey>
-
-  // A function that returns the key object associated with each key signature
-  readonly keyBySignature: Record<ModeKeySignature, PhrygianKey>
-
-  // Mode intervals by mode degree
-  readonly intervalByDegree: Record<ModeDegree, Interval>
-}
-
-export interface LydianMode extends ModeBase {
-  // The list of standard and theoretical mode tonics
-  readonly tonics: readonly LydianTonic[]
-
-  // A function that returns the key object associated with each mode tonic
-  readonly keyByTonic: Record<LydianTonic, LydianKey>
-
-  // A function that returns the key object associated with each key signature
-  readonly keyBySignature: Record<ModeKeySignature, LydianKey>
-
-  // Mode intervals by mode degree
-  readonly intervalByDegree: Record<ModeDegree, Interval>
-}
-
-export interface MixolydianMode extends ModeBase {
-  // The list of standard and theoretical mode tonics
-  readonly tonics: readonly MixolydianTonic[]
-
-  // A function that returns the key object associated with each mode tonic
-  readonly keyByTonic: Record<MixolydianTonic, MixolydianKey>
-
-  // A function that returns the key object associated with each key signature
-  readonly keyBySignature: Record<ModeKeySignature, MixolydianKey>
-
-  // Mode intervals by mode degree
-  readonly intervalByDegree: Record<ModeDegree, Interval>
-}
-
-export interface AeolianMode extends ModeBase {
-  // The list of standard and theoretical mode tonics
-  readonly tonics: readonly AeolianTonic[]
-
-  // A function that returns the key object associated with each mode tonic
-  readonly keyByTonic: Record<AeolianTonic, AeolianKey>
-
-  // A function that returns the key object associated with each key signature
-  readonly keyBySignature: Record<ModeKeySignature, AeolianKey>
-
-  // Mode intervals by mode degree
-  readonly intervalByDegree: Record<ModeDegree, Interval>
-}
-
-export interface LocrianMode extends ModeBase {
-  // The list of standard and theoretical mode tonics
-  readonly tonics: readonly LocrianTonic[]
-
-  // A function that returns the key object associated with each mode tonic
-  readonly keyByTonic: Record<LocrianTonic, LocrianKey>
-
-  // A function that returns the key object associated with each key signature
-  readonly keyBySignature: Record<ModeKeySignature, LocrianKey>
-
-  // Mode intervals by mode degree
-  readonly intervalByDegree: Record<ModeDegree, Interval>
-}
-
-export type Mode = IonianMode | DorianMode | PhrygianMode | LydianMode | MixolydianMode | AeolianMode | LocrianMode
 
 type KeyByTonic =
   Record<IonianTonic, IonianKey> |
@@ -499,66 +460,105 @@ function keyBySignature(modeName: 'Ionian' | 'Dorian' | 'Phrygian' | 'Lydian' | 
   }
 }
 
-export const MODE_BASE_BY_NAME: Record<ModeName, ModeBase> = {
-  Ionian: {
-    name: 'Ionian',
-    alternateName: 'Major',
-    chordNumerals: ['I', 'ii', 'iii', 'IV', 'V', 'vi', 'vii\u2070'],
-    chordBases: ['maj', 'min', 'min', 'maj', 'maj', 'min', 'dim'],
-    semitoneStructure: [2, 2, 1, 2, 2, 2, 1],
-    intervals: ['P1', 'M2', 'M3', 'P4', 'P5', 'M6', 'M7', 'P8'],
-    degreeAdjustmentFromIonian: [0, 0, 0, 0, 0, 0, 0]
-  },
-  Dorian: {
-    name: 'Dorian',
-    chordNumerals: ['i', 'ii', '\u1d47III', 'IV', 'v', 'vi\u2070', '\u1d47VII'],
-    chordBases: ['min', 'min', 'maj', 'maj', 'min', 'dim', 'maj'],
-    semitoneStructure: [2, 1, 2, 2, 2, 1, 2],
-    intervals: ['P1', 'M2', 'm3', 'P4', 'P5', 'M6', 'm7', 'P8'],
-    degreeAdjustmentFromIonian: [0, 0, -1, 0, 0, 0, -1],
-  },
-  Phrygian: {
-    name: 'Phrygian',
-    chordNumerals: ['i', '\u1d47II', '\u1d47III', 'iv', 'v\u2070', '\u1d47VI', '\u1d47vii'],
-    chordBases: ['min', 'maj', 'maj', 'min', 'dim', 'maj', 'min'],
-    semitoneStructure: [1, 2, 2, 2, 1, 2, 2],
-    intervals: ['P1', 'm2', 'm3', 'P4', 'P5', 'm6', 'm7'],
-    degreeAdjustmentFromIonian: [0, -1, -1, 0, 0, -1, -1],
-  },
-  Lydian: {
-    name: 'Lydian',
-    chordNumerals: ['I', 'II', 'iii', '#iv\u2070', 'V', 'vi', 'vii'],
-    chordBases: ['maj', 'maj', 'min', 'dim', 'maj', 'min', 'min'],
-    semitoneStructure: [2, 2, 2, 1, 2, 2, 1],
-    intervals: ['P1', 'M2', 'M3', 'TT', 'P5', 'M6', 'M7'],
-    degreeAdjustmentFromIonian: [0, 0, 0, 1, 0, 0, 0],
-  },
-  Mixolydian: {
-    name: 'Mixolydian',
-    chordNumerals: ['I', 'ii', 'iii\u2070', 'IV', 'v', 'vi', '\u1d47VII'],
-    chordBases: ['maj', 'min', 'dim', 'maj', 'min', 'min', 'maj'],
-    semitoneStructure: [2, 2, 1, 2, 2, 1, 2],
-    intervals: ['P1', 'M2', 'M3', 'P4', 'P5', 'M6', 'm7'],
-    degreeAdjustmentFromIonian: [0, 0, 0, 0, 0, 0, -1],
-  },
-  Aeolian: {
-    name: 'Aeolian',
-    alternateName: 'Minor',
-    chordNumerals: ['i', 'ii\u2070', '\u1d47III', 'iv', 'v', '\u1d47VI', '\u1d47VII'],
-    chordBases: ['min', 'dim', 'maj', 'min', 'min', 'maj', 'maj'],
-    semitoneStructure: [2, 1, 2, 2, 1, 2, 2],
-    intervals: ['P1', 'M2', 'm3', 'P4', 'P5', 'm6', 'm7'],
-    degreeAdjustmentFromIonian: [0, 0, -1, 0, 0, -1, -1],
-  },
-  Locrian: {
-    name: 'Locrian',
-    chordNumerals: ['i\u2070', '\u1d47II', '\u1d47iii', 'iv', '\u1d47V', '\u1d47VI', '\u1d47vii'],
-    chordBases: ['dim', 'maj', 'min', 'min', 'maj', 'maj', 'min'],
-    semitoneStructure: [1, 2, 2, 1, 2, 2, 2],
-    intervals: ['P1', 'm2', 'm3', 'P4', 'TT', 'm6', 'm7'],
-    degreeAdjustmentFromIonian: [0, -1, -1, 0, -1, -1, -1],
-  }
+export interface IonianMode extends ModeBase {
+  // The list of standard and theoretical mode tonics
+  readonly tonics: readonly IonianTonic[]
+
+  // A function that returns the key object associated with each mode tonic
+  readonly keyByTonic: Record<IonianTonic, IonianKey>
+
+  // A function that returns the key object associated with each key signature
+  readonly keyBySignature: Record<ModeKeySignature, IonianKey>
+
+  // Mode intervals by mode degree
+  readonly intervalByDegree: Record<ModeDegree, Interval>
 }
+
+export interface DorianMode extends ModeBase {
+  // The list of standard and theoretical mode tonics
+  readonly tonics: readonly DorianTonic[]
+
+  // A function that returns the key object associated with each mode tonic
+  readonly keyByTonic: Record<DorianTonic, DorianKey>
+
+  // A function that returns the key object associated with each key signature
+  readonly keyBySignature: Record<ModeKeySignature, DorianKey>
+
+  // Mode intervals by mode degree
+  readonly intervalByDegree: Record<ModeDegree, Interval>
+}
+
+export interface PhrygianMode extends ModeBase {
+  // The list of standard and theoretical mode tonics
+  readonly tonics: readonly PhrygianTonic[]
+
+  // A function that returns the key object associated with each mode tonic
+  readonly keyByTonic: Record<PhrygianTonic, PhrygianKey>
+
+  // A function that returns the key object associated with each key signature
+  readonly keyBySignature: Record<ModeKeySignature, PhrygianKey>
+
+  // Mode intervals by mode degree
+  readonly intervalByDegree: Record<ModeDegree, Interval>
+}
+
+export interface LydianMode extends ModeBase {
+  // The list of standard and theoretical mode tonics
+  readonly tonics: readonly LydianTonic[]
+
+  // A function that returns the key object associated with each mode tonic
+  readonly keyByTonic: Record<LydianTonic, LydianKey>
+
+  // A function that returns the key object associated with each key signature
+  readonly keyBySignature: Record<ModeKeySignature, LydianKey>
+
+  // Mode intervals by mode degree
+  readonly intervalByDegree: Record<ModeDegree, Interval>
+}
+
+export interface MixolydianMode extends ModeBase {
+  // The list of standard and theoretical mode tonics
+  readonly tonics: readonly MixolydianTonic[]
+
+  // A function that returns the key object associated with each mode tonic
+  readonly keyByTonic: Record<MixolydianTonic, MixolydianKey>
+
+  // A function that returns the key object associated with each key signature
+  readonly keyBySignature: Record<ModeKeySignature, MixolydianKey>
+
+  // Mode intervals by mode degree
+  readonly intervalByDegree: Record<ModeDegree, Interval>
+}
+
+export interface AeolianMode extends ModeBase {
+  // The list of standard and theoretical mode tonics
+  readonly tonics: readonly AeolianTonic[]
+
+  // A function that returns the key object associated with each mode tonic
+  readonly keyByTonic: Record<AeolianTonic, AeolianKey>
+
+  // A function that returns the key object associated with each key signature
+  readonly keyBySignature: Record<ModeKeySignature, AeolianKey>
+
+  // Mode intervals by mode degree
+  readonly intervalByDegree: Record<ModeDegree, Interval>
+}
+
+export interface LocrianMode extends ModeBase {
+  // The list of standard and theoretical mode tonics
+  readonly tonics: readonly LocrianTonic[]
+
+  // A function that returns the key object associated with each mode tonic
+  readonly keyByTonic: Record<LocrianTonic, LocrianKey>
+
+  // A function that returns the key object associated with each key signature
+  readonly keyBySignature: Record<ModeKeySignature, LocrianKey>
+
+  // Mode intervals by mode degree
+  readonly intervalByDegree: Record<ModeDegree, Interval>
+}
+
+export type Mode = IonianMode | DorianMode | PhrygianMode | LydianMode | MixolydianMode | AeolianMode | LocrianMode
 
 export function ionianMode(): IonianMode {
   return {

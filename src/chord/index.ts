@@ -136,7 +136,7 @@ export interface ChordType {
 }
 
 export interface Chord {
-  root: Note
+  root: IonianTonic
   base: ChordBase
   extension?: ChordExtension
   additions?: ChordAddition[]
