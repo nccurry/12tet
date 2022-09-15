@@ -105,6 +105,34 @@ console.log(gIonian.tonic) // G
 console.log(gIonian.enharmonicEquivalents) // ['F##', 'Abb']
 ```
 
+## Voicing
+
+Generate chord voicings
+
+```typescript
+import {
+    chord,
+    chordVoicings,
+    VoicingOptions,
+    Chord
+} from '12tet'
+
+const cMaj7SlashE = chord('C', {
+    base: 'maj',
+    extension: '7',
+    slash: '3'
+})
+
+const voicings = chordVoicings(cMaj7SlashE, {
+    startingPitch: 3,
+    minSpread: 5,
+    maxSpread: 20,
+    minSize: 3,
+    maxSize: 6,
+    enforceSlash: true
+})
+```
+
 ## Development
 
 ### Running tests

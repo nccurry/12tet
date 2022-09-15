@@ -160,7 +160,7 @@ function getDistanceBetweenVoicedNotes(firstVoicedNote: VoicedNote, secondVoiced
   return interval.length + (12 * (secondVoicedNote.pitch - firstVoicedNote.pitch))
 }
 
-export function generateVoicings (chord: Chord, voicingOptions: VoicingOptions): ChordVoicing[] {
+export function chordVoicings (chord: Chord, voicingOptions: VoicingOptions): ChordVoicing[] {
   const voicedNotes = voiceAllNotes(chord.notes, voicingOptions)
   const voicedIntervals = voicedNotes.map(voicedNote => interval(chord.intervals[chord.notes.findIndex(note => note === voicedNote.note)]))
 
