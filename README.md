@@ -113,8 +113,6 @@ Generate chord voicings
 import {
     chord,
     chordVoicings,
-    VoicingOptions,
-    Chord
 } from '12tet'
 
 const cMaj7SlashE = chord('C', {
