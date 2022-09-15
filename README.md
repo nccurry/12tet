@@ -1,4 +1,6 @@
-# Musicomatic Music Theory Library
+# 12tet Music Theory Library
+
+A Typescript library for working with Modes, Chords, Keys, and other abstractions from the twelve-tone equal temperament music system. 
 
 ## Mode
 
@@ -12,7 +14,7 @@ import {
     mode,
     ionianMode,
     aeolianMode
-} from 'musicomatic'
+} from '12tet'
 
 // List all mode names
 console.log(MODE_NAMES) // ['Ionian', 'Dorian', 'Phrygian', ..., Locrian]
@@ -50,7 +52,7 @@ import {
     ALTERNATE_INTERVAL_NAMES,
     INTERVAL_SHORT_NAMES,
     interval
-} from 'musicomatic'
+} from '12tet'
 
 // List all interval names
 console.log(INTERVAL_NAMES) // ['Perfect Unison', 'Minor Second', 'Major Second', ..., 'Major Seventh', 'Perfect Octave']
@@ -92,7 +94,7 @@ Constants and functions to interact with musical [keys](https://en.wikipedia.org
 ```typescript
 import {
     key
-} from 'musicomatic'
+} from '12tet'
 
 // Create a new key
 const gIonian = key('G', 'Ionian')
