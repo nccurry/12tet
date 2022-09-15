@@ -12,16 +12,28 @@ import {
   ModeDegree
 } from "../mode"
 import {
+  getNaturalNoteRoot, isNote,
+  NaturalNote,
   Note
 } from "../note";
 import {
   generateOrderedCombinations,
   removeDuplicates
 } from "../utils";
-import {key} from "../key";
+import {
+  key
+} from "../key";
 
+export const NOTE_PITCHES = [0, 1, 2 ,3, 4, 5, 6, 7, 8] as const
+export type NotePitch = typeof NOTE_PITCHES[number]
+export function isNotePitch (notePitch: any): notePitch is NotePitch {
+  return NOTE_PITCHES.includes(notePitch)
+}
 
 export interface VoicingOptions {
+  // Pitch for the root note of the voicing
+  startingPitch: NotePitch
+
   // Minimum distance, in semitones, between the first and last note
   minSpread: IntervalDistance
 
@@ -51,7 +63,7 @@ export interface VoicingOptions {
 }
 
 export interface VoicedNote {
-  octave: number
+  pitch: NotePitch
   note: Note
 }
 
@@ -60,43 +72,96 @@ export interface ChordVoicing {
   voicingOptions: VoicingOptions
   voicedNotes: VoicedNote[]
   tension: number
-  density: number
 }
 
+function isValidVoicedNote (note: Note, pitch: number): boolean {
+  if ([0, 1].includes(pitch) && !['A', 'A#', 'Bb', 'B'].includes(note)) {
+    return false
+  } else if (pitch === 8 && note !== 'C') {
+    return false
+  } else if (!isNotePitch(pitch)) {
+    return false
+  } else if (!isNote(note)) {
+    return false
+  } else {
+    return true
+  }
+}
 
-function voiceAllNotes(notes: Note[], maxToneSpread: number, maxSize: number): VoicedNote[] {
-  let totalSpread = 0
-  const octaveNotes: VoicedNote[] = [{ octave: 0, note: notes[0] }]
+function voiceAllNotes(notes: Note[], voicingOptions: VoicingOptions): VoicedNote[] {
+  // We can generate pitches by comparing distance to C, since C is the start of a given pitch.
+  // If notes get farther from C, we're in the same pitch. If they suddenly get closer, we're in the next pitch.
+  const distanceToCByNaturalNote: Record<NaturalNote, number> = {
+    C: 0,
+    D: 1,
+    E: 2,
+    F: 3,
+    G: 4,
+    A: 5,
+    B: 6,
+  }
+  let currentDistanceToC = 0
+  let previousDistanceToC = distanceToCByNaturalNote[getNaturalNoteRoot(notes[0])]
+  let pitchOffset = 0
+
+  let totalToneSpread = 0
+  const voicedNotes: VoicedNote[] = [{ pitch: voicingOptions.startingPitch, note: notes[0] }]
   do {
-    const index = octaveNotes.length
+    const index = voicedNotes.length
     const currentNote = notes[(index - 1) % notes.length]
     const nextNote = notes[index % notes.length]
-    const nextDifference = getIntervalBetweenNotes(currentNote, nextNote)
+    const nextIntervalLength = getIntervalBetweenNotes(currentNote, nextNote).length
 
-    if (totalSpread + nextDifference > maxToneSpread) {
-      console.log(`Adding additional chord note ${nextNote} will result in a chord with spread greater than ${maxToneSpread}.`)
+    if (totalToneSpread + nextIntervalLength > voicingOptions.maxSpread) {
+      console.log(`Adding additional chord note ${nextNote} will result in a chord with spread greater than ${voicingOptions.maxSpread}.`)
       break
-    } else {
-      totalSpread += nextDifference
-      octaveNotes.push({ octave: Math.floor(totalSpread / 12), note: nextNote, })
     }
 
-  } while (totalSpread < maxToneSpread)
+    totalToneSpread += nextIntervalLength
 
+    currentDistanceToC = distanceToCByNaturalNote[getNaturalNoteRoot(nextNote)]
+    if (currentDistanceToC <= previousDistanceToC) {
+      pitchOffset += 1
+    }
+    const pitch = voicingOptions.startingPitch + pitchOffset
+    previousDistanceToC = currentDistanceToC
 
-  return octaveNotes
+    if (!isValidVoicedNote(nextNote, pitch)) {
+      console.log(`Adding additional chord note ${nextNote}${pitch} results in an invalid voiced note`)
+      continue
+    }
+
+    voicedNotes.push({
+      pitch: pitch as NotePitch,
+      note: nextNote
+    })
+
+  } while (totalToneSpread < voicingOptions.maxSpread)
+
+  return voicedNotes
 }
 
-function calculateTension (intervalIdentifiers: IntervalIdentifier[]): number {
+function calculateTension (voicedNotes: VoicedNote[]): number {
   let tension = 0
-  for (let i = 0; i < intervalIdentifiers.length; i++) {
-    tension += interval(intervalIdentifiers[i]).tension
+  let density = 0
+  for (let i = 0; i < voicedNotes.length - 1; i++) {
+    density += getDistanceBetweenVoicedNotes(voicedNotes[i], voicedNotes[i])
+    for (let j = i+1; j < voicedNotes.length; j++) {
+      const interval = getIntervalBetweenNotes(voicedNotes[i].note, voicedNotes[j].note)
+      tension += interval.tension
+    }
   }
-  return tension
+  // TODO: Decide how we actually want to calculate tension. Tension per note is... fine
+  return tension / voicedNotes.length
+}
+
+function getDistanceBetweenVoicedNotes(firstVoicedNote: VoicedNote, secondVoicedNote: VoicedNote): number {
+  const interval = getIntervalBetweenNotes(firstVoicedNote.note, secondVoicedNote.note)
+  return interval.length + (12 * (secondVoicedNote.pitch - firstVoicedNote.pitch))
 }
 
 export function generateVoicings (chord: Chord, voicingOptions: VoicingOptions): ChordVoicing[] {
-  const voicedNotes = voiceAllNotes(chord.notes, voicingOptions.maxSpread, voicingOptions.maxSize)
+  const voicedNotes = voiceAllNotes(chord.notes, voicingOptions)
   const voicedIntervals = voicedNotes.map(voicedNote => interval(chord.intervals[chord.notes.findIndex(note => note === voicedNote.note)]))
 
   const voicedNoteCombinations: VoicedNote[][] = []
@@ -143,7 +208,7 @@ export function generateVoicings (chord: Chord, voicingOptions: VoicingOptions):
     return true
   })
 
-
+  // TODO: Rank tension and density
   const dedupedVoicedNoteCombinations = removeDuplicates(filteredVoicedNoteCombinations)
   const chordVoicings: ChordVoicing[] = []
   dedupedVoicedNoteCombinations.forEach(voicedNoteCombination => {
@@ -151,8 +216,7 @@ export function generateVoicings (chord: Chord, voicingOptions: VoicingOptions):
       chord: chord,
       voicingOptions: voicingOptions,
       voicedNotes: voicedNoteCombination,
-      tension: 0,
-      density: 0
+      tension: calculateTension(voicedNoteCombination)
     })
   })
 

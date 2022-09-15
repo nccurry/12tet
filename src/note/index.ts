@@ -63,6 +63,10 @@ export function isNoteRegister (register: any): register is NoteRegister {
   return NOTE_REGISTER.includes(register)
 }
 
+export function getNaturalNoteRoot(note: Note): NaturalNote {
+  return note[0] as NaturalNote
+}
+
 // Given a note, return the next natural note - i.e. B# => C, Cbb => D
 export function getNextNaturalNote(note: Note): NaturalNote {
   for (let i = 0; i < NATURAL_NOTES.length; i++) {

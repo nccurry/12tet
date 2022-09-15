@@ -277,11 +277,11 @@ export function getIntervalBetweenIntervals(first: IntervalIdentifier, second: I
   return distance === 0 ? 12 : distance // Prefer Perfect Octaves over Perfect Unisons
 }
 
-export function getIntervalBetweenNotes(first: Note, second: Note): IntervalDistance {
+export function getIntervalBetweenNotes(first: Note, second: Note): Interval {
   const firstTone = TONES_BY_NOTE[first]
   const secondTone = TONES_BY_NOTE[second]
   const distance = secondTone.index >= firstTone.index ? secondTone.index - firstTone.index : (11 - firstTone.index) + secondTone .index
-  return distance === 0 ? 12 : distance // Prefer Perfect Octaves over Perfect Unisons
+  return interval(distance === 0 ? 12 : distance) // Prefer Perfect Octaves over Perfect Unisons
 }
 
 export function interval(intervalIdentifier: IntervalIdentifier): Interval {
