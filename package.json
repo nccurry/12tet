@@ -1,6 +1,6 @@
 {
   "name": "12tet",
-  "version": "0.0.2-alpha",
+  "version": "0.0.4-alpha",
   "description": "Music theory library for generating and working with chords, modes, intervals, etc.",
   "main": "./lib/src/index.js",
   "types": "./lib/src/index.d.ts",
@@ -13,7 +13,8 @@
     "lint": "eslint ./src/ --fix",
     "test:watch": "jest --watch",
     "test": "jest --coverage",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "publish": "npm publish"
   },
   "repository": {
     "type": "git",
@@ -22,9 +23,12 @@
   "keywords": [
     "music",
     "theory",
-    "chords",
-    "notes",
-    "intervals",
+    "chord",
+    "interval",
+    "key",
+    "mode",
+    "note",
+    "voicing",
     "generator"
   ],
   "author": "Nick Curry <code@nickcurry.com>",
@@ -37,7 +41,7 @@
   },
   "homepage": "https://github.com/nccurry/12tet#readme",
   "devDependencies": {
-    "@types/jest": "^29.0.2",
+    "@types/jest": "^29.0.3",
     "@typescript-eslint/eslint-plugin": "^5.37.0",
     "@typescript-eslint/parser": "^5.37.0",
     "eslint": "^8.23.1",

@@ -48,19 +48,19 @@ export function isTheoreticalSharpModeKeySignature (signature: any): signature i
   return THEORETICAL_SHARP_MODE_KEY_SIGNATURES.includes(signature)
 }
 
-export const STANDARD_FLAT_MODE_KEY_SIGNATURES = ['1b', '2b', '3b', '4b', '5b', '6b', '7b'] as const
+export const STANDARD_FLAT_MODE_KEY_SIGNATURES = ['7b', '6b', '5b', '4b', '3b', '2b', '1b'] as const
 export type StandardFlatModeKeySignature = typeof STANDARD_FLAT_MODE_KEY_SIGNATURES[number]
 export function isStandardFlatModeKeySignature (signature: any): signature is StandardFlatModeKeySignature {
   return STANDARD_FLAT_MODE_KEY_SIGNATURES.includes(signature)
 }
 
-export const THEORETICAL_FLAT_MODE_KEY_SIGNATURES = ['8b', '9b', '10b', '11b', '12b', '13b', '14b'] as const
+export const THEORETICAL_FLAT_MODE_KEY_SIGNATURES = ['14b', '13b', '12b', '11b', '10b', '9b', '8b'] as const
 export type TheoreticalFlatModeKeySignature = typeof THEORETICAL_FLAT_MODE_KEY_SIGNATURES[number]
 export function isTheoreticalFlatModeKeySignature (signature: any): signature is TheoreticalFlatModeKeySignature {
   return THEORETICAL_FLAT_MODE_KEY_SIGNATURES.includes(signature)
 }
 
-export const MODE_KEY_SIGNATURES = [...NEUTRAL_MODE_KEY_SIGNATURES, ...STANDARD_SHARP_MODE_KEY_SIGNATURES, ...THEORETICAL_SHARP_MODE_KEY_SIGNATURES, ...STANDARD_FLAT_MODE_KEY_SIGNATURES, ...THEORETICAL_FLAT_MODE_KEY_SIGNATURES] as const
+export const MODE_KEY_SIGNATURES = [...NEUTRAL_MODE_KEY_SIGNATURES, ...STANDARD_SHARP_MODE_KEY_SIGNATURES, ...THEORETICAL_SHARP_MODE_KEY_SIGNATURES, ...THEORETICAL_FLAT_MODE_KEY_SIGNATURES, ...STANDARD_FLAT_MODE_KEY_SIGNATURES] as const
 export type ModeKeySignature = typeof MODE_KEY_SIGNATURES[number]
 export function isModeKeySignature (signature: any): signature is ModeKeySignature {
   return MODE_KEY_SIGNATURES.includes(signature)
@@ -630,6 +630,24 @@ export function locrianMode(): LocrianMode {
   }
 }
 
+export const MODE_BY_NAME: {
+  Ionian: IonianMode,
+  Dorian: DorianMode,
+  Phrygian: PhrygianMode,
+  Lydian: LydianMode,
+  Mixolydian: MixolydianMode,
+  Aeolian: AeolianMode,
+  Locrian: LocrianMode
+} = {
+  Ionian: ionianMode(),
+  Dorian: dorianMode(),
+  Phrygian: phrygianMode(),
+  Lydian: lydianMode(),
+  Mixolydian: mixolydianMode(),
+  Aeolian: aeolianMode(),
+  Locrian: locrianMode()
+}
+
 export function mode(modeName: 'Ionian'): IonianMode
 export function mode(modeName: 'Dorian'): DorianMode
 export function mode(modeName: 'Phrygian'): PhrygianMode
@@ -637,6 +655,7 @@ export function mode(modeName: 'Lydian'): LydianMode
 export function mode(modeName: 'Mixolydian'): MixolydianMode
 export function mode(modeName: 'Aeolian'): AeolianMode
 export function mode(modeName: 'Locrian'): LocrianMode
+export function mode(modeName: 'Ionian' | 'Dorian' | 'Phrygian' | 'Lydian' | 'Mixolydian' | 'Aeolian' | 'Locrian'): Mode
 export function mode(modeName: ModeName): Mode {
   switch (modeName) {
     case 'Ionian':
