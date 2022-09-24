@@ -251,25 +251,6 @@ export const INTERVAL_DATA: Record<ShortIntervalName, Interval> = {
   }
 }
 
-export function intervalByDegree(modeName: ModeName): Record<ModeDegree, Interval> {
-  const intervalByDegree: { [key in ModeDegree]?: Interval } = {}
-  MODE_BASE_BY_NAME[modeName].intervals.forEach((intervalShortName, index) => {
-    if (index === 7) {
-      return
-    }
-
-    const neutralInterval = interval(intervalShortName)
-    const sharpInterval = interval(wrapValue(neutralInterval.length + 1, 13)) // 13 because we want perfect octaves on #7
-    const flatInterval = interval(wrapValue(neutralInterval.length - 1, 12))
-
-    intervalByDegree[`${index + 1}` as ModeDegree] = neutralInterval
-    intervalByDegree[`#${index + 1}` as ModeDegree] = sharpInterval
-    intervalByDegree[`b${index + 1}` as ModeDegree] = flatInterval
-  })
-
-  return intervalByDegree as Record<ModeDegree, Interval>
-}
-
 export function getIntervalBetweenIntervals(first: IntervalIdentifier, second: IntervalIdentifier): IntervalDistance {
   const firstInterval = interval(first)
   const secondInterval = interval(second)
