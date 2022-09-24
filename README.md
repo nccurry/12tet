@@ -109,6 +109,10 @@ const gIonian = key('G', 'Ionian')
 // Interact with the key
 console.log(gIonian.signature) // 1#
 console.log(gIonian.tonic) // G
+console.log(gIonian.notes) // []
+console.log(gIonian.toneByDegree['1'])
+console.log(gIonian.noteByDegree['5'])
+console.log(gIonian.degreeByNote['G'])
 console.log(gIonian.enharmonicEquivalents) // ['F##', 'Abb']
 ```
 

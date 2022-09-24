@@ -243,7 +243,7 @@ export interface Key {
   readonly signature: ModeKeySignature
   readonly toneByDegree: Record<ModeDegree, Tone>
   readonly noteByDegree: Record<ModeDegree, Note>
-  readonly degreesByNote: { [key in Note]?: ModeDegree }
+  readonly degreeByNote: { [key in Note]?: ModeDegree }
   readonly enharmonicEquivalents: Note[]
   readonly theoreticalKey: boolean
 }
@@ -310,7 +310,7 @@ export function key(tonic: Tonic, modeName: ModeName): Key | TypeError {
     notes: notes,
     toneByDegree: tonesByDegree,
     noteByDegree: notesByDegree,
-    degreesByNote: degreesByNote,
+    degreeByNote: degreesByNote,
     enharmonicEquivalents: diatonicTones[0].filter(note => note !== tonic && isModeTonicByModeName[modeName](note)),
     signature: signature,
     theoreticalKey: parseInt(signature.slice(0, -1)) > 7
