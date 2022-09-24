@@ -3,16 +3,16 @@ import {
 } from "../utils"
 import {
   Note,
-  TONES_BY_NOTE
+  tonesByNote
 } from "../note";
 import {
-  MODE_BASE_BY_NAME,
+  modeBaseByName,
   ModeDegree,
   ModeName
 } from "../mode";
 
 // Standard inter-octave interval names
-export const INTERVAL_NAMES = [
+const INTERVAL_NAMES = [
   'Perfect Unison',
   'Minor Second',
   'Major Second',
@@ -31,9 +31,10 @@ export type IntervalName = typeof INTERVAL_NAMES[number]
 export function isIntervalName (interval: any): interval is IntervalName {
   return INTERVAL_NAMES.includes(interval)
 }
+export const intervalNames: IntervalName[] = [...INTERVAL_NAMES]
 
 // Alternate and extra-octave interval names
-export const ALTERNATE_INTERVAL_NAMES = [
+const ALTERNATE_INTERVAL_NAMES = [
   'Semitone',
   'Tone',
   'Trisemitone',
@@ -88,20 +89,23 @@ export type AlternateIntervalName = typeof ALTERNATE_INTERVAL_NAMES[number]
 export function isAlternateIntervalName (interval: any): interval is AlternateIntervalName {
   return ALTERNATE_INTERVAL_NAMES.includes(interval)
 }
+export const alternateIntervalNames: AlternateIntervalName[] = [...ALTERNATE_INTERVAL_NAMES]
 
 // Abbreviated inter-octave interval names
-export const SHORT_INTERVAL_NAMES = ['P1', 'm2', 'M2', 'm3', 'M3', 'P4', 'TT', 'P5', 'm6', 'M6', 'm7', 'M7', 'P8'] as const
+const SHORT_INTERVAL_NAMES = ['P1', 'm2', 'M2', 'm3', 'M3', 'P4', 'TT', 'P5', 'm6', 'M6', 'm7', 'M7', 'P8'] as const
 export type ShortIntervalName = typeof SHORT_INTERVAL_NAMES[number]
 export function isShortIntervalName (interval: any): interval is ShortIntervalName {
   return SHORT_INTERVAL_NAMES.includes(interval)
 }
+export const shortIntervalNames: ShortIntervalName[] = [...SHORT_INTERVAL_NAMES]
 
 // A number representing the semitone distance between two intervals inside an octaves length
-export const STANDARD_INTERVAL_DISTANCES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-export type StandardIntervalDistance = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
+const STANDARD_INTERVAL_DISTANCES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as const
+export type StandardIntervalDistance = typeof STANDARD_INTERVAL_DISTANCES[number]
 export function isStandardIntervalDistance (intervalDistance: any): intervalDistance is StandardIntervalDistance {
   return intervalDistance <= 12
 }
+export const standardIntervalDistances: StandardIntervalDistance[] = [...STANDARD_INTERVAL_DISTANCES]
 
 // A number representative the semitone distance between two intervals outside an octaves length
 export type ComplexIntervalDistance = number
@@ -157,7 +161,7 @@ export function isIntervalIdentifier (intervalIdentifier: any): intervalIdentifi
 }
 
 // Metadata of the inter-octave intervals
-export const INTERVAL_DATA: Record<ShortIntervalName, Interval> = {
+export const intervalByShortIntervalName: Record<ShortIntervalName, Interval> = {
   P1: {
     length: 0,
     name: 'Perfect Unison',
@@ -259,8 +263,8 @@ export function getIntervalBetweenIntervals(first: IntervalIdentifier, second: I
 }
 
 export function getIntervalBetweenNotes(first: Note, second: Note): Interval {
-  const firstTone = TONES_BY_NOTE[first]
-  const secondTone = TONES_BY_NOTE[second]
+  const firstTone = tonesByNote[first]
+  const secondTone = tonesByNote[second]
   const distance = secondTone.index >= firstTone.index ? secondTone.index - firstTone.index : (11 - firstTone.index) + secondTone .index
   return interval(distance === 0 ? 12 : distance) // Prefer Perfect Octaves over Perfect Unisons
 }
@@ -270,7 +274,7 @@ export function interval(intervalIdentifier: IntervalIdentifier): Interval {
     return intervalIdentifier
 
   } else if (isIntervalName(intervalIdentifier)) {
-    const intervalData = Object.values(INTERVAL_DATA).find(element => element.name === intervalIdentifier)
+    const intervalData = Object.values(intervalByShortIntervalName).find(element => element.name === intervalIdentifier)
     if (!intervalData) {
       throw TypeError(`Could not find interval with name ${intervalIdentifier}`)
     } else {
@@ -278,10 +282,10 @@ export function interval(intervalIdentifier: IntervalIdentifier): Interval {
     }
 
   } else if (isShortIntervalName(intervalIdentifier)) {
-    return INTERVAL_DATA[intervalIdentifier]
+    return intervalByShortIntervalName[intervalIdentifier]
 
   } else if (isStandardIntervalDistance(intervalIdentifier)) {
-    const intervalData = Object.values(INTERVAL_DATA).find(element => element.length === intervalIdentifier)
+    const intervalData = Object.values(intervalByShortIntervalName).find(element => element.length === intervalIdentifier)
     if (!intervalData) {
       throw TypeError(`Could find find interval with distance ${intervalIdentifier}`)
     } else {
@@ -295,7 +299,7 @@ export function interval(intervalIdentifier: IntervalIdentifier): Interval {
       normalizedValue = 12
     }
 
-    const intervalData = Object.values(INTERVAL_DATA).find(element => element.length === normalizedValue)
+    const intervalData = Object.values(intervalByShortIntervalName).find(element => element.length === normalizedValue)
     if (!intervalData) {
       throw TypeError(`Could not find interval with distance ${intervalIdentifier}`)
     } else {

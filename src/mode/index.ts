@@ -25,218 +25,268 @@ import {
   PhrygianKey
 } from "../key"
 import {
+  removeDuplicates,
   wrapValue
 } from "../utils"
 
-export const MODE_NAMES = ['Ionian', 'Dorian', 'Phrygian', 'Lydian', 'Mixolydian', 'Aeolian', 'Locrian'] as const
+const MODE_NAMES = ['Ionian', 'Dorian', 'Phrygian', 'Lydian', 'Mixolydian', 'Aeolian', 'Locrian'] as const
 export type ModeName = typeof MODE_NAMES[number]
 export function isModeName (name: any): name is ModeName {
   return MODE_NAMES.includes(name)
 }
+export const modeNames: ModeName[] = [...MODE_NAMES]
 
-export const NEUTRAL_MODE_KEY_SIGNATURES = [''] as const
+const NEUTRAL_MODE_KEY_SIGNATURES = [''] as const
 export type NeutralModeKeySignature = typeof NEUTRAL_MODE_KEY_SIGNATURES[number]
 export function isNeutralModeKeySignature (signature: any): signature is NeutralModeKeySignature {
   return NEUTRAL_MODE_KEY_SIGNATURES.includes(signature)
 }
+export const neutralModeKeySignatures: NeutralModeKeySignature[] = [...NEUTRAL_MODE_KEY_SIGNATURES]
 
-export const STANDARD_SHARP_MODE_KEY_SIGNATURES = ['1#', '2#', '3#', '4#', '5#', '6#', '7#'] as const
+const STANDARD_SHARP_MODE_KEY_SIGNATURES = ['1#', '2#', '3#', '4#', '5#', '6#', '7#'] as const
 export type StandardSharpModeKeySignature = typeof STANDARD_SHARP_MODE_KEY_SIGNATURES[number]
 export function isStandardSharpModeKeySignature (signature: any): signature is StandardSharpModeKeySignature {
   return STANDARD_SHARP_MODE_KEY_SIGNATURES.includes(signature)
 }
+export const standardSharpModeKeySignatures: StandardSharpModeKeySignature[] = [...STANDARD_SHARP_MODE_KEY_SIGNATURES]
 
-export const THEORETICAL_SHARP_MODE_KEY_SIGNATURES = ['8#', '9#', '10#', '11#', '12#', '13#', '14#'] as const
+const THEORETICAL_SHARP_MODE_KEY_SIGNATURES = ['8#', '9#', '10#', '11#', '12#', '13#', '14#'] as const
 export type TheoreticalSharpModeKeySignature = typeof THEORETICAL_SHARP_MODE_KEY_SIGNATURES[number]
 export function isTheoreticalSharpModeKeySignature (signature: any): signature is TheoreticalSharpModeKeySignature {
   return THEORETICAL_SHARP_MODE_KEY_SIGNATURES.includes(signature)
 }
+export const TheoreticalSharpModeKeySignatures: TheoreticalSharpModeKeySignature[] = [...THEORETICAL_SHARP_MODE_KEY_SIGNATURES]
 
-export const STANDARD_FLAT_MODE_KEY_SIGNATURES = ['7b', '6b', '5b', '4b', '3b', '2b', '1b'] as const
+const SHARP_MODE_KEY_SIGNATURES = [...STANDARD_SHARP_MODE_KEY_SIGNATURES, ...THEORETICAL_SHARP_MODE_KEY_SIGNATURES] as const
+export type SharpModeKeySignature = typeof SHARP_MODE_KEY_SIGNATURES[number]
+export function isSharpModeKeySignature (signature: any): signature is SharpModeKeySignature {
+  return SHARP_MODE_KEY_SIGNATURES.includes(signature)
+}
+export const sharpModeKeySignatures: SharpModeKeySignature[] = [...SHARP_MODE_KEY_SIGNATURES]
+
+const STANDARD_FLAT_MODE_KEY_SIGNATURES = ['7b', '6b', '5b', '4b', '3b', '2b', '1b'] as const
 export type StandardFlatModeKeySignature = typeof STANDARD_FLAT_MODE_KEY_SIGNATURES[number]
 export function isStandardFlatModeKeySignature (signature: any): signature is StandardFlatModeKeySignature {
   return STANDARD_FLAT_MODE_KEY_SIGNATURES.includes(signature)
 }
+export const standardFlatModeKeySignatures: StandardFlatModeKeySignature[] = [...STANDARD_FLAT_MODE_KEY_SIGNATURES]
 
-export const THEORETICAL_FLAT_MODE_KEY_SIGNATURES = ['14b', '13b', '12b', '11b', '10b', '9b', '8b'] as const
+const THEORETICAL_FLAT_MODE_KEY_SIGNATURES = ['14b', '13b', '12b', '11b', '10b', '9b', '8b'] as const
 export type TheoreticalFlatModeKeySignature = typeof THEORETICAL_FLAT_MODE_KEY_SIGNATURES[number]
 export function isTheoreticalFlatModeKeySignature (signature: any): signature is TheoreticalFlatModeKeySignature {
   return THEORETICAL_FLAT_MODE_KEY_SIGNATURES.includes(signature)
 }
+export const theoreticalFlatModeKeySignatures: TheoreticalFlatModeKeySignature[] = [...THEORETICAL_FLAT_MODE_KEY_SIGNATURES]
 
-export const MODE_KEY_SIGNATURES = [...NEUTRAL_MODE_KEY_SIGNATURES, ...STANDARD_SHARP_MODE_KEY_SIGNATURES, ...THEORETICAL_SHARP_MODE_KEY_SIGNATURES, ...THEORETICAL_FLAT_MODE_KEY_SIGNATURES, ...STANDARD_FLAT_MODE_KEY_SIGNATURES] as const
+const FLAT_MODE_KEY_SIGNATURES = [...THEORETICAL_FLAT_MODE_KEY_SIGNATURES, ...STANDARD_FLAT_MODE_KEY_SIGNATURES] as const
+export type FlatModeKeySignature = typeof FLAT_MODE_KEY_SIGNATURES[number]
+export function isFlatModeKeySignature (signature: any): signature is FlatModeKeySignature {
+  return FLAT_MODE_KEY_SIGNATURES.includes(signature)
+}
+export const flatModeKeySignatures: FlatModeKeySignature[] = [...FLAT_MODE_KEY_SIGNATURES]
+
+const MODE_KEY_SIGNATURES = [...NEUTRAL_MODE_KEY_SIGNATURES, ...SHARP_MODE_KEY_SIGNATURES, ...FLAT_MODE_KEY_SIGNATURES] as const
 export type ModeKeySignature = typeof MODE_KEY_SIGNATURES[number]
 export function isModeKeySignature (signature: any): signature is ModeKeySignature {
   return MODE_KEY_SIGNATURES.includes(signature)
 }
+export const modeKeySignatures: ModeKeySignature[] = [...MODE_KEY_SIGNATURES]
 
-export const STANDARD_MODE_DEGREES = ['1', '2', '3', '4', '5', '6', '7'] as const
+const STANDARD_MODE_DEGREES = ['1', '2', '3', '4', '5', '6', '7'] as const
 export type StandardModeDegree = typeof STANDARD_MODE_DEGREES[number]
 export function isStandardModeDegree (degree: any): degree is StandardModeDegree {
   return STANDARD_MODE_DEGREES.includes(degree)
 }
+export const standardModeDegrees: StandardModeDegree[] = [...STANDARD_MODE_DEGREES]
 
-export const ALTERED_MODE_DEGREES = ['b1', '#1', 'b2', '#2', 'b3', '#3', 'b4', '#4', 'b5', '#5', 'b6', '#6', 'b7', '#7'] as const
+const ALTERED_MODE_DEGREES = ['b1', '#1', 'b2', '#2', 'b3', '#3', 'b4', '#4', 'b5', '#5', 'b6', '#6', 'b7', '#7'] as const
 export type AlteredModeDegree = typeof ALTERED_MODE_DEGREES[number]
 export function isAlteredModeDegree (degree: any): degree is AlteredModeDegree {
   return ALTERED_MODE_DEGREES.includes(degree)
 }
+export const alteredModeDegrees: AlteredModeDegree[] = [...ALTERED_MODE_DEGREES]
 
-export const MODE_DEGREES = [...STANDARD_MODE_DEGREES, ...ALTERED_MODE_DEGREES] as const
+const MODE_DEGREES = [...STANDARD_MODE_DEGREES, ...ALTERED_MODE_DEGREES] as const
 export type ModeDegree = typeof MODE_DEGREES[number]
 export function isModeDegree (degree: any): degree is ModeDegree {
   return MODE_DEGREES.includes(degree)
 }
+export const modeDegrees: ModeDegree[] = [...MODE_DEGREES]
 
-export const MODE_DEGREE_NAMES = ['Tonic', 'Supertonic', 'Mediant', 'Subdominant', 'Dominant', 'Submediant', 'Subtonic', 'Leading Tone'] as const
+const MODE_DEGREE_NAMES = ['Tonic', 'Supertonic', 'Mediant', 'Subdominant', 'Dominant', 'Submediant', 'Subtonic', 'Leading Tone'] as const
 export type ModeDegreeName = typeof MODE_DEGREE_NAMES[number]
 export function isModeDegreeName (degreeName: any): degreeName is ModeDegreeName {
   return MODE_DEGREE_NAMES.includes(degreeName)
 }
+export const modeDegreeNames: ModeDegreeName[] = [...MODE_DEGREE_NAMES]
 
-export const IONIAN_STANDARD_TONICS = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#', 'Cb', 'Gb', 'Db', 'Ab', 'Eb', 'Bb', 'F'] as const
+const IONIAN_STANDARD_TONICS = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#', 'Cb', 'Gb', 'Db', 'Ab', 'Eb', 'Bb', 'F'] as const
 export type IonianStandardTonic = typeof IONIAN_STANDARD_TONICS[number]
 export function isIonianStandardTonic (note: any): note is IonianStandardTonic {
   return IONIAN_STANDARD_TONICS.includes(note)
 }
+export const ionianStandardTonics: IonianStandardTonic[] = [...IONIAN_STANDARD_TONICS]
 
-export const IONIAN_THEORETICAL_TONICS = ['G#', 'D#', 'A#', 'E#', 'B#', 'F##', 'C##', 'Cbb', 'Gbb', 'Dbb', 'Abb', 'Ebb', 'Bbb', 'Fb'] as const
+const IONIAN_THEORETICAL_TONICS = ['G#', 'D#', 'A#', 'E#', 'B#', 'F##', 'C##', 'Cbb', 'Gbb', 'Dbb', 'Abb', 'Ebb', 'Bbb', 'Fb'] as const
 export type IonianTheoreticalTonic = typeof IONIAN_THEORETICAL_TONICS[number]
 export function isIonianTheoreticalTonic (note: any): note is IonianTheoreticalTonic {
   return IONIAN_THEORETICAL_TONICS.includes(note)
 }
+export const ionianTheoreticalTonics: IonianTheoreticalTonic[] = [...IONIAN_THEORETICAL_TONICS]
 
-export const IONIAN_TONICS = [...IONIAN_STANDARD_TONICS, ...IONIAN_THEORETICAL_TONICS] as const
+const IONIAN_TONICS = [...IONIAN_STANDARD_TONICS, ...IONIAN_THEORETICAL_TONICS] as const
 export type IonianTonic = typeof IONIAN_TONICS[number]
 export function isIonianTonic (note: any): note is IonianTonic {
   return IONIAN_TONICS.includes(note)
 }
+export const ionianTonics: IonianTonic[] = [...IONIAN_TONICS]
 
-export const DORIAN_STANDARD_TONICS = ['D', 'A', 'E', 'B', 'F#', 'C#', 'G#', 'D#', 'Db', 'Ab', 'Eb', 'Bb', 'F', 'C', 'G'] as const
+const DORIAN_STANDARD_TONICS = ['D', 'A', 'E', 'B', 'F#', 'C#', 'G#', 'D#', 'Db', 'Ab', 'Eb', 'Bb', 'F', 'C', 'G'] as const
 export type DorianStandardTonic = typeof DORIAN_STANDARD_TONICS[number]
 export function isDorianStandardTonic (note: any): note is DorianStandardTonic {
   return DORIAN_STANDARD_TONICS.includes(note)
 }
+export const dorianStandardTonics: DorianStandardTonic[] = [...DORIAN_STANDARD_TONICS]
 
-export const DORIAN_THEORETICAL_TONICS = ['A#', 'E#', 'B#', 'F##', 'C##', 'G##', 'D##', 'Dbb', 'Abb', 'Ebb', 'Bbb', 'Fb', 'Cb', 'Gb'] as const
+const DORIAN_THEORETICAL_TONICS = ['A#', 'E#', 'B#', 'F##', 'C##', 'G##', 'D##', 'Dbb', 'Abb', 'Ebb', 'Bbb', 'Fb', 'Cb', 'Gb'] as const
 export type DorianTheoreticalTonic = typeof DORIAN_THEORETICAL_TONICS[number]
 export function isDorianTheoreticalTonic (note: any): note is DorianTheoreticalTonic {
   return DORIAN_THEORETICAL_TONICS.includes(note)
 }
+export const dorianTheoreticalTonics: DorianTheoreticalTonic[] = [...DORIAN_THEORETICAL_TONICS]
 
-export const DORIAN_TONICS = [...DORIAN_STANDARD_TONICS, ...DORIAN_THEORETICAL_TONICS] as const
+const DORIAN_TONICS = [...DORIAN_STANDARD_TONICS, ...DORIAN_THEORETICAL_TONICS] as const
 export type DorianTonic = typeof DORIAN_TONICS[number]
 export function isDorianTonic (note: any): note is DorianTonic {
   return DORIAN_TONICS.includes(note)
 }
+export const dorianTonics: DorianTonic[] = [...DORIAN_TONICS]
 
-export const PHRYGIAN_STANDARD_TONICS = ['E', 'B', 'F#', 'C#', 'G#', 'D#', 'A#', 'E#', 'Eb', 'Bb', 'F', 'C', 'G', 'D', 'A'] as const
+const PHRYGIAN_STANDARD_TONICS = ['E', 'B', 'F#', 'C#', 'G#', 'D#', 'A#', 'E#', 'Eb', 'Bb', 'F', 'C', 'G', 'D', 'A'] as const
 export type PhrygianStandardTonic = typeof PHRYGIAN_STANDARD_TONICS[number]
 export function isPhrygianStandardTonic (note: any): note is PhrygianStandardTonic {
   return PHRYGIAN_STANDARD_TONICS.includes(note)
 }
+export const phrygianStandardTonics: PhrygianStandardTonic[] = [...PHRYGIAN_STANDARD_TONICS]
 
-export const PHRYGIAN_THEORETICAL_TONICS = ['B#', 'F##', 'C##', 'G##', 'D##', 'A##', 'E##', 'Ebb', 'Bbb', 'Fb', 'Cb', 'Gb', 'Db', 'Ab'] as const
+const PHRYGIAN_THEORETICAL_TONICS = ['B#', 'F##', 'C##', 'G##', 'D##', 'A##', 'E##', 'Ebb', 'Bbb', 'Fb', 'Cb', 'Gb', 'Db', 'Ab'] as const
 export type PhrygianTheoreticalTonic = typeof PHRYGIAN_THEORETICAL_TONICS[number]
 export function isPhrygianTheoreticalTonic (note: any): note is PhrygianTheoreticalTonic {
   return PHRYGIAN_THEORETICAL_TONICS.includes(note)
 }
+export const phrygianTheoreticalTonics: PhrygianTheoreticalTonic[] = [...PHRYGIAN_THEORETICAL_TONICS]
 
-export const PHRYGIAN_TONICS = [...PHRYGIAN_STANDARD_TONICS, ...PHRYGIAN_THEORETICAL_TONICS] as const
+const PHRYGIAN_TONICS = [...PHRYGIAN_STANDARD_TONICS, ...PHRYGIAN_THEORETICAL_TONICS] as const
 export type PhrygianTonic = typeof PHRYGIAN_TONICS[number]
 export function isPhrygianTonic (note: any): note is PhrygianTonic {
   return PHRYGIAN_TONICS.includes(note)
 }
+export const phrygianTonics: PhrygianTonic[] = [...PHRYGIAN_TONICS]
 
-export const LYDIAN_STANDARD_TONICS = ['F', 'C', 'G', 'D', 'A', 'E', 'B', 'F#', 'Fb', 'Cb', 'Gb', 'Db', 'Ab', 'Eb', 'Bb'] as const
+const LYDIAN_STANDARD_TONICS = ['F', 'C', 'G', 'D', 'A', 'E', 'B', 'F#', 'Fb', 'Cb', 'Gb', 'Db', 'Ab', 'Eb', 'Bb'] as const
 export type LydianStandardTonic = typeof LYDIAN_STANDARD_TONICS[number]
 export function isLydianStandardTonic (note: any): note is LydianStandardTonic {
   return LYDIAN_STANDARD_TONICS.includes(note)
 }
+export const lydianStandardTonics: LydianStandardTonic[] = [...LYDIAN_STANDARD_TONICS]
 
-export const LYDIAN_THEORETICAL_TONICS = ['C#', 'G#', 'D#', 'A#', 'E#', 'B#', 'F##', 'Fbb', 'Cbb', 'Gbb', 'Dbb', 'Abb', 'Ebb', 'Bbb'] as const
+const LYDIAN_THEORETICAL_TONICS = ['C#', 'G#', 'D#', 'A#', 'E#', 'B#', 'F##', 'Fbb', 'Cbb', 'Gbb', 'Dbb', 'Abb', 'Ebb', 'Bbb'] as const
 export type LydianTheoreticalTonic = typeof LYDIAN_THEORETICAL_TONICS[number]
 export function isLydianTheoreticalTonic (note: any): note is LydianTheoreticalTonic {
   return LYDIAN_THEORETICAL_TONICS.includes(note)
 }
+export const lydianTheoreticalTonics: LydianTheoreticalTonic[] = [...LYDIAN_THEORETICAL_TONICS]
 
-export const LYDIAN_TONICS = [...LYDIAN_STANDARD_TONICS, ...LYDIAN_THEORETICAL_TONICS] as const
+const LYDIAN_TONICS = [...LYDIAN_STANDARD_TONICS, ...LYDIAN_THEORETICAL_TONICS] as const
 export type LydianTonic = typeof LYDIAN_TONICS[number]
 export function isLydianTonic (note: any): note is LydianTonic {
   return LYDIAN_TONICS.includes(note)
 }
+export const lydianTonics: LydianTonic[] = [...LYDIAN_TONICS]
 
-export const MIXOLYDIAN_STANDARD_TONICS = ['G', 'D', 'A', 'E', 'B', 'F#', 'C#', 'G#', 'Gb', 'Db', 'Ab', 'Eb', 'Bb', 'F', 'C'] as const
+const MIXOLYDIAN_STANDARD_TONICS = ['G', 'D', 'A', 'E', 'B', 'F#', 'C#', 'G#', 'Gb', 'Db', 'Ab', 'Eb', 'Bb', 'F', 'C'] as const
 export type MixolydianStandardTonic = typeof MIXOLYDIAN_STANDARD_TONICS[number]
 export function isMixolydianStandardTonic (note: any): note is MixolydianStandardTonic {
   return MIXOLYDIAN_STANDARD_TONICS.includes(note)
 }
+export const mixolydianStandardTonics: MixolydianStandardTonic[] = [...MIXOLYDIAN_STANDARD_TONICS]
 
-export const MIXOLYDIAN_THEORETICAL_TONICS = ['D#', 'A#', 'E#', 'B#', 'F##', 'C##', 'G##', 'Gbb', 'Dbb', 'Abb', 'Ebb', 'Bbb', 'Fb', 'Cb'] as const
+const MIXOLYDIAN_THEORETICAL_TONICS = ['D#', 'A#', 'E#', 'B#', 'F##', 'C##', 'G##', 'Gbb', 'Dbb', 'Abb', 'Ebb', 'Bbb', 'Fb', 'Cb'] as const
 export type MixolydianTheoreticalTonic = typeof MIXOLYDIAN_THEORETICAL_TONICS[number]
 export function isMixolydianTheoreticalTonic (note: any): note is MixolydianTheoreticalTonic {
   return MIXOLYDIAN_THEORETICAL_TONICS.includes(note)
 }
+export const mixolydianTheoreticalTonics: MixolydianTheoreticalTonic[] = [...MIXOLYDIAN_THEORETICAL_TONICS]
 
-export const MIXOLYDIAN_TONICS = [...MIXOLYDIAN_STANDARD_TONICS, ...MIXOLYDIAN_THEORETICAL_TONICS] as const
+const MIXOLYDIAN_TONICS = [...MIXOLYDIAN_STANDARD_TONICS, ...MIXOLYDIAN_THEORETICAL_TONICS] as const
 export type MixolydianTonic = typeof MIXOLYDIAN_TONICS[number]
 export function isMixolydianTonic (note: any): note is MixolydianTonic {
   return MIXOLYDIAN_TONICS.includes(note)
 }
+export const mixolydianTonics: MixolydianTonic[] = [...MIXOLYDIAN_TONICS]
 
-export const AEOLIAN_STANDARD_TONICS = ['A', 'E', 'B', 'F#', 'C#', 'G#', 'D#', 'A#', 'Ab', 'Eb', 'Bb', 'F', 'C', 'G', 'D'] as const
+const AEOLIAN_STANDARD_TONICS = ['A', 'E', 'B', 'F#', 'C#', 'G#', 'D#', 'A#', 'Ab', 'Eb', 'Bb', 'F', 'C', 'G', 'D'] as const
 export type AeolianStandardTonic = typeof AEOLIAN_STANDARD_TONICS[number]
 export function isAeolianStandardTonic (note: any): note is AeolianStandardTonic {
   return AEOLIAN_STANDARD_TONICS.includes(note)
 }
+export const aeolianStandardTonics: AeolianStandardTonic[] = [...AEOLIAN_STANDARD_TONICS]
 
-export const AEOLIAN_THEORETICAL_TONICS = ['E#', 'B#', 'F##', 'C##', 'G##', 'D##', 'A##', 'Abb', 'Ebb', 'Bbb', 'Fb', 'Cb', 'Gb', 'Db'] as const
+const AEOLIAN_THEORETICAL_TONICS = ['E#', 'B#', 'F##', 'C##', 'G##', 'D##', 'A##', 'Abb', 'Ebb', 'Bbb', 'Fb', 'Cb', 'Gb', 'Db'] as const
 export type AeolianTheoreticalTonic = typeof AEOLIAN_THEORETICAL_TONICS[number]
 export function isAeolianTheoreticalTonic (note: any): note is AeolianTheoreticalTonic {
   return AEOLIAN_THEORETICAL_TONICS.includes(note)
 }
+export const aeolianTheoreticalTonics: AeolianTheoreticalTonic[] = [...AEOLIAN_THEORETICAL_TONICS]
 
-export const AEOLIAN_TONICS = [...AEOLIAN_STANDARD_TONICS, ...AEOLIAN_THEORETICAL_TONICS] as const
+const AEOLIAN_TONICS = [...AEOLIAN_STANDARD_TONICS, ...AEOLIAN_THEORETICAL_TONICS] as const
 export type AeolianTonic = typeof AEOLIAN_TONICS[number]
 export function isAeolianTonic (note: any): note is AeolianTonic {
   return AEOLIAN_TONICS.includes(note)
 }
+export const aeolianTonics: AeolianTonic[] = [...AEOLIAN_TONICS]
 
-export const LOCRIAN_STANDARD_TONICS = ['B', 'F#', 'C#', 'G#', 'D#', 'A#', 'E#', 'B#', 'Bb', 'F', 'C', 'G', 'D', 'A', 'E'] as const
+const LOCRIAN_STANDARD_TONICS = ['B', 'F#', 'C#', 'G#', 'D#', 'A#', 'E#', 'B#', 'Bb', 'F', 'C', 'G', 'D', 'A', 'E'] as const
 export type LocrianStandardTonic = typeof LOCRIAN_STANDARD_TONICS[number]
 export function isLocrianStandardTonic (note: any): note is LocrianStandardTonic {
   return LOCRIAN_STANDARD_TONICS.includes(note)
 }
+export const locrianStandardTonics: LocrianStandardTonic[] = [...LOCRIAN_STANDARD_TONICS]
 
-export const LOCRIAN_THEORETICAL_TONICS = ['F##', 'C##', 'G##', 'D##', 'A##', 'E##', 'B##', 'Bbb', 'Fb', 'Cb', 'Gb', 'Db', 'Ab', 'Eb'] as const
+const LOCRIAN_THEORETICAL_TONICS = ['F##', 'C##', 'G##', 'D##', 'A##', 'E##', 'B##', 'Bbb', 'Fb', 'Cb', 'Gb', 'Db', 'Ab', 'Eb'] as const
 export type LocrianTheoreticalTonic = typeof LOCRIAN_THEORETICAL_TONICS[number]
 export function isLocrianTheoreticalTonic (note: any): note is LocrianTheoreticalTonic {
   return LOCRIAN_THEORETICAL_TONICS.includes(note)
 }
+export const locrianTheoreticalTonics: LocrianTheoreticalTonic[] = [...LOCRIAN_THEORETICAL_TONICS]
 
-export const LOCRIAN_TONICS = [...LOCRIAN_STANDARD_TONICS, ...LOCRIAN_THEORETICAL_TONICS] as const
+const LOCRIAN_TONICS = [...LOCRIAN_STANDARD_TONICS, ...LOCRIAN_THEORETICAL_TONICS] as const
 export type LocrianTonic = typeof LOCRIAN_TONICS[number]
 export function isLocrianTonic (note: any): note is LocrianTonic {
   return LOCRIAN_TONICS.includes(note)
 }
+export const locrianTonics: LocrianTonic[] = [...LOCRIAN_TONICS]
 
-export const STANDARD_TONICS = [...IONIAN_STANDARD_TONICS, ...DORIAN_STANDARD_TONICS, ...PHRYGIAN_STANDARD_TONICS, ...LYDIAN_STANDARD_TONICS, ...MIXOLYDIAN_STANDARD_TONICS, ...AEOLIAN_STANDARD_TONICS, ...LOCRIAN_STANDARD_TONICS] as const
+const STANDARD_TONICS = [...IONIAN_STANDARD_TONICS, ...DORIAN_STANDARD_TONICS, ...PHRYGIAN_STANDARD_TONICS, ...LYDIAN_STANDARD_TONICS, ...MIXOLYDIAN_STANDARD_TONICS, ...AEOLIAN_STANDARD_TONICS, ...LOCRIAN_STANDARD_TONICS] as const
 export type StandardTonic = typeof STANDARD_TONICS[number]
 export function isStandardTonic (note: any): note is StandardTonic {
   return STANDARD_TONICS.includes(note)
 }
+export const standardTonics: StandardTonic[] = removeDuplicates([...STANDARD_TONICS])
 
-export const THEORETICAL_TONICS = [...IONIAN_THEORETICAL_TONICS, ...DORIAN_THEORETICAL_TONICS, ...PHRYGIAN_THEORETICAL_TONICS, ...LYDIAN_THEORETICAL_TONICS, ...MIXOLYDIAN_THEORETICAL_TONICS, ...AEOLIAN_THEORETICAL_TONICS, ...LOCRIAN_THEORETICAL_TONICS] as const
+const THEORETICAL_TONICS = [...IONIAN_THEORETICAL_TONICS, ...DORIAN_THEORETICAL_TONICS, ...PHRYGIAN_THEORETICAL_TONICS, ...LYDIAN_THEORETICAL_TONICS, ...MIXOLYDIAN_THEORETICAL_TONICS, ...AEOLIAN_THEORETICAL_TONICS, ...LOCRIAN_THEORETICAL_TONICS] as const
 export type TheoreticalTonic = typeof THEORETICAL_TONICS[number]
 export function isTheoreticalTonic (note: any): note is TheoreticalTonic {
   return THEORETICAL_TONICS.includes(note)
 }
+export const theoreticalTonics: TheoreticalTonic[] = removeDuplicates([...THEORETICAL_TONICS])
 
-export const TONICS = [...STANDARD_TONICS, ...THEORETICAL_TONICS]
+const TONICS = [...STANDARD_TONICS, ...THEORETICAL_TONICS] as const
 export type Tonic = typeof TONICS[number]
 export function isTonic (note: any): note is Tonic {
   return TONICS.includes(note)
 }
+export const tonics: Tonic[] = removeDuplicates([...TONICS])
 
 // Maps mode names to the associated isModeTonic type guard
 export const isModeTonicByModeName: {
@@ -280,7 +330,7 @@ export interface ModeBase {
   readonly degreeAdjustmentFromIonian: readonly number[]
 }
 
-export const MODE_BASE_BY_NAME: Record<ModeName, ModeBase> = {
+export const modeBaseByName: Record<ModeName, ModeBase> = {
   Ionian: {
     name: 'Ionian',
     alternateName: 'Major',
@@ -564,7 +614,7 @@ export interface LocrianMode extends ModeBase {
 
 export function intervalByDegree(modeName: ModeName): Record<ModeDegree, Interval> {
   const intervalByDegree: { [key in ModeDegree]?: Interval } = {}
-  MODE_BASE_BY_NAME[modeName].intervals.forEach((intervalShortName, index) => {
+  modeBaseByName[modeName].intervals.forEach((intervalShortName, index) => {
     if (index === 7) {
       return
     }
@@ -585,7 +635,7 @@ export type Mode = IonianMode | DorianMode | PhrygianMode | LydianMode | Mixolyd
 
 export function ionianMode(): IonianMode {
   return {
-    ...MODE_BASE_BY_NAME['Ionian'],
+    ...modeBaseByName['Ionian'],
     tonics: IONIAN_TONICS,
     intervalByDegree: intervalByDegree('Ionian'),
     keyByTonic: keyByTonic('Ionian'),
@@ -595,7 +645,7 @@ export function ionianMode(): IonianMode {
 
 export function dorianMode(): DorianMode {
   return {
-    ...MODE_BASE_BY_NAME['Dorian'],
+    ...modeBaseByName['Dorian'],
     tonics: DORIAN_TONICS,
     intervalByDegree: intervalByDegree('Dorian'),
     keyByTonic: keyByTonic('Dorian'),
@@ -605,7 +655,7 @@ export function dorianMode(): DorianMode {
 
 export function phrygianMode(): PhrygianMode {
   return {
-    ...MODE_BASE_BY_NAME['Phrygian'],
+    ...modeBaseByName['Phrygian'],
     tonics: PHRYGIAN_TONICS,
     intervalByDegree: intervalByDegree('Phrygian'),
     keyByTonic: keyByTonic('Phrygian'),
@@ -615,7 +665,7 @@ export function phrygianMode(): PhrygianMode {
 
 export function lydianMode(): LydianMode {
   return {
-    ...MODE_BASE_BY_NAME['Lydian'],
+    ...modeBaseByName['Lydian'],
     tonics: LYDIAN_TONICS,
     intervalByDegree: intervalByDegree('Lydian'),
     keyByTonic: keyByTonic('Lydian'),
@@ -625,7 +675,7 @@ export function lydianMode(): LydianMode {
 
 export function mixolydianMode(): MixolydianMode {
   return {
-    ...MODE_BASE_BY_NAME['Mixolydian'],
+    ...modeBaseByName['Mixolydian'],
     tonics: MIXOLYDIAN_TONICS,
     intervalByDegree: intervalByDegree('Mixolydian'),
     keyByTonic: keyByTonic('Mixolydian'),
@@ -635,7 +685,7 @@ export function mixolydianMode(): MixolydianMode {
 
 export function aeolianMode(): AeolianMode {
   return {
-    ...MODE_BASE_BY_NAME['Aeolian'],
+    ...modeBaseByName['Aeolian'],
     tonics: AEOLIAN_TONICS,
     intervalByDegree: intervalByDegree('Aeolian'),
     keyByTonic: keyByTonic('Aeolian'),
@@ -645,7 +695,7 @@ export function aeolianMode(): AeolianMode {
 
 export function locrianMode(): LocrianMode {
   return {
-    ...MODE_BASE_BY_NAME['Locrian'],
+    ...modeBaseByName['Locrian'],
     tonics: LOCRIAN_TONICS,
     intervalByDegree: intervalByDegree('Locrian'),
     keyByTonic: keyByTonic('Locrian'),
@@ -653,7 +703,7 @@ export function locrianMode(): LocrianMode {
   }
 }
 
-export const MODE_BY_NAME: {
+export const modeByName: {
   Ionian: IonianMode,
   Dorian: DorianMode,
   Phrygian: PhrygianMode,

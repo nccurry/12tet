@@ -1,67 +1,77 @@
 import {
   getWrappedArrayElement,
-  removeArrayElement
+  removeArrayElement, removeDuplicates
 } from '../utils'
 
-export const NATURAL_NOTES = ['C', 'D', 'E', 'F', 'G', 'A', 'B'] as const
+const NATURAL_NOTES = ['C', 'D', 'E', 'F', 'G', 'A', 'B'] as const
 export type NaturalNote = typeof NATURAL_NOTES[number]
 export function isNaturalNote (note: any): note is NaturalNote {
   return NATURAL_NOTES.includes(note)
 }
+export const naturalNotes: NaturalNote[] = [...NATURAL_NOTES]
 
-export const STANDARD_SHARP_NOTES = ['F#', 'C#', 'G#', 'D#', 'A#', 'E#', 'B#'] as const
+const STANDARD_SHARP_NOTES = ['F#', 'C#', 'G#', 'D#', 'A#', 'E#', 'B#'] as const
 export type StandardSharpNote = typeof STANDARD_SHARP_NOTES[number]
 export function isStandardSharpNote (note: any): note is StandardSharpNote {
   return STANDARD_SHARP_NOTES.includes(note)
 }
+export const standardSharpNotes: StandardSharpNote[] = [...STANDARD_SHARP_NOTES]
 
-export const STANDARD_FLAT_NOTES = ['Bb', 'Eb', 'Ab', 'Db', 'Gb', 'Cb', 'Fb'] as const
+const STANDARD_FLAT_NOTES = ['Bb', 'Eb', 'Ab', 'Db', 'Gb', 'Cb', 'Fb'] as const
 export type StandardFlatNote = typeof STANDARD_FLAT_NOTES[number]
 export function isStandardFlatNote (note: any): note is StandardFlatNote {
   return STANDARD_FLAT_NOTES.includes(note)
 }
+export const standardFlatNotes: StandardFlatNote[] = [...STANDARD_FLAT_NOTES]
 
-export const STANDARD_ACCENTED_NOTES = [...STANDARD_SHARP_NOTES, ...STANDARD_FLAT_NOTES] as const
+const STANDARD_ACCENTED_NOTES = [...STANDARD_SHARP_NOTES, ...STANDARD_FLAT_NOTES] as const
 export type StandardAccentedNote = typeof STANDARD_ACCENTED_NOTES[number]
 export function isStandardAccentedNote (note: any): note is StandardAccentedNote {
   return STANDARD_ACCENTED_NOTES.includes(note)
 }
+export const standardAccentedNotes: StandardAccentedNote[] = [...STANDARD_ACCENTED_NOTES]
 
-export const STANDARD_NOTES = [...NATURAL_NOTES, ...STANDARD_SHARP_NOTES, ...STANDARD_FLAT_NOTES] as const
+const STANDARD_NOTES = [...NATURAL_NOTES, ...STANDARD_SHARP_NOTES, ...STANDARD_FLAT_NOTES] as const
 export type StandardNote = typeof STANDARD_NOTES[number]
 export function isStandardNote (note: any): note is StandardNote {
   return STANDARD_NOTES.includes(note)
 }
+export const standardNotes: StandardNote[] = removeDuplicates([...STANDARD_NOTES])
 
-export const THEORETICAL_SHARP_NOTES = ['C##', 'D##', 'E##', 'F##', 'G##', 'A##', 'B##'] as const
+const THEORETICAL_SHARP_NOTES = ['C##', 'D##', 'E##', 'F##', 'G##', 'A##', 'B##'] as const
 export type TheoreticalSharpNote = typeof THEORETICAL_SHARP_NOTES[number]
 export function isTheoreticalSharpNote (note: any): note is TheoreticalSharpNote {
   return THEORETICAL_SHARP_NOTES.includes(note)
 }
+export const theoreticalSharpNotes: TheoreticalSharpNote[] = [...THEORETICAL_SHARP_NOTES]
 
-export const THEORETICAL_FLAT_NOTES = ['Cbb', 'Dbb', 'Ebb', 'Fbb', 'Gbb', 'Abb', 'Bbb'] as const
+const THEORETICAL_FLAT_NOTES = ['Cbb', 'Dbb', 'Ebb', 'Fbb', 'Gbb', 'Abb', 'Bbb'] as const
 export type TheoreticalFlatNote = typeof THEORETICAL_FLAT_NOTES[number]
 export function isTheoreticalFlatNote (note: any): note is TheoreticalFlatNote {
   return THEORETICAL_FLAT_NOTES.includes(note)
 }
+export const theoreticalFlatNotes: TheoreticalFlatNote[] = [...THEORETICAL_FLAT_NOTES]
 
-export const THEORETICAL_NOTES = [...THEORETICAL_SHARP_NOTES, ...THEORETICAL_FLAT_NOTES] as const
+const THEORETICAL_NOTES = [...THEORETICAL_SHARP_NOTES, ...THEORETICAL_FLAT_NOTES] as const
 export type TheoreticalNote = typeof THEORETICAL_NOTES[number]
 export function isTheoreticalNote (note: any): note is TheoreticalNote {
   return THEORETICAL_NOTES.includes(note)
 }
+export const theoreticalNotes: TheoreticalNote[] = removeDuplicates([...THEORETICAL_NOTES])
 
-export const NOTES = [...STANDARD_NOTES, ...THEORETICAL_NOTES] as const
+const NOTES = [...STANDARD_NOTES, ...THEORETICAL_NOTES] as const
 export type Note = typeof NOTES[number]
 export function isNote (note: any): note is Note {
   return NOTES.includes(note)
 }
+export const notes: Note[] = removeDuplicates([...NOTES])
 
-export const NOTE_REGISTER = [0, 1, 2, 3, 4, 5, 6, 7, 8] as const
+const NOTE_REGISTER = [0, 1, 2, 3, 4, 5, 6, 7, 8] as const
 export type NoteRegister = typeof NOTE_REGISTER[number]
 export function isNoteRegister (register: any): register is NoteRegister {
   return NOTE_REGISTER.includes(register)
 }
+export const noteRegisters: NoteRegister[] = [...NOTE_REGISTER]
 
 export function getNaturalNoteRoot(note: Note): NaturalNote {
   return note[0] as NaturalNote
@@ -82,7 +92,7 @@ export function getNextNaturalNote(note: Note): NaturalNote {
 export type Tone = [Note, Note, Note] | [Note, Note]
 
 // All 12 tones in order
-export const TONES: Tone[] = [
+export const tones: Tone[] = [
   ['B#', 'C', 'Dbb'],
   ['B##', 'C#', 'Db'],
   ['C##', 'D', 'Ebb'],
@@ -98,9 +108,9 @@ export const TONES: Tone[] = [
 ]
 
 // A record mapping each note to its tone and its tones relative position
-function tonesByNote (): Record<Note, { tone: Tone, index: number }> {
+function getTonesByNote (): Record<Note, { tone: Tone, index: number }> {
   const tonesByNote: { [key in Note]?: { tone: Tone, index: number } } = {}
-  TONES.forEach((tone, index) => {
+  tones.forEach((tone, index) => {
     tone.forEach(note => {
       tonesByNote[note] = { tone, index }
     })
@@ -108,10 +118,10 @@ function tonesByNote (): Record<Note, { tone: Tone, index: number }> {
   return tonesByNote as Record<Note, { tone: Tone, index: number }>
 }
 
-export const TONES_BY_NOTE: Record<Note, { tone: Tone, index: number }> = tonesByNote()
+export const tonesByNote: Record<Note, { tone: Tone, index: number }> = getTonesByNote()
 
 export function enharmonicEquivalents(note: Note): Note[] {
-  const tone = TONES_BY_NOTE[note].tone
+  const tone = tonesByNote[note].tone
   const noteIndex = tone.indexOf(note)
   if (noteIndex !== -1) {
     return removeArrayElement(tone, noteIndex)

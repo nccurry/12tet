@@ -7,23 +7,26 @@ A Typescript library for working with Modes, Chords, Keys, and other abstraction
 Constants and functions to interact with musical [modes](https://en.wikipedia.org/wiki/Mode_(music)).
 
 ```typescript
-import {
-    MODE_NAMES,
-    IONIAN_TONICS,
-    AEOLIAN_STANDARD_TONICS,
-    mode,
-    ionianMode,
-    aeolianMode
-} from '12tet'
-
 // List all mode names
-console.log(MODE_NAMES) // ['Ionian', 'Dorian', 'Phrygian', ..., Locrian]
+console.log(modeNames) // ['Ionian', 'Dorian', 'Phrygian', ..., Locrian]
+
+// List all mode key signatures
+console.log(modeKeySignatures) // ['', '1#', ..., '2b', '1b']
+
+// List all mode degrees
+console.log(modeDegrees) // ['1', '2', ..., 'b7', '#7']
+
+// List all mode degree names
+console.log(modeDegreeNames) // ['Tonic', 'Supertonic', ..., 'Subtonic', 'Leading Tone']
 
 // List all tonic notes in the Ionian mode, including theoretical tonic notes
-console.log(IONIAN_TONICS) // ['C', 'G', 'D', 'A', 'E', ..., 'Bbb', 'Fb']
+console.log(ionianTonics) // ['C', 'G', 'D', 'A', 'E', ..., 'Bbb', 'Fb']
 
 // List all standard tonic notes in the Aeolian mode, ignoring theoretical tonic notes
-console.log(AEOLIAN_STANDARD_TONICS) // ['A',  'E',  'B',  'F#', 'C#', ..., 'Bb', 'F']
+console.log(aeolianStandardTonics) // ['A',  'E',  'B',  'F#', 'C#', ..., 'Bb', 'F']
+
+// List all tonics across every mode
+console.log(tonics) // ['C', 'G', ..., 'F']
 
 // Get the Ionian mode
 const ionianMode = mode('Ionian')
@@ -47,21 +50,14 @@ console.log(aeolianMode.key('F').notesByDegree['b4']) // A
 Constants and functions to interact with musical [intervals](https://en.wikipedia.org/wiki/Interval_(music)).
 
 ```typescript
-import {
-    INTERVAL_NAMES,
-    ALTERNATE_INTERVAL_NAMES,
-    INTERVAL_SHORT_NAMES,
-    interval
-} from '12tet'
-
 // List all interval names
-console.log(INTERVAL_NAMES) // ['Perfect Unison', 'Minor Second', 'Major Second', ..., 'Major Seventh', 'Perfect Octave']
+console.log(intervalNames) // ['Perfect Unison', 'Minor Second', 'Major Second', ..., 'Major Seventh', 'Perfect Octave']
 
 // List all alternate interval names
-console.log(ALTERNATE_INTERVAL_NAMES) // ['Semitone', 'Tone', 'Trisemitone', 'Tritone', ..., 'Half Step', 'Whole Step']
+console.log(alternateIntervalNames) // ['Semitone', 'Tone', 'Trisemitone', 'Tritone', ..., 'Half Step', 'Whole Step']
 
 // List all interval short names
-console.log(SHORT_INTERVAL_NAMES) // ['P1', 'm2', 'M2', 'm3', 'M3', 'P4', ..., M7, P8]
+console.log(shortIntervalNames) // ['P1', 'm2', 'M2', 'm3', 'M3', 'P4', ..., M7, P8]
 
 // Create new Interval instance with semitone distance
 const p8_1 = interval(12)
@@ -76,6 +72,9 @@ const p8_3 = interval('Perfect Octave')
 console.log(p8_1.name) // Perfect Octave
 console.log(p8_2.tension) // 0
 console.log(p8_3.alternateNames) // ['Augmented Seventh']
+
+// Get the interval distance between two notes
+console.log(getIntervalBetweenNotes('C', 'D')) // { length: 2, name: 'Major Second', ..., tension: 3 }
 ```
 
 ## Note
@@ -84,7 +83,19 @@ Constants and functions to interact with musical notes.
 
 ```typescript
 // List all Natural Notes
-console.log(NATURAL_NOTES) // ['C', 'D', 'E', 'F', 'G', 'A', 'B']
+console.log(naturalNotes) // ['C', 'D', 'E', 'F', 'G', 'A', 'B']
+
+// List all Standard Notes
+console.log(standardNotes) // ['C', 'D', ..., 'Cb', 'Fb']
+
+// List all Theoretical Notes
+console.log(theoreticalNotes) // ['C##', 'D##', 'E##', ..., 'Abb', 'Bbb']
+
+// List all note Registers
+console.log(noteRegisters) // [1, 2, 3, ..., 7, 8]
+
+// List enharmonic equivalents
+console.log(enharmonicEquivalents('C')) // ['B#', 'Dbb']
 ```
 
 ## Key
@@ -92,10 +103,6 @@ console.log(NATURAL_NOTES) // ['C', 'D', 'E', 'F', 'G', 'A', 'B']
 Constants and functions to interact with musical [keys](https://en.wikipedia.org/wiki/Key_(music)).
 
 ```typescript
-import {
-    key
-} from '12tet'
-
 // Create a new key
 const gIonian = key('G', 'Ionian')
 
@@ -110,11 +117,6 @@ console.log(gIonian.enharmonicEquivalents) // ['F##', 'Abb']
 Generate chord voicings
 
 ```typescript
-import {
-    chord,
-    chordVoicings,
-} from '12tet'
-
 const cMaj7SlashE = chord('C', {
     base: 'maj',
     extension: '7',

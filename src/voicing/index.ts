@@ -2,33 +2,33 @@ import {
   interval,
   getIntervalBetweenNotes,
   IntervalDistance,
-  IntervalIdentifier
 } from "../interval"
 import {
   Chord
 } from "../chord"
 import {
-  ionianMode,
   ModeDegree
 } from "../mode"
 import {
-  getNaturalNoteRoot, isNote,
+  getNaturalNoteRoot,
+  isNote,
   NaturalNote,
   Note
-} from "../note";
+} from "../note"
 import {
   generateOrderedCombinations,
   removeDuplicates
-} from "../utils";
+} from "../utils"
 import {
   key
-} from "../key";
+} from "../key"
 
-export const NOTE_PITCHES = [0, 1, 2 ,3, 4, 5, 6, 7, 8] as const
+const NOTE_PITCHES = [0, 1, 2 ,3, 4, 5, 6, 7, 8] as const
 export type NotePitch = typeof NOTE_PITCHES[number]
 export function isNotePitch (notePitch: any): notePitch is NotePitch {
   return NOTE_PITCHES.includes(notePitch)
 }
+export const notePitches: NotePitch[] = [...NOTE_PITCHES]
 
 export interface VoicingOptions {
   // Pitch for the root note of the voicing

@@ -14,56 +14,63 @@ import {
   Note,
 } from '../note'
 import {
-  ALTERED_MODE_DEGREES,
-  IonianTonic, isModeDegree,
-  MODE_DEGREES,
-  ModeDegree,
+  alteredModeDegrees,
+  IonianTonic,
+  isModeDegree,
+  ModeDegree, modeDegrees,
 } from '../mode'
 import {
   key
 } from "../key"
 
-export const DIATONIC_CHORD_BASES = ['maj', 'min', 'dim'] as const
+const DIATONIC_CHORD_BASES = ['maj', 'min', 'dim'] as const
 export type DiatonicChordBase = typeof DIATONIC_CHORD_BASES[number]
 export function isDiatonicChordBase (chordType: any): chordType is DiatonicChordBase {
   return DIATONIC_CHORD_BASES.includes(chordType)
 }
+export const diatonicChordBases: DiatonicChordBase[] = [...DIATONIC_CHORD_BASES]
 
-export const CHORD_BASES = [...DIATONIC_CHORD_BASES, 'dom', 'sus2', 'sus4', 'aug'] as const
+const CHORD_BASES = [...DIATONIC_CHORD_BASES, 'dom', 'sus2', 'sus4', 'aug'] as const
 export type ChordBase = typeof CHORD_BASES[number]
 export function isChordBase (chordType: any): chordType is ChordBase {
   return CHORD_BASES.includes(chordType)
 }
+export const chordBases: ChordBase[] = [...CHORD_BASES]
 
-export const CHORD_ADDITIONS = ['2', '4', '6', '9', '11', '13'] as const
+const CHORD_ADDITIONS = ['2', '4', '6', '9', '11', '13'] as const
 export type ChordAddition = typeof CHORD_ADDITIONS[number]
 export function isChordAddition (chordAddition: any): chordAddition is ChordAddition {
   return CHORD_ADDITIONS.includes(chordAddition)
 }
+export const chordAdditions: ChordAddition[] = [...CHORD_ADDITIONS]
 
-export const CHORD_EXTENSIONS = ['7', '9', '11', '13'] as const
+const CHORD_EXTENSIONS = ['7', '9', '11', '13'] as const
 export type ChordExtension = typeof CHORD_EXTENSIONS[number]
 export function isChordExtension (chordExtension: any): chordExtension is ChordExtension {
   return CHORD_EXTENSIONS.includes(chordExtension)
 }
+export const chordExtensions: ChordExtension[] = [...CHORD_EXTENSIONS]
 
-export const STANDARD_CHORD_DEGREES = [...MODE_DEGREES, '9', '11', '13'] as const
+const STANDARD_CHORD_DEGREES = [...modeDegrees, '9', '11', '13'] as const
 export type StandardChordDegree = typeof STANDARD_CHORD_DEGREES[number]
 export function isStandardChordDegree (degreeNumber: any): degreeNumber is StandardChordDegree {
   return STANDARD_CHORD_DEGREES.includes(degreeNumber)
 }
+export const standardChordDegrees: StandardChordDegree[] = [...STANDARD_CHORD_DEGREES]
 
-export const ALTERED_CHORD_DEGREES = [...ALTERED_MODE_DEGREES, 'b9', '#9', 'b11', '#11', 'b13', '#13'] as const
+const ALTERED_CHORD_DEGREES = [...alteredModeDegrees, 'b9', '#9', 'b11', '#11', 'b13', '#13'] as const
 export type AlteredChordDegree = typeof ALTERED_CHORD_DEGREES[number]
 export function isAlteredChordDegree (degreeNumber: any): degreeNumber is AlteredChordDegree {
   return ALTERED_CHORD_DEGREES.includes(degreeNumber)
 }
+export const alteredChordDegrees: AlteredChordDegree[] = [...ALTERED_CHORD_DEGREES]
 
-export const CHORD_DEGREES = [...STANDARD_CHORD_DEGREES, ...ALTERED_CHORD_DEGREES]
+const CHORD_DEGREES = [...STANDARD_CHORD_DEGREES, ...ALTERED_CHORD_DEGREES]
 export type ChordDegree = typeof CHORD_DEGREES[number]
 export function isChordDegree (degreeNumber: any): degreeNumber is ChordDegree {
   return CHORD_DEGREES.includes(degreeNumber)
 }
+export const chordDegrees: ChordDegree[] = [...CHORD_DEGREES]
 
 export function chordDegreeToModeDegree(chordDegree: ChordDegree): ModeDegree {
   switch (chordDegree) {
@@ -100,7 +107,7 @@ export function chordDegreesToModeDegrees(chordDegrees: ChordDegree[]): ModeDegr
 // \u1d47 -> superscript b
 // \u2070 -> superscript 0
 // \u2075 -> superscript 5
-export const CHORD_NUMERALS = [
+const CHORD_NUMERALS = [
   'I', 'i', 'i\u2070',
   'II', '\u1d47II', 'ii', 'ii\u2070',
   '\u1d47III', 'iii', '\u1d47iii', 'iii\u2070',
@@ -110,8 +117,12 @@ export const CHORD_NUMERALS = [
   '\u1d47VII', 'vii', '\u1d47vii', 'vii\u2070'
 ] as const
 export type ChordNumeral = typeof CHORD_NUMERALS[number]
+export function isChordNumeral (numeral: any): numeral is ChordNumeral {
+  return CHORD_NUMERALS.includes(numeral)
+}
+export const chordNumerals: ChordNumeral[] = [...CHORD_NUMERALS]
 
-const CHORD_DEGREES_BY_BASE: Record<ChordBase, ChordDegree[]> = {
+const chordDegreesByChordBase: Record<ChordBase, ChordDegree[]> = {
   maj: ['1', '3', '5', '7', '9', '11', '13'],
   // b3, b7
   min: ['1', 'b3', '5', 'b7', '9', '11', '13'],
@@ -243,7 +254,7 @@ function insertDegree(degrees: ModeDegree[] | ChordDegree[], degree: ModeDegree 
 export function chord(tonic: IonianTonic, type: ChordType): Chord {
   const chordKey = key(tonic, 'Ionian')
   const extensionIndex = type.extension ? Math.ceil(parseInt(type.extension) / 2) : 3
-  let chordDegrees: ChordDegree[] = CHORD_DEGREES_BY_BASE[type.base].slice(0, extensionIndex)
+  let chordDegrees: ChordDegree[] = chordDegreesByChordBase[type.base].slice(0, extensionIndex)
 
   if (type.additions) {
     type.additions.forEach(addition => {

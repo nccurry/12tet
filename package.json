@@ -1,6 +1,6 @@
 {
   "name": "12tet",
-  "version": "0.0.4-alpha",
+  "version": "0.0.18-alpha",
   "description": "Music theory library for generating and working with chords, modes, intervals, etc.",
   "main": "./lib/src/index.js",
   "types": "./lib/src/index.d.ts",
@@ -13,8 +13,7 @@
     "lint": "eslint ./src/ --fix",
     "test:watch": "jest --watch",
     "test": "jest --coverage",
-    "typecheck": "tsc --noEmit",
-    "publish": "npm publish"
+    "typecheck": "tsc --noEmit"
   },
   "repository": {
     "type": "git",

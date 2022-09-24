@@ -1,3 +1,4 @@
+export * from './utils'
 export * from './chord'
 export * from './interval'
 export * from './key'

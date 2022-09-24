@@ -14,15 +14,15 @@ import {
   isTheoreticalFlatNote,
   isTheoreticalSharpNote,
   Tone,
-  TONES_BY_NOTE,
-  TONES,
+  tonesByNote,
+  tones,
 } from '../note'
 import {
   ModeDegree,
   ModeKeySignature,
   ModeName,
-  ALTERED_MODE_DEGREES,
-  STANDARD_MODE_DEGREES,
+  alteredModeDegrees,
+  standardModeDegrees,
   isModeKeySignature,
   IonianTonic,
   DorianTonic,
@@ -32,7 +32,7 @@ import {
   AeolianTonic,
   LocrianTonic,
   isModeTonicByModeName,
-  MODE_BASE_BY_NAME,
+  modeBaseByName,
   Tonic,
 } from '../mode'
 
@@ -64,10 +64,10 @@ export function getKeySignatureFromKeyNotes(notes: Note[]): ModeKeySignature | T
 
 // Given a tonic note and a mode, return an array of Tones
 export function getKeyTones(tonic: Note, modeName: ModeName): Tone[] {
-  const tone = TONES_BY_NOTE[tonic]
+  const tone = tonesByNote[tonic]
   let toneIndexes: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
   toneIndexes = rotateArray(toneIndexes, tone.index)
-  const modeTonePattern = MODE_BASE_BY_NAME[modeName].semitoneStructure
+  const modeTonePattern = modeBaseByName[modeName].semitoneStructure
 
   // Generate tones
   const keyTones: Tone[] = []
@@ -75,10 +75,10 @@ export function getKeyTones(tonic: Note, modeName: ModeName): Tone[] {
   while (keyTones.length < 7) {
     // If we're still at the tonic, just use the first toneIndex
     if (index === -1) {
-      keyTones.push(TONES[toneIndexes[0]])
+      keyTones.push(tones[toneIndexes[0]])
       // If not, count up the appropriate number of semitones for the mode
     } else {
-      keyTones.push(TONES[toneIndexes[sumTo([...modeTonePattern], index)]])
+      keyTones.push(tones[toneIndexes[sumTo([...modeTonePattern], index)]])
     }
     index++
   }
@@ -89,14 +89,14 @@ export function getKeyTones(tonic: Note, modeName: ModeName): Tone[] {
 export function getKeyTonesByDegree(tonic: Note, modeName: ModeName): Record<ModeDegree, Tone> {
   const keyTonesByDegree: { [key in ModeDegree]?: Tone } = {}
 
-  const tonicTone = TONES_BY_NOTE[tonic]
+  const tonicTone = tonesByNote[tonic]
   let toneIndexes: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-  const modeSemitoneLengths = MODE_BASE_BY_NAME[modeName].semitoneStructure
+  const modeSemitoneLengths = modeBaseByName[modeName].semitoneStructure
 
   // Start toneIndexes on the index of the tonic tone
   toneIndexes = rotateArray(toneIndexes, tonicTone.index)
 
-  STANDARD_MODE_DEGREES.forEach(standardModeDegree => {
+  standardModeDegrees.forEach(standardModeDegree => {
     // Get the number of semitones between the tonic and this tone
     // -1 to make an array index out of a mode degree
     // -1 because the modeTonePattern maps the semitones at the 0th element to the II degree of the mode
@@ -108,9 +108,9 @@ export function getKeyTonesByDegree(tonic: Note, modeName: ModeName): Record<Mod
     const sharpToneIndex = getWrappedArrayElement(toneIndexes, semitones + 1)
 
     // Set the values of the degree tone and its # and b equivalents
-    keyTonesByDegree[`b${standardModeDegree}`] = TONES[flatToneIndex]
-    keyTonesByDegree[standardModeDegree] = TONES[toneIndex]
-    keyTonesByDegree[`#${standardModeDegree}`] = TONES[sharpToneIndex]
+    keyTonesByDegree[`b${standardModeDegree}`] = tones[flatToneIndex]
+    keyTonesByDegree[standardModeDegree] = tones[toneIndex]
+    keyTonesByDegree[`#${standardModeDegree}`] = tones[sharpToneIndex]
   })
 
   return keyTonesByDegree as Record<ModeDegree, Tone>
@@ -167,7 +167,7 @@ export function convertDiatonicKeyTonesToNotes(tonic: Note, keyTones: [Tone, Ton
 // Get the note a sharp or flat above or below a given note
 export function adjustNote(note: Note, adjustment: 'b' | '#'): Note {
   const toneAdjustment = adjustment === 'b' ? -1 : 1
-  const tone = TONES[wrapValue(TONES_BY_NOTE[note].index + toneAdjustment, 12)]
+  const tone = tones[wrapValue(tonesByNote[note].index + toneAdjustment, 12)]
 
   const adjustedToneNaturalNote = tone.filter(isNaturalNote)
   const adjustedToneStandardSharpNote = tone.filter(isStandardSharpNote)
@@ -215,11 +215,11 @@ export function adjustNote(note: Note, adjustment: 'b' | '#'): Note {
 // It is assumed that the notes are given in order - i.e. index 0 is the first degree of the key
 export function generateNoteByDegree(notes: Note[]): Record<ModeDegree, Note> {
   const notesByDegree: { [key in ModeDegree]?: Note } = {}
-  STANDARD_MODE_DEGREES.forEach((degree, index)=> {
+  standardModeDegrees.forEach((degree, index)=> {
     notesByDegree[degree] = notes[index]
   })
 
-  ALTERED_MODE_DEGREES.forEach(degree => {
+  alteredModeDegrees.forEach(degree => {
     notesByDegree[degree] = adjustNote(notes[parseInt(degree[1]) - 1], degree[0] as 'b' | '#')
   })
 
@@ -289,7 +289,7 @@ export function key(tonic: Tonic, modeName: ModeName): Key | TypeError {
   }
 
   const tonesByDegree = getKeyTonesByDegree(tonic, modeName)
-  const diatonicTones = STANDARD_MODE_DEGREES.map(degree => tonesByDegree[degree]) as [Tone, Tone, Tone, Tone, Tone, Tone, Tone]
+  const diatonicTones = standardModeDegrees.map(degree => tonesByDegree[degree]) as [Tone, Tone, Tone, Tone, Tone, Tone, Tone]
 
   const notes = convertDiatonicKeyTonesToNotes(tonic, diatonicTones)
   if (isTypeError(notes)) {
