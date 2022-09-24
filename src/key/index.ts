@@ -33,7 +33,7 @@ import {
   LocrianTonic,
   isModeTonicByModeName,
   modeBaseByName,
-  Tonic,
+  Tonic, isNeutralModeKeySignature, isSharpModeKeySignature,
 } from '../mode'
 
 // Given the notes of a key, return the key signature
@@ -236,10 +236,23 @@ export function getDegreesByNote(notesByDegree: Record<ModeDegree, Note>): { [ke
   return degreesByNote
 }
 
+export function keySignatureToAccidentals(keySignature: ModeKeySignature): Note[] {
+  const sharps: Note[] = ['F#', 'C#', 'G#', 'D#', 'A#', 'E#', 'B#', 'F##', 'C##', 'G##', 'D##', 'A##', 'E##', 'B##']
+  const flats: Note[] = ['Bb', 'Eb', 'Ab', 'Db', 'Gb', 'Cb', 'Fb', 'Bbb', 'Ebb', 'Abb', 'Dbb', 'Gbb', 'Cbb', 'Fbb']
+  if (isNeutralModeKeySignature(keySignature)) {
+    return []
+  } else if (isSharpModeKeySignature(keySignature)) {
+    return sharps.slice(0, parseInt(keySignature.slice(0, -1)))
+  } else {
+    return flats.slice(0, parseInt(keySignature.slice(0, -1)))
+  }
+}
+
 export interface Key {
   readonly tonic: Tonic
   readonly mode: ModeName
   readonly notes: Note[]
+  readonly accidentals: Note[]
   readonly signature: ModeKeySignature
   readonly toneByDegree: Record<ModeDegree, Tone>
   readonly noteByDegree: Record<ModeDegree, Note>
@@ -308,6 +321,7 @@ export function key(tonic: Tonic, modeName: ModeName): Key | TypeError {
     tonic: tonic,
     mode: modeName,
     notes: notes,
+    accidentals: keySignatureToAccidentals(signature),
     toneByDegree: tonesByDegree,
     noteByDegree: notesByDegree,
     degreeByNote: degreesByNote,
