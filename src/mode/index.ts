@@ -55,7 +55,7 @@ export type TheoreticalSharpModeKeySignature = typeof THEORETICAL_SHARP_MODE_KEY
 export function isTheoreticalSharpModeKeySignature (signature: any): signature is TheoreticalSharpModeKeySignature {
   return THEORETICAL_SHARP_MODE_KEY_SIGNATURES.includes(signature)
 }
-export const TheoreticalSharpModeKeySignatures: TheoreticalSharpModeKeySignature[] = [...THEORETICAL_SHARP_MODE_KEY_SIGNATURES]
+export const theoreticalSharpModeKeySignatures: TheoreticalSharpModeKeySignature[] = [...THEORETICAL_SHARP_MODE_KEY_SIGNATURES]
 
 const SHARP_MODE_KEY_SIGNATURES = [...STANDARD_SHARP_MODE_KEY_SIGNATURES, ...THEORETICAL_SHARP_MODE_KEY_SIGNATURES] as const
 export type SharpModeKeySignature = typeof SHARP_MODE_KEY_SIGNATURES[number]

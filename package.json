@@ -1,6 +1,6 @@
 {
   "name": "12tet",
-  "version": "0.0.21-alpha",
+  "version": "0.0.22-alpha",
   "description": "Music theory library for generating and working with chords, modes, intervals, etc.",
   "main": "./lib/src/index.js",
   "types": "./lib/src/index.d.ts",
