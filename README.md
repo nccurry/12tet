@@ -8,41 +8,74 @@ Constants and functions to interact with musical [modes](https://en.wikipedia.or
 
 ```typescript
 // List all mode names
-console.log(modeNames) // ['Ionian', 'Dorian', 'Phrygian', ..., Locrian]
+import { ModeName, modeNames } from '12tet'
+
+const names: ModeName[] = modeNames
+console.log(names) // ['Ionian', 'Dorian', 'Phrygian', ..., Locrian]
 
 // List all mode key signatures
-console.log(modeKeySignatures) // ['', '1#', ..., '2b', '1b']
+import { ModeKeySignature, modeKeySignatures } from '12tet'
+
+const signatures: ModeKeySignature[] = modeKeySignatures
+console.log(signatures) // ['', '1#', ..., '2b', '1b']
 
 // List all mode degrees
-console.log(modeDegrees) // ['1', '2', ..., 'b7', '#7']
+import { ModeDegree, modeDegrees } from '12tet'
+
+const degrees: ModeDegree[] = modeDegrees
+console.log(degrees) // ['1', '2', ..., 'b7', '#7']
 
 // List all mode degree names
-console.log(modeDegreeNames) // ['Tonic', 'Supertonic', ..., 'Subtonic', 'Leading Tone']
+import { ModeDegreeName, modeDegreeNames } from '12tet'
+
+const degreeNames: ModeDegreeName[] = modeDegreeNames
+console.log(degreeNames) // ['Tonic', 'Supertonic', ..., 'Subtonic', 'Leading Tone']
 
 // List all tonic notes in the Ionian mode, including theoretical tonic notes
-console.log(ionianTonics) // ['C', 'G', 'D', 'A', 'E', ..., 'Bbb', 'Fb']
+import { IonianTonic, ionianTonics } from '12tet'
+
+const majorTonics: IonianTonic[] = ionianTonics
+console.log(majorTonics) // ['C', 'G', 'D', 'A', 'E', ..., 'Bbb', 'Fb']
 
 // List all standard tonic notes in the Aeolian mode, ignoring theoretical tonic notes
-console.log(aeolianStandardTonics) // ['A',  'E',  'B',  'F#', 'C#', ..., 'Bb', 'F']
+import { AeolianStandardTonic, aeolianStandardTonics } from '12tet'
+
+const minorStandardTonics: AeolianStandardTonic[] = aeolianStandardTonics
+console.log(minorStandardTonics) // ['A',  'E',  'B',  'F#', 'C#', ..., 'Bb', 'F']
 
 // List all tonics across every mode
-console.log(tonics) // ['C', 'G', ..., 'F']
+import { Tonic, tonics } from '12tet'
 
-// Get the Ionian mode
-const ionianMode = mode('Ionian')
+const allTonics: Tonic[] = tonics
+console.log(allTonics) // ['C', 'G', ..., 'F']
 
-// Interact with the Ionian mode
-console.log(ionianMode.tonics) // [ 'C',   'G',   'D',   'A',   'E', ..., 'Abb', 'Ebb', 'Bbb', 'Fb' ]
-console.log(ionianMode.chordBases) // [ 'maj', 'min', 'min', 'maj', 'maj', 'min', 'dim' ]
+// Get the Ionian mode and interact with it
+import { IonianMode, mode, IonianTonic, ChordBase } from '12tet'
 
-// Get the Aeolian mode
-const aeolianMode = mode('Aeolian')
+const ionianMode: IonianMode = mode('Ionian')
 
-// Interact with a specific Aeolian key
-console.log(aeolianMode.key('C').signature) // 3b
-console.log(aeolianMode.key('A').notes) // [ 'A', 'B', 'C', 'D', 'E', 'F', 'G' ]
-console.log(aeolianMode.key('D').enharmonicEquivalents) // [ 'C##', 'Ebb' ]
-console.log(aeolianMode.key('F').notesByDegree['b4']) // A
+const majorKeys: IonianTonic[] = ionianMode.tonics
+console.log(majorKeys) // [ 'C',   'G',   'D',   'A',   'E', ..., 'Abb', 'Ebb', 'Bbb', 'Fb' ]
+
+const minorChords: ChordBase[] = ionianMode.chordBases
+console.log(minorChords) // [ 'maj', 'min', 'min', 'maj', 'maj', 'min', 'dim' ]
+
+// Get the Aeolian mode and interact with it
+import { AeolianMode, mode, ModeKeySignature, Note } from '12tet'
+
+const aeolianMode: AeolianMode = mode('Aeolian')
+
+const cMinSignature: ModeKeySignature = aeolianMode.key('C').signature
+console.log(cMinSignature) // 3b
+
+const aMinNotes: Note[] = aeolianMode.key('A').notes
+console.log(aMinNotes) // [ 'A', 'B', 'C', 'D', 'E', 'F', 'G' ]
+
+const dMinEquivalents: Note[] = aeolianMode.key('D').enharmonicEquivalents
+console.log(dMinEquivalents) // [ 'C##', 'Ebb' ]
+
+const fMinb4: Note = aeolianMode.key('F').notesByDegree['b4']
+console.log(fMinb4) // A
 ```
 
 ## Interval
@@ -51,30 +84,42 @@ Constants and functions to interact with musical [intervals](https://en.wikipedi
 
 ```typescript
 // List all interval names
-console.log(intervalNames) // ['Perfect Unison', 'Minor Second', 'Major Second', ..., 'Major Seventh', 'Perfect Octave']
+import { IntervalName, intervalNames } from '12tet'
+
+const intervals: IntervalName[] = intervalNames
+console.log(intervals) // ['Perfect Unison', 'Minor Second', 'Major Second', ..., 'Major Seventh', 'Perfect Octave']
 
 // List all alternate interval names
-console.log(alternateIntervalNames) // ['Semitone', 'Tone', 'Trisemitone', 'Tritone', ..., 'Half Step', 'Whole Step']
+import { AlternateIntervalName, alternateIntervalNames } from '12tet'
+
+const alternateNames: AlternateIntervalName[] = alternateIntervalNames
+console.log(alternateNames) // ['Semitone', 'Tone', 'Trisemitone', 'Tritone', ..., 'Half Step', 'Whole Step']
 
 // List all interval short names
-console.log(shortIntervalNames) // ['P1', 'm2', 'M2', 'm3', 'M3', 'P4', ..., M7, P8]
+import { ShortIntervalName, shortIntervalNames } from '12tet'
 
-// Create new Interval instance with semitone distance
-const p8_1 = interval(12)
+const shortNames: ShortIntervalName[] = shortIntervalNames
+console.log(shortNames) // ['P1', 'm2', 'M2', 'm3', 'M3', 'P4', ..., M7, P8]
 
-// Create new Interval instance with short name
-const p8_2 = interval('P8')
+// Create intervals and interact with them
+import { Interval, interval, IntervalName, AlternateIntervalName } from '12tet'
+const p8_1: Interval = interval(12)
+const name: IntervalName = p8_1.name
+console.log(name) // Perfect Octave
 
-// Create new Interval instance with long name
-const p8_3 = interval('Perfect Octave')
+const p8_2: Interval = interval('P8')
+const tension: number = p8_2.tension
+console.log(tension) // 0
 
-// Interact with the Interval instance
-console.log(p8_1.name) // Perfect Octave
-console.log(p8_2.tension) // 0
-console.log(p8_3.alternateNames) // ['Augmented Seventh']
+const p8_3: Interval = interval('Perfect Octave')
+const intervalAlternateNames: AlternateIntervalName = p8_3.alternateNames
+console.log(intervalAlternateNames) // ['Augmented Seventh']
 
 // Get the interval distance between two notes
-console.log(getIntervalBetweenNotes('C', 'D')) // { length: 2, name: 'Major Second', ..., tension: 3 }
+import { Interval, getIntervalBetweenNotes } from '12tet'
+
+const intervalBetween: Interval = getIntervalBetweenNotes('C', 'D')
+console.log(intervalBetween) // { length: 2, name: 'Major Second', ..., tension: 3 }
 ```
 
 ## Note
