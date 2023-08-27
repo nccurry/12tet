@@ -17,7 +17,8 @@ import {
   alteredModeDegrees,
   IonianTonic,
   isModeDegree,
-  ModeDegree, modeDegrees,
+  ModeDegree,
+  modeDegrees,
 } from '../mode'
 import {
   key

@@ -515,6 +515,12 @@ function keyBySignature(modeName: 'Ionian' | 'Dorian' | 'Phrygian' | 'Lydian' | 
 }
 
 export interface IonianMode extends ModeBase {
+  // The list of standard mode tonics
+  readonly standardTonics: readonly IonianStandardTonic[]
+
+  // The list of theoretical mode tonics
+  readonly theoreticalTonics: readonly IonianTheoreticalTonic[]
+
   // The list of standard and theoretical mode tonics
   readonly tonics: readonly IonianTonic[]
 
@@ -529,6 +535,12 @@ export interface IonianMode extends ModeBase {
 }
 
 export interface DorianMode extends ModeBase {
+  // The list of standard mode tonics
+  readonly standardTonics: readonly DorianStandardTonic[]
+
+  // The list of theoretical mode tonics
+  readonly theoreticalTonics: readonly DorianTheoreticalTonic[]
+
   // The list of standard and theoretical mode tonics
   readonly tonics: readonly DorianTonic[]
 
@@ -543,6 +555,12 @@ export interface DorianMode extends ModeBase {
 }
 
 export interface PhrygianMode extends ModeBase {
+  // The list of standard mode tonics
+  readonly standardTonics: readonly PhrygianStandardTonic[]
+
+  // The list of theoretical mode tonics
+  readonly theoreticalTonics: readonly PhrygianTheoreticalTonic[]
+
   // The list of standard and theoretical mode tonics
   readonly tonics: readonly PhrygianTonic[]
 
@@ -557,6 +575,12 @@ export interface PhrygianMode extends ModeBase {
 }
 
 export interface LydianMode extends ModeBase {
+  // The list of standard mode tonics
+  readonly standardTonics: readonly LydianStandardTonic[]
+
+  // The list of theoretical mode tonics
+  readonly theoreticalTonics: readonly LydianTheoreticalTonic[]
+
   // The list of standard and theoretical mode tonics
   readonly tonics: readonly LydianTonic[]
 
@@ -571,6 +595,12 @@ export interface LydianMode extends ModeBase {
 }
 
 export interface MixolydianMode extends ModeBase {
+  // The list of standard mode tonics
+  readonly standardTonics: readonly MixolydianStandardTonic[]
+
+  // The list of theoretical mode tonics
+  readonly theoreticalTonics: readonly MixolydianTheoreticalTonic[]
+
   // The list of standard and theoretical mode tonics
   readonly tonics: readonly MixolydianTonic[]
 
@@ -585,6 +615,12 @@ export interface MixolydianMode extends ModeBase {
 }
 
 export interface AeolianMode extends ModeBase {
+  // The list of standard mode tonics
+  readonly standardTonics: readonly AeolianStandardTonic[]
+
+  // The list of theoretical mode tonics
+  readonly theoreticalTonics: readonly AeolianTheoreticalTonic[]
+
   // The list of standard and theoretical mode tonics
   readonly tonics: readonly AeolianTonic[]
 
@@ -599,6 +635,12 @@ export interface AeolianMode extends ModeBase {
 }
 
 export interface LocrianMode extends ModeBase {
+  // The list of standard mode tonics
+  readonly standardTonics: readonly LocrianStandardTonic[]
+
+  // The list of theoretical mode tonics
+  readonly theoreticalTonics: readonly LocrianTheoreticalTonic[]
+
   // The list of standard and theoretical mode tonics
   readonly tonics: readonly LocrianTonic[]
 
@@ -636,6 +678,8 @@ export type Mode = IonianMode | DorianMode | PhrygianMode | LydianMode | Mixolyd
 export function ionianMode(): IonianMode {
   return {
     ...modeBaseByName['Ionian'],
+    standardTonics: IONIAN_STANDARD_TONICS,
+    theoreticalTonics: IONIAN_THEORETICAL_TONICS,
     tonics: IONIAN_TONICS,
     intervalByDegree: intervalByDegree('Ionian'),
     keyByTonic: keyByTonic('Ionian'),
@@ -646,6 +690,8 @@ export function ionianMode(): IonianMode {
 export function dorianMode(): DorianMode {
   return {
     ...modeBaseByName['Dorian'],
+    standardTonics: DORIAN_STANDARD_TONICS,
+    theoreticalTonics: DORIAN_THEORETICAL_TONICS,
     tonics: DORIAN_TONICS,
     intervalByDegree: intervalByDegree('Dorian'),
     keyByTonic: keyByTonic('Dorian'),
@@ -656,6 +702,8 @@ export function dorianMode(): DorianMode {
 export function phrygianMode(): PhrygianMode {
   return {
     ...modeBaseByName['Phrygian'],
+    standardTonics: PHRYGIAN_STANDARD_TONICS,
+    theoreticalTonics: PHRYGIAN_THEORETICAL_TONICS,
     tonics: PHRYGIAN_TONICS,
     intervalByDegree: intervalByDegree('Phrygian'),
     keyByTonic: keyByTonic('Phrygian'),
@@ -666,6 +714,8 @@ export function phrygianMode(): PhrygianMode {
 export function lydianMode(): LydianMode {
   return {
     ...modeBaseByName['Lydian'],
+    standardTonics: LYDIAN_STANDARD_TONICS,
+    theoreticalTonics: LYDIAN_THEORETICAL_TONICS,
     tonics: LYDIAN_TONICS,
     intervalByDegree: intervalByDegree('Lydian'),
     keyByTonic: keyByTonic('Lydian'),
@@ -676,6 +726,8 @@ export function lydianMode(): LydianMode {
 export function mixolydianMode(): MixolydianMode {
   return {
     ...modeBaseByName['Mixolydian'],
+    standardTonics: MIXOLYDIAN_STANDARD_TONICS,
+    theoreticalTonics: MIXOLYDIAN_THEORETICAL_TONICS,
     tonics: MIXOLYDIAN_TONICS,
     intervalByDegree: intervalByDegree('Mixolydian'),
     keyByTonic: keyByTonic('Mixolydian'),
@@ -686,6 +738,8 @@ export function mixolydianMode(): MixolydianMode {
 export function aeolianMode(): AeolianMode {
   return {
     ...modeBaseByName['Aeolian'],
+    standardTonics: AEOLIAN_STANDARD_TONICS,
+    theoreticalTonics: AEOLIAN_THEORETICAL_TONICS,
     tonics: AEOLIAN_TONICS,
     intervalByDegree: intervalByDegree('Aeolian'),
     keyByTonic: keyByTonic('Aeolian'),
@@ -696,6 +750,8 @@ export function aeolianMode(): AeolianMode {
 export function locrianMode(): LocrianMode {
   return {
     ...modeBaseByName['Locrian'],
+    standardTonics: LOCRIAN_STANDARD_TONICS,
+    theoreticalTonics: LOCRIAN_THEORETICAL_TONICS,
     tonics: LOCRIAN_TONICS,
     intervalByDegree: intervalByDegree('Locrian'),
     keyByTonic: keyByTonic('Locrian'),
