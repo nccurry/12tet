@@ -8,3 +8,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.0.23-alpha] - 2023-08-27
 ### Added
 - Added `standardTonics` and `theoreticalTonics` fields to mode objects.
+
+### Changed
+- Updated all packages to latest
