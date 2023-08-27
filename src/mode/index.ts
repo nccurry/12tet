@@ -85,6 +85,20 @@ export function isFlatModeKeySignature (signature: any): signature is FlatModeKe
 }
 export const flatModeKeySignatures: FlatModeKeySignature[] = [...FLAT_MODE_KEY_SIGNATURES]
 
+const STANDARD_MODE_KEY_SIGNATURES = [...NEUTRAL_MODE_KEY_SIGNATURES, ...STANDARD_SHARP_MODE_KEY_SIGNATURES, ...STANDARD_FLAT_MODE_KEY_SIGNATURES] as const
+export type StandardModeKeySignature = typeof STANDARD_MODE_KEY_SIGNATURES[number]
+export function isStandardModeKeySignature (signature: any): signature is StandardModeKeySignature {
+  return STANDARD_MODE_KEY_SIGNATURES.includes(signature)
+}
+export const standardModeKeySignatures: StandardModeKeySignature[] = [...STANDARD_MODE_KEY_SIGNATURES]
+
+const THEORETICAL_MODE_KEY_SIGNATURES = [...THEORETICAL_SHARP_MODE_KEY_SIGNATURES, ...THEORETICAL_FLAT_MODE_KEY_SIGNATURES] as const
+export type TheoreticalModeKeySignature = typeof THEORETICAL_MODE_KEY_SIGNATURES[number]
+export function isTheoreticalModeKeySignature (signature: any): signature is TheoreticalModeKeySignature {
+  return THEORETICAL_MODE_KEY_SIGNATURES.includes(signature)
+}
+export const theoreticalModeKeySignatures: TheoreticalModeKeySignature[] = [...THEORETICAL_MODE_KEY_SIGNATURES]
+
 const MODE_KEY_SIGNATURES = [...NEUTRAL_MODE_KEY_SIGNATURES, ...SHARP_MODE_KEY_SIGNATURES, ...FLAT_MODE_KEY_SIGNATURES] as const
 export type ModeKeySignature = typeof MODE_KEY_SIGNATURES[number]
 export function isModeKeySignature (signature: any): signature is ModeKeySignature {
